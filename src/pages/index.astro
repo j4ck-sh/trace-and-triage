@@ -1,61 +1,203 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+const articles = await getCollection("research");
+
+const latestArticles = articles
+  .sort(
+    (a, b) =>
+      b.data.date.valueOf() - a.data.date.valueOf()
+
+  )
+  .slice(0, 3);
 ---
 
-<BaseLayout title="About | Trace & Triage">
+<BaseLayout
+  title="Trace & Triage"
+  description="Digital Forensics, Incident Response and Security Research"
+>
 
-<p class="case-id">ABOUT</p>
+<section class="hero">
 
-<h1>About Trace & Triage</h1>
+  <p class="case-id">
+    DIGITAL FORENSICS • INCIDENT RESPONSE • SECURITY RESEARCH
+  </p>
 
-<p>
-  I work within Digital Forensics and eDiscovery and have
-  a wider interest in incident response, malware analysis,
-  cybersecurity and emerging forms of digital evidence.
-</p>
+  <h1>
+    Trace <span class="accent">&</span> Triage
+  </h1>
 
-<p>
-  Trace & Triage is my personal research journal documenting
-  practical investigations conducted within controlled,
-  isolated or otherwise authorised environments.
-</p>
+  <p class="hero-subtitle">
+    Practical investigations into digital evidence,
+    malware behaviour, security incidents and
+    non-traditional forensic systems.
+  </p>
 
-
-<h2>Research Interests</h2>
-
-<ul>
-  <li>Digital Forensics</li>
-  <li>Incident Response</li>
-  <li>Malware Analysis</li>
-  <li>Threat Hunting</li>
-  <li>Security Operations</li>
-  <li>Drone Forensics</li>
-  <li>Vehicle Forensics</li>
-  <li>Mobile Forensics</li>
-  <li>Satellite & Space Cybersecurity</li>
-</ul>
+</section>
 
 
-<h2>Research Philosophy</h2>
+<section>
 
-<p>
-  My aim is to understand not only how security events occur,
-  but what evidence they leave behind and how that evidence
-  can be used to reconstruct activity.
-</p>
+  <h2>Latest Research</h2>
+
+  <p class="section-description">
+    My latest digital forensic investigations,
+    malware analysis and security research.
+  </p>
+
+  <div class="grid">
+
+    {latestArticles.map((article) => (
+
+      <a
+        class="card"
+        href={`/research/${article.id}`}
+      >
+
+        <span class="case-id">
+          {article.data.caseId}
+        </span>
+
+        <h3>
+          {article.data.title}
+        </h3>
+
+        <p class="muted">
+          {article.data.description}
+        </p>
+
+        <p class="article-meta">
+          {article.data.category}
+          ·
+          {article.data.date.toLocaleDateString("en-GB")}
+        </p>
+
+        <div class="tags">
+
+          {article.data.tags.map((tag) => (
+
+            <span class="tag">
+              {tag}
+            </span>
+
+          ))}
+
+        </div>
+
+      </a>
+
+    ))}
+
+  </div>
+
+  <p class="view-all">
+    <a href="/research">
+      View all research →
+    </a>
+  </p>
+
+</section>
+
+<style>
+
+.article-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 15px;
+}
+
+.tags {
+  margin-top: 15px;
+}
+
+.view-all {
+  margin-top: 25px;
+}
+
+</style>
 
 
-<h2>Disclaimer</h2>
+<section>
 
-<p>
-  Research and opinions published on Trace & Triage are my own
-  and do not represent my employer.
-</p>
+  <h2>Research Areas</h2>
 
-<p>
-  All security testing and malware analysis is performed within
-  isolated or authorised environments. Client, confidential,
-  classified and employer information is never published.
-</p>
+  <div class="grid">
+
+    <div class="card">
+      <span class="case-id">TT-DF</span>
+      <h3>Digital Forensics</h3>
+      <p class="muted">
+        Windows artefacts, timelines, disk analysis
+        and evidence reconstruction.
+      </p>
+    </div>
+
+    <div class="card">
+      <span class="case-id">TT-ML</span>
+      <h3>Malware Analysis</h3>
+      <p class="muted">
+        Static and dynamic analysis of malicious software.
+      </p>
+    </div>
+
+    <div class="card">
+      <span class="case-id">TT-IR</span>
+      <h3>Incident Response</h3>
+      <p class="muted">
+        Investigation and reconstruction of security incidents.
+      </p>
+    </div>
+
+    <div class="card">
+      <span class="case-id">TT-DR</span>
+      <h3>Drone Forensics</h3>
+      <p class="muted">
+        UAV telemetry, GPS and digital evidence.
+      </p>
+    </div>
+
+    <div class="card">
+      <span class="case-id">TT-SP</span>
+      <h3>Space Systems</h3>
+      <p class="muted">
+        Satellite cybersecurity, telemetry and space-system research.
+      </p>
+    </div>
+
+    <div class="card">
+      <span class="case-id">TT-TH</span>
+      <h3>Threat Hunting</h3>
+      <p class="muted">
+        Behaviour-based detection and investigative hunting.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+
+<section>
+
+  <h2>About Trace & Triage</h2>
+
+  <p class="section-description">
+    Trace & Triage documents my practical research across
+    digital forensics, incident response, malware analysis
+    and security.
+  </p>
+
+  <p>
+    The focus is not simply on identifying malicious activity,
+    but understanding what evidence remains afterwards and how
+    that evidence can be used to reconstruct what happened.
+  </p>
+
+  <a href="/about">
+    More about the project →
+  </a>
+
+</section>
 
 </BaseLayout>

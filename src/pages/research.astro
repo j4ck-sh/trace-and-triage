@@ -1,0 +1,84 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Get every article from the research collection
+const articles = await getCollection("research");
+
+// Newest articles first
+const sortedArticles = articles.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout title="Research | Trace & Triage">
+
+  <p class="case-id">
+    RESEARCH ARCHIVE
+  </p>
+
+  <h1>Research</h1>
+
+  <p class="hero-subtitle">
+    Digital forensic investigations, malware analysis,
+    incident response and security research.
+  </p>
+
+  <div class="grid">
+
+    {sortedArticles.map((article) => (
+
+      <a
+        class="card"
+        href={`/research/${article.id}`}
+      >
+
+        <span class="case-id">
+          {article.data.caseId}
+        </span>
+
+        <h3>
+          {article.data.title}
+        </h3>
+
+        <p class="muted">
+          {article.data.description}
+        </p>
+
+        <p class="article-meta">
+          {article.data.category}
+          ·
+          {article.data.date.toLocaleDateString("en-GB")}
+        </p>
+
+        <div class="tags">
+
+          {article.data.tags.map((tag) => (
+            <span class="tag">
+              {tag}
+            </span>
+          ))}
+
+        </div>
+
+      </a>
+
+    ))}
+
+  </div>
+
+</BaseLayout>
+
+<style>
+
+.article-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 15px;
+}
+
+.tags {
+  margin-top: 15px;
+}
+
+</style>
