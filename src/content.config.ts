@@ -32,6 +32,13 @@ const research = defineCollection({
       ])
       .optional(),
 
+      draft: z.boolean().default(false),
+
+      platform: z.string().optional(),
+      environment: z.string().optional(),
+      status: z.string().default("Completed"),
+      heroImage: z.string().optional(),
+
   }),
 
 });

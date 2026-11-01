@@ -10,6 +10,12 @@ tags:
 tools:
   - Event Viewer
 difficulty: "Beginner"
+
+draft: false
+
+platform: "Windows 11"
+environment: "Isolated Test Lab"
+status: "Completed"
 ---
 
 # Executive Summary

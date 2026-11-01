@@ -2,7 +2,10 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const articles = await getCollection("research");
+const articles = await getCollection(
+  "research",
+  ({ data }) => !data.draft
+);
 
 const latestArticles = articles
   .sort(
