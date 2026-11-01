@@ -1,0 +1,71 @@
+<header>
+  <nav>
+    <a class="brand" href="/">TRACE & TRIAGE</a>
+
+    <div class="links">
+      <a href="/research">Research</a>
+      <a href="/projects">Projects</a>
+      <a href="/certifications">Certifications</a>
+      <a href="/about">About</a>
+    </div>
+  </nav>
+</header>
+
+<style>
+  header {
+    border-bottom: 1px solid var(--border);
+    background: rgba(11, 15, 20, 0.95);
+  }
+
+  nav {
+    max-width: var(--max-width);
+    margin: auto;
+
+    padding: 20px 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    color: var(--text);
+
+    font-family: Consolas, monospace;
+    font-weight: bold;
+
+    letter-spacing: 0.1em;
+  }
+
+  .brand:hover {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .links {
+    display: flex;
+    gap: 25px;
+  }
+
+  .links a {
+    color: var(--muted);
+  }
+
+  .links a:hover {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  @media (max-width: 700px) {
+    nav {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .links {
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+  }
+</style>
