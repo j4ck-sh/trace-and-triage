@@ -1,12 +1,16 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
 <header>
   <nav>
-    <a class="brand" href="/">TRACE & TRIAGE</a>
+    <a href={base}>TRACE & TRIAGE</a>
 
     <div class="links">
-      <a href="/research">Research</a>
-      <a href="/projects">Projects</a>
-      <a href="/certifications">Certifications</a>
-      <a href="/about">About</a>
+      <a href={`${base}research`}>Research</a>
+      <a href={`${base}projects`}>Projects</a>
+      <a href={`${base}certifications`}>Certifications</a>
+      <a href={`${base}about`}>About</a>
     </div>
   </nav>
 </header>

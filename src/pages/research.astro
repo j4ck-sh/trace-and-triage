@@ -2,6 +2,8 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
+const base = import.meta.env.BASE_URL;
+
 // Get every article from the research collection
 const articles = await getCollection(
   "research",
@@ -33,7 +35,7 @@ const sortedArticles = articles.sort(
 
       <a
         class="card"
-        href={`/research/${article.id}`}
+        href={`${base}research/${article.id}`}
       >
 
         <span class="case-id">

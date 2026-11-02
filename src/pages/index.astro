@@ -2,6 +2,8 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
+const base = import.meta.env.BASE_URL;
+
 const articles = await getCollection(
   "research",
   ({ data }) => !data.draft
@@ -55,7 +57,7 @@ const latestArticles = articles
 
       <a
         class="card"
-        href={`/research/${article.id}`}
+        href={`${base}research/${article.id}`}
       >
 
         <span class="case-id">
@@ -95,7 +97,7 @@ const latestArticles = articles
   </div>
 
   <p class="view-all">
-    <a href="/research">
+    <a href={`${base}research`}>
       View all research →
     </a>
   </p>
