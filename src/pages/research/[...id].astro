@@ -66,7 +66,10 @@ const imageUrl = article.data.heroImage
   description={article.data.description}
 >
 
-  <article class="research-article">
+  <article 
+    class="research-article"
+    data-pagefind-body
+  >
 
     <!-- ARTICLE HEADER -->
 
@@ -194,7 +197,7 @@ const imageUrl = article.data.heroImage
     <!-- Automatic TABLE of CONTENT -->
 
 {tocHeadings.length > 0 && (
-  <nav class="table-of-contents" aria-label="Article contents">
+  <nav class="table-of-contents" aria-label="Article contents" data-pagefind-body>
 
     <div class="toc-header">
       <span class="toc-label">ARTICLE CONTENTS</span>

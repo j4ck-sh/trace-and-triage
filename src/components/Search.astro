@@ -1,0 +1,100 @@
+
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<section class="search-section">
+  <label class="search-label" for="research-search">
+    SEARCH RESEARCH
+  </label>
+
+  <div id="research-search"></div>
+
+  <p id="search-error" class="search-error" hidden>
+    Search could not be loaded. Please refresh the page.
+  </p>
+</section>
+
+<link
+  rel="stylesheet"
+  href={`${base}pagefind/pagefind-ui.css`}
+/>
+
+<script is:inline define:vars={{ base }}>
+  function initialisePagefind() {
+    const container = document.getElementById("research-search");
+    const errorMessage = document.getElementById("search-error");
+
+    if (!container || container.dataset.initialised === "true") {
+      return;
+    }
+
+    const script = document.createElement("script");
+
+    script.src = base + "pagefind/pagefind-ui.js";
+
+    script.onload = () => {
+      if (typeof window.PagefindUI !== "function") {
+        console.error("PagefindUI is unavailable.");
+        if (errorMessage) errorMessage.hidden = false;
+        return;
+      }
+
+      new window.PagefindUI({
+        element: "#research-search",
+        showSubResults: true,
+        showImages: false
+      });
+
+      container.dataset.initialised = "true";
+    };
+
+    script.onerror = () => {
+      console.error("Failed to load Pagefind UI:", script.src);
+      if (errorMessage) errorMessage.hidden = false;
+    };
+
+    document.head.appendChild(script);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialisePagefind
+    );
+  } else {
+    initialisePagefind();
+  }
+</script>
+
+<style>
+  .search-section {
+    margin: 35px 0 45px;
+  }
+
+  .search-label {
+    display: block;
+    margin-bottom: 12px;
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+  }
+
+  .search-error {
+    color: #ff8585;
+    font-size: 0.9rem;
+  }
+
+  :global(.pagefind-ui) {
+    --pagefind-ui-primary: #52c7ea;
+    --pagefind-ui-text: #e8edf2;
+    --pagefind-ui-background: #111820;
+    --pagefind-ui-border: #24313d;
+    --pagefind-ui-tag: #17212b;
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 8px;
+    --pagefind-ui-font: inherit;
+  }
+</style>
