@@ -1,0 +1,263 @@
+
+---
+import {
+  getCollection,
+  type CollectionEntry
+} from "astro:content";
+
+interface Props {
+  currentArticle: CollectionEntry<"research">;
+}
+
+const { currentArticle } = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+
+// Load published articles only.
+const articles = await getCollection(
+  "research",
+  ({ data }) => !data.draft
+);
+
+// Normalise text for consistent comparisons.
+const normalise = (value: string) =>
+  value.trim().toLowerCase();
+
+// Get current article tags.
+const currentTags = new Set(
+  currentArticle.data.tags.map(normalise)
+);
+
+// Score articles by relevance.
+const relatedArticles = articles
+  // Never recommend the article currently being read.
+  .filter((article) => article.id !== currentArticle.id)
+
+  .map((article) => {
+    let score = 0;
+
+    // Same category = 3 points.
+    if (
+      normalise(article.data.category) ===
+      normalise(currentArticle.data.category)
+    ) {
+      score += 3;
+    }
+
+    // Each matching tag = 2 points.
+    for (const tag of article.data.tags) {
+      if (currentTags.has(normalise(tag))) {
+        score += 2;
+      }
+    }
+
+    return {
+      article,
+      score
+    };
+  })
+
+  // Only recommend articles with a genuine match.
+  .filter((item) => item.score > 0)
+
+  // Highest relevance first, then newest.
+  .sort(
+    (a, b) =>
+      b.score - a.score ||
+      b.article.data.date.valueOf() -
+      a.article.data.date.valueOf()
+  )
+
+  // Show a maximum of three recommendations.
+  .slice(0, 3);
+---
+
+{relatedArticles.length > 0 && (
+  <section
+    class="related-research"
+    aria-labelledby="related-research-heading"
+  >
+
+    <div class="related-header">
+      <div>
+        <p class="section-label">
+          CONTINUE INVESTIGATING
+        </p>
+
+        <h2 id="related-research-heading">
+          Related Research
+        </h2>
+      </div>
+
+      <a
+        class="view-all"
+        href={`${base}research/`}
+      >
+        View all research →
+      </a>
+    </div>
+
+    <div class="related-grid">
+      {relatedArticles.map(({ article }) => (
+
+        <a
+          class="related-card"
+          href={`${base}research/${article.id}/`}
+        >
+
+          <span class="related-case-id">
+            {article.data.caseId}
+          </span>
+
+          <h3>{article.data.title}</h3>
+
+          <p class="related-description">
+            {article.data.description}
+          </p>
+
+          <div class="related-meta">
+            <span>{article.data.category}</span>
+
+            <span>
+              {article.data.date.toLocaleDateString("en-GB")}
+            </span>
+          </div>
+
+          <div class="related-tags">
+            {article.data.tags.slice(0, 3).map((tag) => (
+              <span class="related-tag">{tag}</span>
+            ))}
+          </div>
+
+        </a>
+
+      ))}
+    </div>
+
+  </section>
+)}
+
+<style>
+  .related-research {
+    margin-top: 75px;
+    padding-top: 35px;
+    border-top: 1px solid var(--border);
+  }
+
+  .related-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .section-label {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .related-header h2 {
+    margin: 8px 0 0;
+    font-size: 1.8rem;
+  }
+
+  .view-all {
+    color: var(--accent);
+    font-size: 0.9rem;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(230px, 1fr));
+    gap: 18px;
+  }
+
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 12px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    color: var(--text);
+    text-decoration: none;
+
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .related-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+
+  .related-card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .related-case-id {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+  }
+
+  .related-card h3 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .related-description {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .related-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 12px;
+
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .related-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .related-tag {
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 600px) {
+    .related-research {
+      margin-top: 50px;
+    }
+
+    .related-card {
+      padding: 20px;
+    }
+  }
+</style>
