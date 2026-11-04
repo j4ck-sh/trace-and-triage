@@ -13,9 +13,6 @@ difficulty: "Beginner"
 
 draft: false
 
-heroImage: "/images/tt-sp-001/hero.png"
-HeroImageAlt: "Salellite orbiting Earth"
-
 platform: "Windows 11"
 environment: "Isolated Test Lab"
 status: "Completed"
@@ -29,6 +26,12 @@ If you can read this, the Trace & Triage article system is working.
 
 This is a test investigation.
 
+## Evidence Examination
+
+![Windows forensic Evidence](/trace-and-triage/public/images/tt-sp-001/hero.png)
+
+*Figure 1 - Example of evidence screenshot.*
+
 ## Findings
 
 The Markdown article successfully rendered.
@@ -36,3 +39,7 @@ The Markdown article successfully rendered.
 ## Conclusion
 
 Trace & Triage can now publish research articles.
+
+### Testing further
+
+oh yeah baby

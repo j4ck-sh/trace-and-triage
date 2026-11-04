@@ -16,10 +16,6 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   margin: 0;
   background: var(--background);
@@ -186,5 +182,130 @@ img {
 
   .hero {
     padding-top: 50px;
+  }
+}
+
+
+
+/* ==========================================
+   TRACE & TRIAGE - TABLE OF CONTENTS
+   ========================================== */
+
+.table-of-contents {
+  margin: 45px 0 60px;
+  padding: 28px 30px;
+  background: #111820;
+  border: 1px solid #24313d;
+  border-radius: 12px;
+}
+
+.toc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid #24313d;
+}
+
+.toc-label {
+  color: #52c7ea;
+  font-family: Consolas, monospace;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+}
+
+.toc-count {
+  color: #8d9aa6;
+  font-size: 0.8rem;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item a {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  color: #e8edf2;
+  text-decoration: none;
+}
+
+.toc-item a:hover {
+  background: #17212b;
+  color: #52c7ea;
+}
+
+.toc-number {
+  color: #52c7ea;
+  font-family: Consolas, monospace;
+  font-size: 0.8rem;
+}
+
+.toc-subsection {
+  padding-left: 25px;
+}
+
+.toc-subsection a {
+  color: #8d9aa6;
+  font-size: 0.9rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.article-content h2,
+.article-content h3 {
+  scroll-margin-top: 35px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+
+/* =========================================
+   TRACE & TRIAGE - ARTICLE CARD METADATA
+   ========================================= */
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 15px;
+
+  color: var(--muted);
+  font-family: Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.article-meta .reading-time {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.article-meta .meta-separator {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+/* Mobile styling */
+
+@media (max-width: 600px) {
+  .article-meta {
+    gap: 6px;
+    font-size: 0.8rem;
   }
 }

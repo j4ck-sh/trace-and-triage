@@ -1,26 +1,43 @@
+
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Search from "../components/Search.astro";
 
 const base = import.meta.env.BASE_URL;
 
-// Get every article from the research collection
+// Load published articles only
 const articles = await getCollection(
   "research",
   ({ data }) => !data.draft
 );
 
-// Newest articles first
+// Sort newest first
 const sortedArticles = articles.sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  (a, b) =>
+    b.data.date.valueOf() - a.data.date.valueOf()
 );
+
+// Generate categories from existing articles
+const categories = [
+  "All",
+  ...new Set(
+    sortedArticles.map((article) => article.data.category)
+  )
+];
+
+// Reading time section
+import {
+  getReadingTime,
+  formatReadingTime
+} from "../utils/readingTime";
+
+
 ---
 
 <BaseLayout title="Research | Trace & Triage">
 
-  <p class="case-id">
-    RESEARCH ARCHIVE
-  </p>
+  <p class="case-id">RESEARCH ARCHIVE</p>
 
   <h1>Research</h1>
 
@@ -28,23 +45,42 @@ const sortedArticles = articles.sort(
     Digital forensic investigations, malware analysis,
     incident response and security research.
   </p>
+  <Search />
 
-  <div class="grid">
+  <!-- CATEGORY FILTER BUTTONS -->
+
+  <div class="category-filters" aria-label="Filter research by category">
+
+    {categories.map((category) => (
+      <button
+        type="button"
+        class="filter-button"
+        data-filter={category}
+        aria-pressed={category === "All" ? "true" : "false"}
+      >
+        {category}
+      </button>
+    ))}
+
+  </div>
+
+  <!-- RESEARCH CARDS -->
+
+  <div class="grid research-grid">
 
     {sortedArticles.map((article) => (
 
       <a
-        class="card"
-        href={`${base}research/${article.id}`}
+        class="card research-card"
+        href={`${base}research/${article.id}/`}
+        data-category={article.data.category}
       >
 
         <span class="case-id">
           {article.data.caseId}
         </span>
 
-        <h3>
-          {article.data.title}
-        </h3>
+        <h3>{article.data.title}</h3>
 
         <p class="muted">
           {article.data.description}
@@ -52,18 +88,16 @@ const sortedArticles = articles.sort(
 
         <p class="article-meta">
           {article.data.category}
-          ·
+          .
           {article.data.date.toLocaleDateString("en-GB")}
+          .
+          {formatReadingTime(getReadingTime(article))}
         </p>
 
         <div class="tags">
-
-          {article.data.tags.map((tag) => (
-            <span class="tag">
-              {tag}
-            </span>
+          {article.data.tags.map((tag: string) => (
+            <span class="tag">{tag}</span>
           ))}
-
         </div>
 
       </a>
@@ -72,18 +106,121 @@ const sortedArticles = articles.sort(
 
   </div>
 
+  <p id="no-results" hidden>
+    No research articles found in this category.
+  </p>
+
 </BaseLayout>
 
 <style>
+  .category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 35px 0;
+  }
 
-.article-meta {
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin-top: 15px;
-}
+  .filter-button {
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9rem;
+    transition: 0.2s ease;
+  }
 
-.tags {
-  margin-top: 15px;
-}
+  .filter-button:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
 
+  .filter-button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0b0f14;
+    font-weight: 600;
+  }
+
+  .filter-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .article-meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-top: 15px;
+  }
+
+  .tags {
+    margin-top: 15px;
+  }
+
+  .research-card[hidden],
+  #no-results[hidden] {
+    display: none;
+  }
 </style>
+
+<script>
+  function setupFilters() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>(
+      ".filter-button"
+    );
+
+    const cards = document.querySelectorAll<HTMLElement>(
+      ".research-card"
+    );
+
+    const noResults = document.querySelector<HTMLElement>(
+      "#no-results"
+    );
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const selected = button.dataset.filter;
+        let visibleCount = 0;
+
+        // Update active button
+        buttons.forEach((otherButton) => {
+          const isActive = otherButton === button;
+
+          otherButton.classList.toggle("active", isActive);
+          otherButton.setAttribute(
+            "aria-pressed",
+            String(isActive)
+          );
+        });
+
+        // Show only matching articles
+        cards.forEach((card) => {
+          const matches =
+            selected === "All" ||
+            card.dataset.category === selected;
+
+          card.hidden = !matches;
+
+          if (matches) {
+            visibleCount++;
+          }
+        });
+
+        if (noResults) {
+          noResults.hidden = visibleCount > 0;
+        }
+      });
+    });
+
+    // Select All by default
+    const allButton = document.querySelector<HTMLButtonElement>(
+      '.filter-button[data-filter="All"]'
+    );
+
+    allButton?.classList.add("active");
+  }
+
+  document.addEventListener("DOMContentLoaded", setupFilters);
+</script>
