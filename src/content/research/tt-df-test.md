@@ -26,6 +26,12 @@ If you can read this, the Trace & Triage article system is working.
 
 This is a test investigation.
 
+## Evidence Examination
+
+![Windows forensic Evidence](/trace-and-triage/public/images/tt-sp-001/hero.png)
+
+*Figure 1 - Example of evidence screenshot.*
+
 ## Findings
 
 The Markdown article successfully rendered.

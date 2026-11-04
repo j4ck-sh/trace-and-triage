@@ -1,0 +1,209 @@
+
+<dialog id="image-lightbox" aria-label="Enlarged evidence image">
+  <div class="lightbox-content">
+    <div class="lightbox-toolbar">
+      <span id="lightbox-caption">Evidence image</span>
+
+      <div class="lightbox-controls">
+        <button type="button" id="zoom-out" aria-label="Zoom out">
+          −
+        </button>
+
+        <button type="button" id="zoom-reset" aria-label="Reset zoom">
+          100%
+        </button>
+
+        <button type="button" id="zoom-in" aria-label="Zoom in">
+          +
+        </button>
+
+        <button type="button" id="lightbox-close" aria-label="Close image">
+          ×
+        </button>
+      </div>
+    </div>
+
+    <div class="lightbox-viewport">
+        Image loaded properly
+      <img id="lightbox-image" alt="" />
+    </div>
+  </div>
+</dialog>
+
+<style>
+  dialog {
+    width: min(96vw, 1400px);
+    max-width: none;
+    max-height: 95vh;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #0b0f14;
+    color: var(--text);
+  }
+
+  dialog::backdrop {
+    background: rgba(0, 0, 0, 0.88);
+  }
+
+  .lightbox-content {
+    display: flex;
+    flex-direction: column;
+    height: min(90vh, 1000px);
+  }
+
+  .lightbox-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #lightbox-caption {
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .lightbox-controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .lightbox-controls button {
+    min-width: 38px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .lightbox-controls button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .lightbox-viewport {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+  }
+
+  #lightbox-image {
+    display: block;
+    max-width: none;
+    width: auto;
+    height: auto;
+    transform-origin: center center;
+  }
+
+  @media (max-width: 650px) {
+    .lightbox-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .lightbox-controls {
+      justify-content: space-between;
+    }
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>(
+    "#image-lightbox"
+  );
+
+  const image = document.querySelector<HTMLImageElement>(
+    "#lightbox-image"
+  );
+
+  const caption = document.querySelector<HTMLElement>(
+    "#lightbox-caption"
+  );
+
+  const viewport = document.querySelector<HTMLElement>(
+    ".lightbox-viewport"
+  );
+
+  let zoom = 1;
+
+  function applyZoom() {
+    if (!image) return;
+    image.style.transform = `scale(${zoom})`;
+  }
+
+  function resetZoom() {
+    zoom = 1;
+    applyZoom();
+  }
+
+  document.querySelector("#zoom-in")?.addEventListener(
+    "click",
+    () => {
+      zoom = Math.min(zoom + 0.25, 4);
+      applyZoom();
+    }
+  );
+
+  document.querySelector("#zoom-out")?.addEventListener(
+    "click",
+    () => {
+      zoom = Math.max(zoom - 0.25, 0.5);
+      applyZoom();
+    }
+  );
+
+  document.querySelector("#zoom-reset")?.addEventListener(
+    "click",
+    resetZoom
+  );
+
+  document.querySelector("#lightbox-close")?.addEventListener(
+    "click",
+    () => dialog?.close()
+  );
+
+  dialog?.addEventListener("close", () => {
+    resetZoom();
+    if (image) image.removeAttribute("src");
+  });
+
+  document.querySelectorAll<HTMLImageElement>(
+    ".article-content img"
+  ).forEach((sourceImage) => {
+    sourceImage.tabIndex = 0;
+    sourceImage.setAttribute("role", "button");
+    sourceImage.setAttribute(
+      "aria-label",
+      `Enlarge image: ${sourceImage.alt || "Evidence image"}`
+    );
+
+    function openImage() {
+      if (!dialog || !image || !caption) return;
+
+      image.src = sourceImage.currentSrc || sourceImage.src;
+      image.alt = sourceImage.alt;
+      caption.textContent = sourceImage.alt || "Evidence image";
+
+      resetZoom();
+      dialog.showModal();
+      viewport?.scrollTo(0, 0);
+    }
+
+    sourceImage.addEventListener("click", openImage);
+
+    sourceImage.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openImage();
+      }
+    });
+  });
+</script>

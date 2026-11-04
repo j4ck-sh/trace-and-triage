@@ -14,6 +14,8 @@ import {
   formatReadingTime
 } from "../../utils/readingTime";
 
+// Image zoom function
+import ImageLightbox from "../../components/ImageLightbox.astro";
 
 // Define the type of article passed to this page
 type ResearchArticle = CollectionEntry<"research">;
@@ -232,6 +234,8 @@ const imageUrl = article.data.heroImage
       <Content />
     </div>
 
+    <ImageLightbox />
+
     <!-- REFERENCES -->
 
     {article.data.references.length > 0 && (
@@ -432,6 +436,18 @@ const imageUrl = article.data.heroImage
     border: 1px solid var(--border);
     border-radius: 10px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    cursor:zoom-in;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .article-content :global(img:hover) {
+    border-color: var(--accent);
+    box-shadow: 0 8px 35px rgba(82, 199, 234, 0.15);
+  }
+
+  .article-content :global(img:focus-visible) {
+    outline: 3px solid var(--accent);
+    outline-offset: 4px;
   }
 
   .article-content :global(p > em:only-child) {
