@@ -20,6 +20,11 @@ import ImageLightbox from "../../components/ImageLightbox.astro";
 // Define the type of article passed to this page
 type ResearchArticle = CollectionEntry<"research">;
 
+// Related content
+import RelatedResearch from "../../components/RelatedResearch.astro";
+
+
+
 // Generate one page per published research article
 export async function getStaticPaths() {
   const articles = await getCollection(
@@ -278,6 +283,10 @@ const imageUrl = article.data.heroImage
         </a>
       </section>
     )}
+
+    <!-- Related Research -->
+
+    <RelatedResearch currentArticle={article} />
 
     <!-- ARTICLE FOOTER -->
 
