@@ -1,53 +1,466 @@
+
 ---
-import { getCollection, render } from "astro:content";
+import {
+  getCollection,
+  render,
+  type CollectionEntry
+} from "astro:content";
+
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-export async function getStaticPaths() {
-  const articles = await getCollection("research");
+// Define the type of article passed to this page
+type ResearchArticle = CollectionEntry<"research">;
 
-  return articles.map((article) => {
-    return {
-      params: {
-        id: article.id,
-      },
-      props: {
-        article,
-      },
-    };
-  });
+// Generate one page per published research article
+export async function getStaticPaths() {
+  const articles = await getCollection(
+    "research",
+    ({ data }) => !data.draft
+  );
+
+  return articles.map((article) => ({
+    params: {
+      id: article.id,
+    },
+    props: {
+      article,
+    },
+  }));
 }
 
-const { article } = Astro.props;
+// Tell Astro exactly what properties this page receives
+interface Props {
+  article: ResearchArticle;
+}
 
+const { article } = Astro.props as Props;
+
+// Render the Markdown article
 const { Content } = await render(article);
+
+// GitHub Pages base path
+const base = import.meta.env.BASE_URL;
+
+const imageUrl = article.data.heroImage
+  ? `${base}${article.data.heroImage.replace(/^\/+/, "")}`
+  : undefined;
 ---
 
-<BaseLayout title={`${article.data.title} | Trace & Triage`}>
+<BaseLayout
+  title={`${article.data.title} | Trace & Triage`}
+  description={article.data.description}
+>
 
-  <p class="case-id">
-    {article.data.caseId}
-  </p>
+  <article class="research-article">
 
-  <h1>
-    {article.data.title}
-  </h1>
+    <!-- ARTICLE HEADER -->
 
-  <p class="muted">
-    {article.data.description}
-  </p>
+    <header class="article-header">
 
-  <p>
-    <strong>Category:</strong>
-    {article.data.category}
-  </p>
+      <div class="article-type">
+        <span class="case-id">
+          {article.data.caseId}
+        </span>
 
-  <p>
-    <strong>Date:</strong>
-    {article.data.date.toLocaleDateString("en-GB")}
-  </p>
+        <span class="category">
+          {article.data.category}
+        </span>
+      </div>
 
-  <hr />
+      <h1>{article.data.title}</h1>
 
-  <Content />
+      <p class="article-description">
+        {article.data.description}
+      </p>
+
+      <!-- HERO IMAGE -->
+
+      {imageUrl && (
+        <img
+          class="hero-image"
+          src={imageUrl}
+          alt={article.data.heroImageAlt ?? article.data.title}
+          loading="eager"
+        />
+      )}
+
+      <!-- ARTICLE METADATA -->
+
+      <div class="metadata">
+
+        <span>
+          {article.data.date.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          })}
+        </span>
+
+        {article.data.difficulty && (
+          <span>{article.data.difficulty}</span>
+        )}
+
+        {article.data.readingTime && (
+          <span>{article.data.readingTime}</span>
+        )}
+
+        <span>{article.data.status}</span>
+
+      </div>
+
+      <!-- TAGS -->
+
+      {article.data.tags.length > 0 && (
+        <div class="tags">
+          {article.data.tags.map((tag: string) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
+
+    </header>
+
+    <!-- INVESTIGATION SUMMARY -->
+
+    <section class="investigation-summary">
+
+      <h2>Investigation Summary</h2>
+
+      <div class="summary-grid">
+
+        <div>
+          <strong>Case ID</strong>
+          <span>{article.data.caseId}</span>
+        </div>
+
+        <div>
+          <strong>Category</strong>
+          <span>{article.data.category}</span>
+        </div>
+
+        <div>
+          <strong>Platform</strong>
+          <span>{article.data.platform ?? "Not specified"}</span>
+        </div>
+
+        <div>
+          <strong>Environment</strong>
+          <span>{article.data.environment ?? "Not specified"}</span>
+        </div>
+
+        <div>
+          <strong>Difficulty</strong>
+          <span>{article.data.difficulty ?? "Not specified"}</span>
+        </div>
+
+        <div>
+          <strong>Status</strong>
+          <span>{article.data.status}</span>
+        </div>
+
+        {article.data.subject && (
+          <div>
+            <strong>Subject</strong>
+            <span>{article.data.subject}</span>
+          </div>
+        )}
+
+      </div>
+
+      {article.data.tools.length > 0 && (
+        <div class="tools">
+          <strong>Tools Used</strong>
+          <p>{article.data.tools.join(" • ")}</p>
+        </div>
+      )}
+
+    </section>
+
+    <!-- ACTUAL MARKDOWN ARTICLE -->
+
+    <div class="article-content">
+      <Content />
+    </div>
+
+    <!-- REFERENCES -->
+
+    {article.data.references.length > 0 && (
+      <section class="references">
+        <h2>References</h2>
+
+        <ul>
+          {article.data.references.map((reference) => (
+            <li>
+              <a
+                href={reference.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {reference.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- SUPPORTING GITHUB MATERIAL -->
+
+    {article.data.githubUrl && (
+      <section class="supporting-material">
+        <h2>Supporting Material</h2>
+
+        <p>
+          Additional research notes, sanitised evidence and
+          supporting technical material are available on GitHub.
+        </p>
+
+        <a
+          href={article.data.githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View supporting material on GitHub →
+        </a>
+      </section>
+    )}
+
+    <!-- ARTICLE FOOTER -->
+
+    <div class="article-footer">
+      <p class="case-id">{article.data.caseId}</p>
+
+      <p>
+        Trace & Triage — Digital Forensics,
+        Incident Response & Security Research
+      </p>
+
+      <a href={`${base}research`}>
+        ← Back to Research
+      </a>
+    </div>
+
+  </article>
 
 </BaseLayout>
+
+<style>
+  .research-article {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .article-header {
+    padding: 45px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .article-type {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 15px;
+  }
+
+  .category {
+    color: var(--muted);
+    font-family: Consolas, monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+  }
+
+  .article-header h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    margin: 20px 0;
+  }
+
+  .article-description {
+    color: var(--muted);
+    font-size: 1.2rem;
+  }
+
+  .hero-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 30px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 25px 0;
+    color: var(--muted);
+    font-family: Consolas, monospace;
+    font-size: 0.85rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .tags .tag {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .investigation-summary {
+    margin: 45px 0;
+    padding: 30px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .investigation-summary h2 {
+    margin: 0 0 25px;
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(180px, 1fr));
+    gap: 25px;
+  }
+
+  .summary-grid div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .summary-grid strong,
+  .tools strong {
+    color: var(--muted);
+    font-family: Consolas, monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .tools {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .tools p {
+    margin-bottom: 0;
+  }
+
+  .article-content {
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+
+  .article-content :global(h2) {
+    margin-top: 55px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .article-content :global(h3) {
+    margin-top: 35px;
+  }
+
+  .article-content :global(img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 30px auto 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  }
+
+  .article-content :global(p > em:only-child) {
+    display: block;
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+    margin-bottom: 35px;
+  }
+
+  .article-content :global(table) {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 30px 0;
+  }
+
+  .article-content :global(th),
+  .article-content :global(td) {
+    padding: 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .article-content :global(th) {
+    background: var(--surface);
+  }
+
+  .article-content :global(pre) {
+    padding: 20px;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .article-content :global(blockquote) {
+    margin: 25px 0;
+    padding: 15px 20px;
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    color: var(--muted);
+  }
+
+  .references,
+  .supporting-material {
+    margin-top: 55px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .references ul {
+    padding-left: 20px;
+  }
+
+  .references li {
+    margin-bottom: 10px;
+  }
+
+  .article-footer {
+    margin-top: 70px;
+    padding-top: 25px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .article-footer a {
+    display: inline-block;
+    margin-top: 15px;
+  }
+
+  @media (max-width: 600px) {
+    .investigation-summary {
+      padding: 20px;
+    }
+
+    .article-header {
+      padding: 25px 0;
+    }
+  }
+</style>
