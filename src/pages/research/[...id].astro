@@ -36,7 +36,12 @@ interface Props {
 const { article } = Astro.props as Props;
 
 // Render the Markdown article
-const { Content } = await render(article);
+const { Content, headings } = await render(article);
+
+const tocHeadings = headings.filter(
+  (heading) => heading.depth === 2 || heading.depth === 3
+);
+
 
 // GitHub Pages base path
 const base = import.meta.env.BASE_URL;
@@ -176,6 +181,38 @@ const imageUrl = article.data.heroImage
 
     </section>
 
+    <!-- Automatic TABLE of CONTENT -->
+
+{tocHeadings.length > 0 && (
+  <nav class="table-of-contents" aria-label="Article contents">
+
+    <div class="toc-header">
+      <span class="toc-label">ARTICLE CONTENTS</span>
+      <span class="toc-count">
+        {tocHeadings.length} sections
+      </span>
+    </div>
+
+    <ol class="toc-list">
+      {tocHeadings.map((heading, index) => (
+        <li
+          class:list={[
+            "toc-item",
+            { "toc-subsection": heading.depth === 3 }
+          ]}
+        >
+          <a href={`#${heading.slug}`}>
+            <span class="toc-number">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span>{heading.text}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+
+  </nav>
+)}
     <!-- ACTUAL MARKDOWN ARTICLE -->
 
     <div class="article-content">
@@ -461,6 +498,28 @@ const imageUrl = article.data.heroImage
 
     .article-header {
       padding: 25px 0;
+    }
+  }
+
+
+  /* Mobile Styling */
+  @media (max-width: 600px) {
+    .table-of-contents {
+      padding: 20px 15px;
+    }
+
+    .toc-subsection {
+      padding-left: 15px;
+    }
+
+    .toc-item a {
+      gap: 10px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
     }
   }
 </style>
