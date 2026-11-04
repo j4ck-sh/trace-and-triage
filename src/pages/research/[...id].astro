@@ -8,6 +8,13 @@ import {
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
+// reading time function
+import {
+  getReadingTime,
+  formatReadingTime
+} from "../../utils/readingTime";
+
+
 // Define the type of article passed to this page
 type ResearchArticle = CollectionEntry<"research">;
 
@@ -34,6 +41,9 @@ interface Props {
 }
 
 const { article } = Astro.props as Props;
+
+const readingMinutes = getReadingTime(article);
+const readingLabel = formatReadingTime(readingMinutes);
 
 // Render the Markdown article
 const { Content, headings } = await render(article);
@@ -105,9 +115,9 @@ const imageUrl = article.data.heroImage
           <span>{article.data.difficulty}</span>
         )}
 
-        {article.data.readingTime && (
-          <span>{article.data.readingTime}</span>
-        )}
+        <span class="reading-time">
+          {readingLabel}
+        </span>
 
         <span>{article.data.status}</span>
 
@@ -522,4 +532,49 @@ const imageUrl = article.data.heroImage
       scroll-behavior: auto;
     }
   }
+
+  
+/* =========================================
+   TRACE & TRIAGE — READING TIME
+   ========================================= */
+
+.reading-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  color: var(--accent);
+  font-family: Consolas, monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Article metadata layout */
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+
+  margin: 25px 0;
+
+  color: var(--muted);
+  font-family: Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+/* Mobile adjustments */
+
+@media (max-width: 600px) {
+  .metadata {
+    gap: 12px;
+    font-size: 0.8rem;
+  }
+
+  .reading-time {
+    font-size: 0.8rem;
+  }
+}
+
 </style>

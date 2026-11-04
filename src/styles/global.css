@@ -271,3 +271,41 @@ html {
     scroll-behavior: auto;
   }
 }
+
+
+/* =========================================
+   TRACE & TRIAGE - ARTICLE CARD METADATA
+   ========================================= */
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 15px;
+
+  color: var(--muted);
+  font-family: Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.article-meta .reading-time {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.article-meta .meta-separator {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+/* Mobile styling */
+
+@media (max-width: 600px) {
+  .article-meta {
+    gap: 6px;
+    font-size: 0.8rem;
+  }
+}

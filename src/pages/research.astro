@@ -24,6 +24,14 @@ const categories = [
     sortedArticles.map((article) => article.data.category)
   )
 ];
+
+// Reading time section
+import {
+  getReadingTime,
+  formatReadingTime
+} from "../utils/readingTime";
+
+
 ---
 
 <BaseLayout title="Research | Trace & Triage">
@@ -78,8 +86,10 @@ const categories = [
 
         <p class="article-meta">
           {article.data.category}
-          ·
+          .
           {article.data.date.toLocaleDateString("en-GB")}
+          .
+          {formatReadingTime(getReadingTime(article))}
         </p>
 
         <div class="tags">

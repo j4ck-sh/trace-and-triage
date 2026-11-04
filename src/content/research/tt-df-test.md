@@ -13,9 +13,6 @@ difficulty: "Beginner"
 
 draft: false
 
-heroImage: "/images/tt-sp-001/hero.png"
-HeroImageAlt: "Salellite orbiting Earth"
-
 platform: "Windows 11"
 environment: "Isolated Test Lab"
 status: "Completed"
