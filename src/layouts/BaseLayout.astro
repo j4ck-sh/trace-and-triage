@@ -1,3 +1,4 @@
+
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -6,43 +7,131 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: "website" | "article";
+  publishedDate?: Date;
 }
 
 const {
   title = "Trace & Triage",
-  description = "Digital Forensics, Incident Response and Security Research"
+  description =
+    "Digital Forensics, Incident Response and Security Research",
+  image: suppliedImage,
+  type = "website",
+  publishedDate
 } = Astro.props;
+
+// GitHub Pages base path
+const base = import.meta.env.BASE_URL;
+
+// Use article image or default image
+const image = suppliedImage || "/images/default-social.png";
+
+// Convert image paths into a full URL
+function getAbsoluteImageURL(imagePath: string): string {
+  // Already an absolute URL
+  if (/^https?:\/\//i.test(imagePath)) {
+    return imagePath;
+  }
+
+  // Remove leading slashes
+  let cleanPath = imagePath.replace(/^\/+/, "");
+
+  // Avoid duplicating the repository base path
+  const cleanBase = base.replace(/^\/+|\/+$/g, "");
+
+  if (
+    cleanBase &&
+    cleanPath.startsWith(`${cleanBase}/`)
+  ) {
+    cleanPath = cleanPath.slice(cleanBase.length + 1);
+  }
+
+  // Build the final URL
+  return new URL(
+    `${base}${cleanPath}`,
+    Astro.site ?? Astro.url
+  ).toString();
+}
+
+// Canonical URL for this page
+const canonicalURL = Astro.url.toString();
+
+// Absolute URL used by LinkedIn and social platforms
+const socialImageURL = getAbsoluteImageURL(image);
 ---
 
 <!doctype html>
-<html lang="en" data-base={import.meta.env.BASE_URL}>
+<html lang="en">
 
-  <head>
-    <meta charset="UTF-8" />
+<head>
+  <meta charset="UTF-8" />
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <meta
+    name="description"
+    content={description}
+  />
+
+  <title>{title}</title>
+
+  <!-- Canonical URL -->
+  <link
+    rel="canonical"
+    href={canonicalURL}
+  />
+
+  <!-- Open Graph / LinkedIn -->
+  <meta property="og:type" content={type} />
+  <meta property="og:site_name" content="Trace & Triage" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:image" content={socialImageURL} />
+  <meta
+    property="og:image:alt"
+    content="Trace & Triage research preview"
+  />
+
+  <!-- Twitter / X -->
+  <meta
+    name="twitter:card"
+    content="summary_large_image"
+  />
+  <meta
+    name="twitter:title"
+    content={title}
+  />
+  <meta
+    name="twitter:description"
+    content={description}
+  />
+  <meta
+    name="twitter:image"
+    content={socialImageURL}
+  />
+
+  <!-- Article publication date -->
+  {type === "article" && publishedDate && (
     <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
+      property="article:published_time"
+      content={publishedDate.toISOString()}
     />
+  )}
+</head>
 
-    <meta
-      name="description"
-      content={description}
-    />
+<body>
+  <Header />
 
-    <title>{title}</title>
-  </head>
+  <main>
+    <slot />
+  </main>
 
-  <body>
-
-    <Header />
-
-    <main>
-      <slot />
-    </main>
-
-    <Footer />
-
-  </body>
+  <Footer />
+</body>
 
 </html>
