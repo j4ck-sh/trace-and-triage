@@ -1,0 +1,123 @@
+
+---
+interface Props {
+  type:
+    | "finding"
+    | "note"
+    | "evidence"
+    | "limitation"
+    | "conclusion";
+
+  title: string;
+  text: string;
+  reference?: string;
+}
+
+const {
+  type,
+  title,
+  text,
+  reference
+} = Astro.props;
+
+const labels = {
+  finding: "KEY FINDING",
+  note: "FORENSIC NOTE",
+  evidence: "EVIDENCE RECORD",
+  limitation: "INVESTIGATION LIMITATION",
+  conclusion: "CONCLUSION"
+};
+---
+
+<aside
+  class:list={["research-callout", type]}
+  aria-label={labels[type]}
+>
+  <div class="callout-header">
+    <span class="callout-label">
+      {labels[type]}
+    </span>
+
+    {reference && (
+      <span class="callout-reference">
+        {reference}
+      </span>
+    )}
+  </div>
+
+  <h3>{title}</h3>
+
+  <p>{text}</p>
+</aside>
+
+<style>
+  .research-callout {
+    --callout-accent: #52c7ea;
+
+    margin: 28px 0;
+    padding: 22px 25px;
+
+    background: #111820;
+    border: 1px solid #24313d;
+    border-left: 4px solid var(--callout-accent);
+    border-radius: 8px;
+  }
+
+  .research-callout.note {
+    --callout-accent: #a5b4fc;
+  }
+
+  .research-callout.evidence {
+    --callout-accent: #86c7aa;
+  }
+
+  .research-callout.limitation {
+    --callout-accent: #e5b96c;
+  }
+
+  .research-callout.conclusion {
+    --callout-accent: #52c7ea;
+  }
+
+  .callout-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .callout-label {
+    color: var(--callout-accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.07em;
+  }
+
+  .callout-reference {
+    color: #8d9aa6;
+    font-family: Consolas, monospace;
+    font-size: 0.75rem;
+  }
+
+  .research-callout h3 {
+    margin: 0 0 10px;
+    color: #e8edf2;
+    font-size: 1.15rem;
+  }
+
+  .research-callout p {
+    margin: 0;
+    color: #b5c0ca;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 600px) {
+    .research-callout {
+      padding: 18px;
+    }
+  }
+</style>

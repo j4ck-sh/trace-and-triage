@@ -48,6 +48,31 @@ indicators:
     description: "Example filename for testing."
 
 
+
+
+callouts:
+  - type: "finding"
+    title: "PowerShell execution identified"
+    text: "Simulated process creation telemetry indicates that PowerShell executed at 14:32:16 UTC."
+    reference: "TT-DF-TEST-F01"
+
+  - type: "note"
+    title: "Windows artefact interpretation"
+    text: "The presence of a Prefetch file can support an inference of execution, but should be correlated with additional evidence."
+
+  - type: "evidence"
+    title: "Windows Event Logs"
+    text: "Simulated Windows Security and Sysmon event records were used during the test investigation."
+    reference: "E01"
+
+  - type: "limitation"
+    title: "Incomplete telemetry"
+    text: "The example dataset does not contain complete historical process activity."
+
+  - type: "conclusion"
+    title: "Test investigation outcome"
+    text: "The simulated evidence demonstrates how structured forensic findings can be presented in Trace & Triage."
+    
 ---
 
 # Executive Summary

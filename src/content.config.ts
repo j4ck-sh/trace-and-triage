@@ -132,6 +132,25 @@ const research = defineCollection({
       })
     ).default([]),
 
+
+    callouts: z.array(
+      z.object({
+        type: z.enum([
+          "finding",
+          "note",
+          "evidence",
+          "limitation",
+          "conclusion"
+        ]),
+
+        title: z.string(),
+
+        text: z.string(),
+
+        reference: z.string().optional()
+      })
+    ).default([]),
+
   }),
 
 });

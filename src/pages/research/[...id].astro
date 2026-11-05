@@ -11,6 +11,7 @@ import ImageLightbox from "../../components/ImageLightbox.astro";
 import RelatedResearch from "../../components/RelatedResearch.astro";
 import ForensicTimeline from "../../components/ForensicTimeline.astro";
 import IOCTable from "../../components/IOCTable.astro";
+import ResearchCallout from "../../components/ResearchCallout.astro";
 
 import {
   getReadingTime,
@@ -235,6 +236,23 @@ const imageUrl = article.data.heroImage
   <div class="article-content" data-pagefind-body>
     <Content />
   </div>
+
+  <!-- RESEARCH FINDINGS -->
+   {article.data.callouts.length > 0 && (
+    <section class="research-findings">
+
+      <h2>Investigation Findings & Notes</h2>
+
+      {article.data.callouts.map((callout) => (
+        <ResearchCallout
+          type={callout.type}
+          title={callout.title}
+          text={callout.text}
+          reference={callout.reference}
+        />
+      ))}
+    </section>
+   )}
 
   <!-- FORENSICS TIMELINE -->
   {article.data.timeline.length > 0 && (
@@ -585,5 +603,20 @@ const imageUrl = article.data.heroImage
 
   .methodology-reference a:hover {
     text-decoration: underline;
+  }
+
+  /* Investigation findings */
+
+  .research-findings {
+    margin: 55px 0;
+  }
+
+  .research-findings > h2 {
+    margin-bottom: 30px;
+    padding-bottom: 12px;
+
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    font-size: 1.5rem;
   }
 </style>
