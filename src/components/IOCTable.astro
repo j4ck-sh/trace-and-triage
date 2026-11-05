@@ -1,0 +1,94 @@
+
+---
+export interface IOC {
+  type: string;
+  value: string;
+  description?: string;
+}
+
+interface Props {
+  indicators: IOC[];
+  heading?: string;
+}
+
+const {
+  indicators,
+  heading = "Indicators of Compromise"
+} = Astro.props;
+---
+
+<section class="ioc-section">
+  <h2>{heading}</h2>
+
+  <div class="ioc-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Indicator</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {indicators.map((ioc) => (
+          <tr>
+            <td>{ioc.type}</td>
+
+            <td>
+              <code>{ioc.value}</code>
+            </td>
+
+            <td>{ioc.description ?? "—"}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<style>
+  .ioc-section {
+    margin: 45px 0;
+  }
+
+  .ioc-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--surface);
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+  }
+
+  td {
+    font-size: 0.9rem;
+  }
+
+  td code {
+    overflow-wrap: anywhere;
+    color: var(--accent);
+    font-family: Consolas, monospace;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+</style>

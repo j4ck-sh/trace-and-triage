@@ -115,6 +115,23 @@ const research = defineCollection({
       })
     ).default([]),
 
+    timeline: z.array(
+      z.object({
+        timestamp: z.string(),
+        title: z.string(),
+        description: z.string().optional(),
+        source: z.string().optional(),
+      })
+    ).default([]),
+
+    indicators: z.array(
+      z.object({
+        type: z.string(),
+        value: z.string(),
+        description: z.string().optional(),
+      })
+    ).default([]),
+
   }),
 
 });

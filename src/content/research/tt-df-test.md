@@ -16,6 +16,38 @@ draft: false
 platform: "Windows 11"
 environment: "Isolated Test Lab"
 status: "Completed"
+
+
+timeline:
+  - timestamp: "2026-11-05 14:30:01 UTC"
+    title: "User logon recorded"
+    description: "A test user logon event was identified."
+    source: "Windows Security Event Log"
+
+  - timestamp: "2026-11-05 14:32:16 UTC"
+    title: "PowerShell execution"
+    description: "A PowerShell process was observed."
+    source: "Sysmon Event ID 1"
+
+  - timestamp: "2026-11-05 14:32:20 UTC"
+    title: "File created"
+    description: "A test file creation event was recorded."
+    source: "Filesystem evidence"
+
+indicators:
+  - type: "Domain"
+    value: "example[.]com"
+    description: "Illustrative domain, not a real IOC."
+
+  - type: "IPv4"
+    value: "192.0.2.10"
+    description: "Documentation-only IP address."
+
+  - type: "Filename"
+    value: "sample.exe"
+    description: "Example filename for testing."
+
+
 ---
 
 # Executive Summary

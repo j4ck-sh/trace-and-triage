@@ -9,6 +9,8 @@ import {
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ImageLightbox from "../../components/ImageLightbox.astro";
 import RelatedResearch from "../../components/RelatedResearch.astro";
+import ForensicTimeline from "../../components/ForensicTimeline.astro";
+import IOCTable from "../../components/IOCTable.astro";
 
 import {
   getReadingTime,
@@ -233,6 +235,22 @@ const imageUrl = article.data.heroImage
   <div class="article-content" data-pagefind-body>
     <Content />
   </div>
+
+  <!-- FORENSICS TIMELINE -->
+  {article.data.timeline.length > 0 && (
+    <ForensicTimeline
+      events={article.data.timeline}
+    />
+  )}
+
+  <!-- INDICATORS OF COMPROMISE -->
+
+  {article.data.indicators.length > 0 && (
+    <IOCTable
+      indicators={article.data.indicators}
+    />
+  )}
+
 
   <!-- SCREENSHOT LIGHTBOX -->
 
