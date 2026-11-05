@@ -1,0 +1,482 @@
+
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const stages = [
+  {
+    number: "01",
+    title: "Identification",
+    description:
+      "Establish the investigation scope, research questions, relevant systems and potential evidence sources.",
+    activities: [
+      "Define the objectives and boundaries of the investigation.",
+      "Identify relevant devices, files, logs and telemetry.",
+      "Record the operating environment and assumptions.",
+      "Identify legal, ethical and technical constraints."
+    ]
+  },
+  {
+    number: "02",
+    title: "Preservation",
+    description:
+      "Protect evidence integrity and document how evidence was obtained and handled.",
+    activities: [
+      "Record the source and provenance of evidence.",
+      "Calculate cryptographic hashes where appropriate.",
+      "Preserve original evidence and work from verified copies.",
+      "Document acquisition methods, timestamps and limitations."
+    ]
+  },
+  {
+    number: "03",
+    title: "Examination",
+    description:
+      "Extract, inspect and validate relevant digital artefacts using suitable forensic techniques.",
+    activities: [
+      "Examine filesystems, logs, memory or telemetry.",
+      "Identify potentially relevant artefacts.",
+      "Record tool names, versions and configurations.",
+      "Validate important results using independent methods."
+    ]
+  },
+  {
+    number: "04",
+    title: "Analysis",
+    description:
+      "Correlate evidence to establish what happened, when it happened and what conclusions the evidence supports.",
+    activities: [
+      "Normalise timestamps and document time zones.",
+      "Correlate evidence across independent sources.",
+      "Construct investigative timelines.",
+      "Consider alternative explanations and uncertainty."
+    ]
+  },
+  {
+    number: "05",
+    title: "Reporting",
+    description:
+      "Communicate the investigation in a structured and reproducible manner.",
+    activities: [
+      "Document methodology and relevant observations.",
+      "Separate factual observations from interpretations.",
+      "Include supporting screenshots, hashes and references.",
+      "Clearly explain findings, limitations and conclusions."
+    ]
+  },
+  {
+    number: "06",
+    title: "Review",
+    description:
+      "Review the evidence, technical accuracy and reproducibility of the investigation before publication.",
+    activities: [
+      "Check important claims against supporting evidence.",
+      "Verify links, screenshots and technical details.",
+      "Remove sensitive or identifying information.",
+      "Review the article for clarity and reproducibility."
+    ]
+  }
+];
+---
+
+<BaseLayout
+  title="Research Methodology | Trace & Triage"
+  description="The evidence handling, forensic examination, analysis and reporting principles used in Trace & Triage research."
+>
+
+  <section class="methodology-hero">
+    <p class="case-id">RESEARCH STANDARDS / TT-METHOD</p>
+
+    <h1>Research Methodology</h1>
+
+    <p class="hero-subtitle">
+      A structured and evidence-driven approach to digital
+      forensics, incident investigation and security research.
+    </p>
+
+    <p class="intro">
+      Trace & Triage documents independent technical research
+      across digital forensics, malware analysis, incident
+      response and non-traditional digital systems.
+
+      The methodology described here provides a consistent
+      framework for planning, conducting, documenting and
+      reviewing investigations.
+    </p>
+  </section>
+
+  <section class="principles">
+    <p class="section-label">CORE PRINCIPLES</p>
+
+    <h2>Evidence Before Conclusions</h2>
+
+    <p>
+      Investigative findings should be supported by identifiable
+      evidence, documented methodology and appropriate validation.
+
+      Observations, interpretations and hypotheses are treated
+      separately to avoid presenting assumptions as established facts.
+    </p>
+
+    <div class="principle-grid">
+      <div class="principle-card">
+        <span class="case-id">INTEGRITY</span>
+        <h3>Evidence Integrity</h3>
+        <p>
+          Preserve original evidence where practicable and
+          document the integrity of acquired material.
+        </p>
+      </div>
+
+      <div class="principle-card">
+        <span class="case-id">REPRODUCIBILITY</span>
+        <h3>Repeatable Analysis</h3>
+        <p>
+          Record tools, configurations, methods and relevant
+          environmental details so findings can be independently
+          assessed.
+        </p>
+      </div>
+
+      <div class="principle-card">
+        <span class="case-id">TRANSPARENCY</span>
+        <h3>Clear Limitations</h3>
+        <p>
+          Document missing evidence, environmental constraints,
+          uncertainty and alternative explanations.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="methodology-process">
+    <p class="section-label">INVESTIGATION WORKFLOW</p>
+
+    <h2>Six-Stage Research Process</h2>
+
+    <p class="muted">
+      These stages provide a general framework rather than a rigid
+      sequence. Real investigations may require revisiting earlier
+      stages as new evidence becomes available.
+    </p>
+
+    <div class="stage-list">
+      {stages.map((stage) => (
+        <section class="stage-card">
+          <div class="stage-heading">
+            <span class="stage-number">{stage.number}</span>
+
+            <div>
+              <h3>{stage.title}</h3>
+              <p>{stage.description}</p>
+            </div>
+          </div>
+
+          <ul>
+            {stage.activities.map((activity) => (
+              <li>{activity}</li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <section class="evidence-handling">
+    <p class="section-label">EVIDENCE HANDLING</p>
+
+    <h2>Integrity and Provenance</h2>
+
+    <p>
+      Where appropriate, research records the origin of evidence,
+      acquisition methods, cryptographic hashes, timestamps,
+      analysis tools and relevant handling decisions.
+    </p>
+
+    <div class="evidence-example">
+      <p class="case-id">EXAMPLE EVIDENCE RECORD</p>
+
+      <dl>
+        <div>
+          <dt>Evidence ID</dt>
+          <dd>TT-DF-001-E01</dd>
+        </div>
+
+        <div>
+          <dt>Evidence Type</dt>
+          <dd>Disk image</dd>
+        </div>
+
+        <div>
+          <dt>Acquisition Method</dt>
+          <dd>Forensic imaging</dd>
+        </div>
+
+        <div>
+          <dt>Integrity Verification</dt>
+          <dd>SHA-256</dd>
+        </div>
+
+        <div>
+          <dt>Environment</dt>
+          <dd>Controlled laboratory</dd>
+        </div>
+      </dl>
+
+      <p class="example-note">
+        Illustrative record only. Actual investigations document
+        their specific evidence sources and verification results.
+      </p>
+    </div>
+  </section>
+
+  <section class="research-standards">
+    <p class="section-label">RESEARCH STANDARDS</p>
+
+    <h2>Technical Accuracy and Validation</h2>
+
+    <p>
+      Findings are assessed in the context of the available
+      evidence. Where possible, significant observations are
+      corroborated using additional artefacts or independent
+      analytical techniques.
+    </p>
+
+    <p>
+      Tool output is not treated as infallible. Results may be
+      affected by software versions, operating system behaviour,
+      collection methods, timestamp interpretation or incomplete
+      evidence.
+    </p>
+
+    <h2>Research Ethics and Safety</h2>
+
+    <p>
+      Technical experiments are conducted using authorised
+      systems, controlled laboratories, simulations or publicly
+      available datasets where their use is permitted.
+    </p>
+
+    <p>
+      Malware research is conducted within appropriately isolated
+      environments. Research involving drones, vehicles, radio
+      systems or satellite technologies is limited to lawful,
+      authorised and appropriately controlled activities.
+    </p>
+
+    <h2>Confidentiality</h2>
+
+    <p>
+      Trace & Triage does not publish client evidence,
+      confidential employer information, classified material,
+      personal data or other restricted information.
+    </p>
+
+    <p>
+      Screenshots, logs and datasets are reviewed before
+      publication to identify information requiring removal
+      or sanitisation.
+    </p>
+  </section>
+
+  <section class="reporting">
+    <p class="section-label">REPORTING</p>
+
+    <h2>Investigation Report Structure</h2>
+
+    <p>
+      Research articles generally follow a consistent structure,
+      adapted to the subject and evidence available.
+    </p>
+
+    <ol class="report-list">
+      <li>Executive Summary</li>
+      <li>Research Question and Scope</li>
+      <li>Laboratory Environment</li>
+      <li>Evidence Sources and Acquisition</li>
+      <li>Examination and Analysis</li>
+      <li>Timeline Reconstruction</li>
+      <li>Key Findings</li>
+      <li>Limitations</li>
+      <li>Conclusion</li>
+      <li>References and Supporting Material</li>
+    </ol>
+  </section>
+
+  <section class="methodology-footer">
+    <p class="case-id">TRACE & TRIAGE</p>
+
+    <h2>Research, Analyse, Document.</h2>
+
+    <p>
+      This methodology is intended to support transparent,
+      technically grounded and reproducible research.
+      Individual articles explain any relevant deviations
+      or additional investigative procedures.
+    </p>
+
+    <a href={`${import.meta.env.BASE_URL}research/`}>
+      Explore Research →
+    </a>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .methodology-hero {
+    padding: 55px 0 65px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .intro {
+    margin-top: 35px;
+    color: var(--text);
+    font-size: 1.05rem;
+  }
+
+  .section-label {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+  }
+
+  .principle-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+  }
+
+  .principle-card,
+  .stage-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 25px;
+  }
+
+  .principle-card h3 {
+    margin: 12px 0;
+  }
+
+  .principle-card p,
+  .stage-card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .methodology-process,
+  .evidence-handling,
+  .research-standards,
+  .reporting {
+    margin-top: 75px;
+  }
+
+  .stage-list {
+    display: grid;
+    gap: 20px;
+    margin-top: 35px;
+  }
+
+  .stage-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 22px;
+  }
+
+  .stage-number {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 1.4rem;
+    font-weight: bold;
+  }
+
+  .stage-heading h3 {
+    margin: 0;
+    font-size: 1.3rem;
+  }
+
+  .stage-heading p {
+    margin: 10px 0;
+  }
+
+  .stage-card ul {
+    margin: 20px 0 0 52px;
+    padding-left: 20px;
+    color: var(--muted);
+  }
+
+  .stage-card li {
+    margin-bottom: 8px;
+  }
+
+  .evidence-example {
+    margin-top: 30px;
+    padding: 30px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .evidence-example dl {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+  }
+
+  .evidence-example dt {
+    color: var(--muted);
+    font-family: Consolas, monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .evidence-example dd {
+    margin: 6px 0 0;
+  }
+
+  .example-note {
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .report-list {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px 35px;
+    padding-left: 25px;
+  }
+
+  .report-list li {
+    padding: 8px 0;
+  }
+
+  .methodology-footer {
+    margin-top: 90px;
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .methodology-hero {
+      padding-top: 25px;
+    }
+
+    .stage-heading {
+      gap: 15px;
+    }
+
+    .stage-card ul {
+      margin-left: 10px;
+    }
+
+    .evidence-example {
+      padding: 20px;
+    }
+  }
+</style>

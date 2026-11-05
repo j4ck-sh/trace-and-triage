@@ -303,8 +303,22 @@ const imageUrl = article.data.heroImage
 
   <RelatedResearch currentArticle={article} />
 
-  <!-- ARTICLE FOOTER -->
+  <section class="methodology-reference">
+    <p class="case-id">RESEARCH STANDARDS</p>
 
+    <h2>Research Methodology</h2>
+
+    <p>
+      This investigation follows the general research and evidence-handling principles documented by Trace & Triage.
+      Any investigation-specific methods or limitations are described within the article.
+    </p>
+
+    <a href={`${base}methodology/`}>
+      View Research Methodology
+    </a>
+  </section>
+
+  <!-- ARTICLE FOOTER -->
   <div class="article-footer">
     <p class="case-id">{article.data.caseId}</p>
 
@@ -538,5 +552,38 @@ const imageUrl = article.data.heroImage
     .article-header {
       padding: 25px 0;
     }
+  }
+
+
+  /* RESEARCH METHODOLOGY */
+
+  .methodology-reference {
+    margin-top: 60px;
+    padding: 28px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .methodology-reference h2 {
+    margin: 10px 0 15px;
+    font-size: 1.3rem;
+  }
+
+  .methodology-reference p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .methodology-reference a {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .methodology-reference a:hover {
+    text-decoration: underline;
   }
 </style>
