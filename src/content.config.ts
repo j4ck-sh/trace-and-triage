@@ -151,6 +151,30 @@ const research = defineCollection({
       })
     ).default([]),
 
+    attackTechniques: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        tactic: z.string().optional(),
+        evidence: z.string(),
+        assessment: z.enum(["Observed", "Inferred", "Background"]),
+        confidence: z.enum(["High", "Medium", "Low"]),
+        reference: z.string().url().optional(),
+      })
+    ).default([]),
+
+    spartaTechniques: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        tactic: z.string().optional(),
+        evidence: z.string(),
+        assessment: z.enum(["Observed", "Inferred", "Background"]),
+        confidence: z.enum(["High", "Medium", "Low"]),
+        reference: z.string().url().optional(),
+      })
+    ).default([]),
+
   }),
 
 });

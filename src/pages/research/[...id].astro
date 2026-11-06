@@ -12,6 +12,7 @@ import RelatedResearch from "../../components/RelatedResearch.astro";
 import ForensicTimeline from "../../components/ForensicTimeline.astro";
 import IOCTable from "../../components/IOCTable.astro";
 import ResearchCallout from "../../components/ResearchCallout.astro";
+import FrameworkMapping from "../../components/FrameworkMapping.astro";
 
 import {
   getReadingTime,
@@ -266,6 +267,22 @@ const imageUrl = article.data.heroImage
   {article.data.indicators.length > 0 && (
     <IOCTable
       indicators={article.data.indicators}
+    />
+  )}
+
+  <!-- FRAMEWORK MAPPINGS -->
+   
+  {article.data.attackTechniques.length > 0 && (
+    <FrameworkMapping
+      framework="MITRE ATT&CK"
+      techniques={article.data.attackTechniques}
+    />
+  )}
+
+  {article.data.spartaTechniques.length > 0 && (
+    <FrameworkMapping
+      framework="SPARTA"
+      techniques={article.data.spartaTechniques}
     />
   )}
 

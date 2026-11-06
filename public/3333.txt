@@ -1,0 +1,176 @@
+
+---
+interface Technique {
+  id: string;
+  name: string;
+  tactic?: string;
+  evidence: string;
+  assessment: "Observed" | "Inferred" | "Background";
+  confidence: "High" | "Medium" | "Low";
+  reference?: string;
+}
+
+interface Props {
+  framework: "MITRE ATT&CK" | "SPARTA";
+  techniques: Technique[];
+}
+
+const { framework, techniques } = Astro.props;
+
+const headingId = framework === "SPARTA"
+  ? "sparta-mapping"
+  : "mitre-attack-mapping";
+---
+
+{techniques.length > 0 && (
+  <section class="framework-mapping" aria-labelledby={headingId}>
+    <p class="section-label">ADVERSARY TECHNIQUE ANALYSIS</p>
+    <h2 id={headingId}>{framework} Mapping</h2>
+
+    <div class="technique-list">
+      {techniques.map((technique) => (
+        <article class="technique-card">
+          <div class="technique-header">
+            <div>
+              <span class="technique-id">{technique.id}</span>
+              <h3>{technique.name}</h3>
+            </div>
+
+            <span class:list={[
+              "confidence",
+              technique.confidence.toLowerCase()
+            ]}>
+              {technique.confidence} confidence
+            </span>
+          </div>
+
+          {technique.tactic && (
+            <p class="tactic">TACTIC: {technique.tactic}</p>
+          )}
+
+          <div class="evidence">
+            <strong>Supporting Evidence</strong>
+            <p>{technique.evidence}</p>
+          </div>
+
+          <div class="technique-footer">
+            <span>ASSESSMENT: {technique.assessment}</span>
+
+            {technique.reference && (
+              <a
+                href={technique.reference}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Framework Reference →
+              </a>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .framework-mapping {
+    margin: 65px 0;
+    padding-top: 25px;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label,
+  .technique-id {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .framework-mapping h2 {
+    margin: 10px 0 25px;
+  }
+
+  .technique-list {
+    display: grid;
+    gap: 18px;
+  }
+
+  .technique-card {
+    padding: 25px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .technique-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .technique-header h3 {
+    margin: 8px 0;
+  }
+
+  .confidence {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.75rem;
+  }
+
+  .confidence.high {
+    color: #86c7aa;
+  }
+
+  .confidence.medium {
+    color: #e5b96c;
+  }
+
+  .confidence.low {
+    color: #a5b4fc;
+  }
+
+  .tactic,
+  .technique-footer {
+    color: var(--muted);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+  }
+
+  .evidence {
+    margin: 20px 0;
+    padding: 18px;
+    background: #0b0f14;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .evidence strong {
+    color: var(--accent);
+    font-size: 0.8rem;
+  }
+
+  .evidence p {
+    margin-bottom: 0;
+  }
+
+  .technique-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .technique-footer a {
+    color: var(--accent);
+  }
+
+  @media (max-width: 600px) {
+    .technique-card {
+      padding: 18px;
+    }
+  }
+</style>

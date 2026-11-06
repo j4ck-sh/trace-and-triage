@@ -73,6 +73,26 @@ callouts:
     title: "Test investigation outcome"
     text: "The simulated evidence demonstrates how structured forensic findings can be presented in Trace & Triage."
     
+
+    
+attackTechniques:
+  - id: "T1059.001"
+    name: "PowerShell"
+    tactic: "Execution"
+    evidence: "Fictional Sysmon process creation telemetry."
+    assessment: "Background"
+    confidence: "Low"
+    reference: "https://attack.mitre.org/techniques/T1059/001/"
+
+  - id: "T1486"
+    name: "Data Encrypted for Impact"
+    tactic: "Impact"
+    evidence: "Illustrative ransomware behaviour for testing."
+    assessment: "Background"
+    confidence: "Low"
+    reference: "https://attack.mitre.org/techniques/T1486/"
+
+spartaTechniques: []
 ---
 
 # Executive Summary
