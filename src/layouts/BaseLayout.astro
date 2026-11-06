@@ -128,6 +128,13 @@ const socialImageURL = getAbsoluteImageURL(image);
       content={publishedDate.toISOString()}
     />
   )}
+
+  <link
+    rel="alternate"
+    type="application/rss+xml"
+    title="Trace & Triage Research RSS Feed"
+    href={`${import.meta.env.BASE_URL}rss.xml`}
+  />
 </head>
 
 <body>
