@@ -7,19 +7,26 @@ import {
 } from "astro:content";
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// Components
 import ImageLightbox from "../../components/ImageLightbox.astro";
 import RelatedResearch from "../../components/RelatedResearch.astro";
 import ForensicTimeline from "../../components/ForensicTimeline.astro";
 import IOCTable from "../../components/IOCTable.astro";
 import ResearchCallout from "../../components/ResearchCallout.astro";
 import FrameworkMapping from "../../components/FrameworkMapping.astro";
+import ShareArticle from "../../components/ShareArticle.astro";
 
+// Utilities
 import {
   getReadingTime,
   formatReadingTime
 } from "../../utils/readingTime";
 
-// Generate a page for each published article
+// ==========================================
+// GENERATE RESEARCH ARTICLE PAGES
+// ==========================================
+
 export async function getStaticPaths() {
   const articles = await getCollection(
     "research",
@@ -36,6 +43,10 @@ export async function getStaticPaths() {
   }));
 }
 
+// ==========================================
+// ARTICLE TYPES
+// ==========================================
+
 interface Props {
   article: CollectionEntry<"research">;
 }
@@ -45,23 +56,45 @@ const { article } = Astro.props as Props;
 // Render Markdown and extract headings
 const { Content, headings } = await render(article);
 
-// Automatic Table of Contents
+// ==========================================
+// AUTOMATIC TABLE OF CONTENTS
+// ==========================================
+
 const tocHeadings = headings.filter(
-  (heading) => heading.depth === 2 || heading.depth === 3
+  (heading) =>
+    heading.depth === 2 ||
+    heading.depth === 3
 );
 
-// Reading time
+// ==========================================
+// AUTOMATIC READING TIME
+// ==========================================
+
 const readingLabel = formatReadingTime(
   getReadingTime(article)
 );
 
-// GitHub Pages base path
+// ==========================================
+// URLS AND HERO IMAGE
+// ==========================================
+
 const base = import.meta.env.BASE_URL;
 
-// Hero image URL
-const imageUrl = article.data.heroImage
+// Full public URL for sharing
+const articleUrl = Astro.url.toString();
+
+// Convert image path for GitHub Pages
+const heroImageUrl = article.data.heroImage
   ? `${base}${article.data.heroImage.replace(/^\/+/, "")}`
   : undefined;
+
+// ==========================================
+// ARTICLE STATUS
+// ==========================================
+
+const statusClass = article.data.status
+  .toLowerCase()
+  .replace(/\s+/g, "-");
 ---
 
 <BaseLayout
@@ -72,324 +105,375 @@ const imageUrl = article.data.heroImage
   publishedDate={article.data.date}
 >
 
-<article class="research-article">
+  <article class="research-article">
 
-  <!-- ARTICLE HEADER -->
+    <!-- ARTICLE HEADER -->
 
-  <header class="article-header">
+    <header class="article-header">
 
-    <div class="article-type">
-      <span class="case-id">
-        {article.data.caseId}
-      </span>
+      <div class="article-top">
+        <span class="case-id">
+          {article.data.caseId}
+        </span>
 
-      <span class="category">
-        {article.data.category}
-      </span>
-    </div>
+        <span class="article-category">
+          {article.data.category}
+        </span>
+      </div>
 
-    <h1>{article.data.title}</h1>
+      <h1>{article.data.title}</h1>
 
-    <p class="article-description">
-      {article.data.description}
-    </p>
+      <p class="article-description">
+        {article.data.description}
+      </p>
 
-    <!-- HERO IMAGE -->
+      <!-- HERO IMAGE -->
 
-    {imageUrl && (
-      <img
-        class="hero-image"
-        src={imageUrl}
-        alt={article.data.heroImageAlt ?? article.data.title}
-        loading="eager"
-      />
-    )}
-
-    <!-- ARTICLE METADATA -->
-
-    <div class="metadata">
-      <span>
-        {article.data.date.toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        })}
-      </span>
-
-      <span class="reading-time">
-        {readingLabel}
-      </span>
-
-      {article.data.difficulty && (
-        <span>{article.data.difficulty}</span>
+      {heroImageUrl && (
+        <img
+          class="hero-image"
+          src={heroImageUrl}
+          alt={article.data.heroImageAlt ?? article.data.title}
+          loading="eager"
+          decoding="async"
+        />
       )}
 
-      <span>{article.data.status}</span>
-    </div>
+      <!-- ARTICLE METADATA -->
 
-    <!-- TAGS -->
+      <div class="article-metadata">
 
-    {article.data.tags.length > 0 && (
-      <div class="tags">
-        {article.data.tags.map((tag: string) => (
-          <span class="tag">{tag}</span>
-        ))}
-      </div>
-    )}
+        <span>
+          {article.data.date.toLocaleDateString(
+            "en-GB",
+            {
+              day: "numeric",
+              month: "long",
+              year: "numeric"
+            }
+          )}
+        </span>
 
-  </header>
+        <span class="reading-time">
+          {readingLabel}
+        </span>
 
-  <!-- INVESTIGATION SUMMARY -->
+        {article.data.difficulty && (
+          <span>{article.data.difficulty}</span>
+        )}
 
-  <section class="investigation-summary">
-    <h2>Investigation Summary</h2>
+        <span class:list={["article-status", statusClass]}>
+          {article.data.status}
+        </span>
 
-    <div class="summary-grid">
-
-      <div>
-        <strong>Case ID</strong>
-        <span>{article.data.caseId}</span>
-      </div>
-
-      <div>
-        <strong>Category</strong>
-        <span>{article.data.category}</span>
       </div>
 
-      <div>
-        <strong>Platform</strong>
-        <span>{article.data.platform ?? "Not specified"}</span>
-      </div>
+      <!-- ARTICLE TAGS -->
 
-      <div>
-        <strong>Environment</strong>
-        <span>{article.data.environment ?? "Not specified"}</span>
-      </div>
-
-      <div>
-        <strong>Difficulty</strong>
-        <span>{article.data.difficulty ?? "Not specified"}</span>
-      </div>
-
-      <div>
-        <strong>Status</strong>
-        <span>{article.data.status}</span>
-      </div>
-
-      {article.data.subject && (
-        <div>
-          <strong>Subject</strong>
-          <span>{article.data.subject}</span>
+      {article.data.tags.length > 0 && (
+        <div class="article-tags">
+          {article.data.tags.map((tag) => (
+            <span class="article-tag">{tag}</span>
+          ))}
         </div>
       )}
 
-    </div>
+    </header>
 
-    {article.data.tools.length > 0 && (
-      <div class="tools">
-        <strong>Tools Used</strong>
-        <p>{article.data.tools.join(" • ")}</p>
+    <!-- INVESTIGATION SUMMARY -->
+
+    <section class="investigation-summary">
+
+      <h2>Investigation Summary</h2>
+
+      <div class="summary-grid">
+
+        <div>
+          <strong>Case Reference</strong>
+          <span>{article.data.caseId}</span>
+        </div>
+
+        <div>
+          <strong>Category</strong>
+          <span>{article.data.category}</span>
+        </div>
+
+        <div>
+          <strong>Platform</strong>
+          <span>{article.data.platform ?? "Not specified"}</span>
+        </div>
+
+        <div>
+          <strong>Environment</strong>
+          <span>{article.data.environment ?? "Not specified"}</span>
+        </div>
+
+        <div>
+          <strong>Difficulty</strong>
+          <span>{article.data.difficulty ?? "Not specified"}</span>
+        </div>
+
+        <div>
+          <strong>Status</strong>
+          <span>{article.data.status}</span>
+        </div>
+
+        {article.data.subject && (
+          <div>
+            <strong>Subject</strong>
+            <span>{article.data.subject}</span>
+          </div>
+        )}
+
       </div>
+
+      {article.data.tools.length > 0 && (
+        <div class="summary-tools">
+          <strong>Tools Used</strong>
+          <p>{article.data.tools.join(" • ")}</p>
+        </div>
+      )}
+
+    </section>
+
+    <!-- AUTOMATIC TABLE OF CONTENTS -->
+
+    {tocHeadings.length > 0 && (
+      <nav
+        class="table-of-contents"
+        aria-label="Article table of contents"
+        data-pagefind-ignore
+      >
+
+        <div class="toc-header">
+          <span class="toc-label">
+            ARTICLE CONTENTS
+          </span>
+
+          <span class="toc-count">
+            {tocHeadings.length} sections
+          </span>
+        </div>
+
+        <ol class="toc-list">
+          {tocHeadings.map((heading, index) => (
+            <li
+              class:list={[
+                "toc-item",
+                {
+                  "toc-subsection": heading.depth === 3
+                }
+              ]}
+            >
+              <a href={`#${heading.slug}`}>
+                <span class="toc-number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+
+                <span>{heading.text}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+
+      </nav>
     )}
 
-  </section>
+    <!-- MAIN MARKDOWN ARTICLE -->
 
-  <!-- TABLE OF CONTENTS -->
+    <div class="article-content" data-pagefind-body>
+      <Content />
+    </div>
 
-  {tocHeadings.length > 0 && (
-    <nav
-      class="table-of-contents"
-      aria-label="Article table of contents"
-      data-pagefind-ignore
-    >
-      <div class="toc-header">
-        <span class="toc-label">
-          ARTICLE CONTENTS
-        </span>
+    <!-- SCREENSHOT LIGHTBOX -->
 
-        <span class="toc-count">
-          {tocHeadings.length} sections
-        </span>
-      </div>
+    <ImageLightbox />
 
-      <ol class="toc-list">
-        {tocHeadings.map((heading, index) => (
-          <li
-            class:list={[
-              "toc-item",
-              { "toc-subsection": heading.depth === 3 }
-            ]}
-          >
-            <a href={`#${heading.slug}`}>
-              <span class="toc-number">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span>{heading.text}</span>
-            </a>
-          </li>
+    <!-- FORENSIC TIMELINE -->
+
+    {article.data.timeline.length > 0 && (
+      <ForensicTimeline
+        events={article.data.timeline}
+      />
+    )}
+
+    <!-- INDICATORS OF COMPROMISE -->
+
+    {article.data.indicators.length > 0 && (
+      <IOCTable
+        indicators={article.data.indicators}
+      />
+    )}
+
+    <!-- EVIDENCE AND FINDINGS -->
+
+    {article.data.callouts.length > 0 && (
+      <section class="research-findings">
+
+        <h2>Investigation Findings & Notes</h2>
+
+        {article.data.callouts.map((callout) => (
+          <ResearchCallout
+            type={callout.type}
+            title={callout.title}
+            text={callout.text}
+            reference={callout.reference}
+          />
         ))}
-      </ol>
-    </nav>
-  )}
 
-  <!-- ACTUAL MARKDOWN ARTICLE -->
+      </section>
+    )}
 
-  <div class="article-content" data-pagefind-body>
-    <Content />
-  </div>
+    <!-- MITRE ATT&CK MAPPING -->
 
-  <!-- RESEARCH FINDINGS -->
-   {article.data.callouts.length > 0 && (
-    <section class="research-findings">
+    {article.data.attackTechniques.length > 0 && (
+      <FrameworkMapping
+        framework="MITRE ATT&CK"
+        techniques={article.data.attackTechniques}
+      />
+    )}
 
-      <h2>Investigation Findings & Notes</h2>
+    <!-- SPARTA MAPPING -->
 
-      {article.data.callouts.map((callout) => (
-        <ResearchCallout
-          type={callout.type}
-          title={callout.title}
-          text={callout.text}
-          reference={callout.reference}
-        />
-      ))}
-    </section>
-   )}
+    {article.data.spartaTechniques.length > 0 && (
+      <FrameworkMapping
+        framework="SPARTA"
+        techniques={article.data.spartaTechniques}
+      />
+    )}
 
-  <!-- FORENSICS TIMELINE -->
-  {article.data.timeline.length > 0 && (
-    <ForensicTimeline
-      events={article.data.timeline}
-    />
-  )}
+    <!-- REFERENCES -->
 
-  <!-- INDICATORS OF COMPROMISE -->
+    {article.data.references.length > 0 && (
+      <section class="references">
 
-  {article.data.indicators.length > 0 && (
-    <IOCTable
-      indicators={article.data.indicators}
-    />
-  )}
+        <h2>References</h2>
 
-  <!-- FRAMEWORK MAPPINGS -->
-   
-  {article.data.attackTechniques.length > 0 && (
-    <FrameworkMapping
-      framework="MITRE ATT&CK"
-      techniques={article.data.attackTechniques}
-    />
-  )}
+        <ul>
+          {article.data.references.map((reference) => (
+            <li>
+              <a
+                href={reference.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {reference.title}
+              </a>
+            </li>
+          ))}
+        </ul>
 
-  {article.data.spartaTechniques.length > 0 && (
-    <FrameworkMapping
-      framework="SPARTA"
-      techniques={article.data.spartaTechniques}
-    />
-  )}
+      </section>
+    )}
 
+    <!-- SUPPORTING GITHUB REPOSITORY -->
 
-  <!-- SCREENSHOT LIGHTBOX -->
+    {article.data.githubUrl && (
+      <section class="supporting-repository">
 
-  <ImageLightbox />
+        <p class="case-id">SUPPORTING MATERIAL</p>
 
-  <!-- REFERENCES -->
+        <h2>Research Repository</h2>
 
-  {article.data.references.length > 0 && (
-    <section class="references">
-      <h2>References</h2>
+        <p>
+          Explore supporting documentation, research scripts,
+          sanitised evidence and additional technical material
+          associated with this investigation.
+        </p>
 
-      <ul>
-        {article.data.references.map((reference) => (
-          <li>
-            <a
-              href={reference.url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {reference.title}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
+        <a
+          href={article.data.githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View Supporting Repository on GitHub ↗
+        </a>
 
-  <!-- SUPPORTING MATERIAL -->
+      </section>
+    )}
 
-  {article.data.githubUrl && (
-    <section class="supporting-material">
-      <h2>Supporting Material</h2>
+    <!-- RESEARCH METHODOLOGY -->
+
+    <section class="methodology-reference">
+
+      <p class="case-id">RESEARCH STANDARDS</p>
+
+      <h2>Research Methodology</h2>
 
       <p>
-        Additional research notes, sanitised evidence
-        and supporting technical material.
+        This investigation follows the general research
+        and evidence-handling principles documented by
+        Trace & Triage.
+
+        Investigation-specific methods and limitations
+        are described within the article.
       </p>
 
-      <a
-        href={article.data.githubUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        View supporting material on GitHub →
+      <a href={`${base}methodology/`}>
+        View Research Methodology →
       </a>
+
     </section>
-  )}
 
-  <!-- RELATED RESEARCH -->
+    <!-- SHARE ARTICLE -->
 
-  <RelatedResearch currentArticle={article} />
+    <ShareArticle
+      title={article.data.title}
+      url={articleUrl}
+    />
 
-  <section class="methodology-reference">
-    <p class="case-id">RESEARCH STANDARDS</p>
+    <!-- RELATED RESEARCH -->
 
-    <h2>Research Methodology</h2>
+    <RelatedResearch currentArticle={article} />
 
-    <p>
-      This investigation follows the general research and evidence-handling principles documented by Trace & Triage.
-      Any investigation-specific methods or limitations are described within the article.
-    </p>
+    <!-- ARTICLE FOOTER -->
 
-    <a href={`${base}methodology/`}>
-      View Research Methodology
-    </a>
-  </section>
+    <footer class="article-footer">
 
-  <!-- ARTICLE FOOTER -->
-  <div class="article-footer">
-    <p class="case-id">{article.data.caseId}</p>
+      <p class="case-id">
+        {article.data.caseId}
+      </p>
 
-    <p>
-      Trace & Triage — Digital Forensics,
-      Incident Response & Security Research
-    </p>
+      <p>
+        Trace & Triage — Digital Forensics,
+        Incident Response & Security Research
+      </p>
 
-    <a href={`${base}research/`}>
-      ← Back to Research
-    </a>
-  </div>
+      <a href={`${base}research/`}>
+        ← Back to Research
+      </a>
 
-</article>
+    </footer>
+
+  </article>
 
 </BaseLayout>
 
 <style>
+  /* ==========================================
+     RESEARCH ARTICLE LAYOUT
+     ========================================== */
+
   .research-article {
     max-width: 900px;
     margin: 0 auto;
   }
 
+  /* ARTICLE HEADER */
+
   .article-header {
-    padding: 45px 0;
+    padding: 50px 0 40px;
     border-bottom: 1px solid var(--border);
   }
 
-  .article-type {
+  .article-top {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 15px;
   }
 
-  .category {
+  .article-category {
     color: var(--muted);
     font-family: Consolas, monospace;
     font-size: 0.85rem;
@@ -397,14 +481,18 @@ const imageUrl = article.data.heroImage
   }
 
   .article-header h1 {
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
     margin: 20px 0;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.15;
   }
 
   .article-description {
     color: var(--muted);
-    font-size: 1.2rem;
+    font-size: 1.15rem;
+    line-height: 1.7;
   }
+
+  /* HERO IMAGE */
 
   .hero-image {
     display: block;
@@ -415,10 +503,13 @@ const imageUrl = article.data.heroImage
     border-radius: 12px;
   }
 
-  .metadata {
+  /* ARTICLE METADATA */
+
+  .article-metadata {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    align-items: center;
+    gap: 18px;
     margin: 25px 0;
     color: var(--muted);
     font-family: Consolas, monospace;
@@ -430,20 +521,38 @@ const imageUrl = article.data.heroImage
     font-weight: 600;
   }
 
-  .tags {
+  .article-status {
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .article-status.completed {
+    color: #86c7aa;
+  }
+
+  .article-status.in-progress {
+    color: #e5b96c;
+  }
+
+  /* TAGS */
+
+  .article-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-top: 20px;
   }
 
-  .tags .tag {
+  .article-tag {
     padding: 5px 10px;
     border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--muted);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
   }
+
+  /* INVESTIGATION SUMMARY */
 
   .investigation-summary {
     margin: 45px 0;
@@ -455,8 +564,8 @@ const imageUrl = article.data.heroImage
 
   .investigation-summary h2 {
     margin: 0 0 25px;
-    font-size: 1.2rem;
     color: var(--accent);
+    font-size: 1.25rem;
   }
 
   .summary-grid {
@@ -466,25 +575,32 @@ const imageUrl = article.data.heroImage
     gap: 25px;
   }
 
-  .summary-grid div {
+  .summary-grid > div {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
   }
 
   .summary-grid strong,
-  .tools strong {
+  .summary-tools strong {
     color: var(--muted);
     font-family: Consolas, monospace;
     font-size: 0.75rem;
     text-transform: uppercase;
   }
 
-  .tools {
+  .summary-tools {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
   }
+
+  .summary-tools p {
+    color: var(--text);
+    margin-bottom: 0;
+  }
+
+  /* MARKDOWN CONTENT */
 
   .article-content {
     line-height: 1.8;
@@ -503,6 +619,10 @@ const imageUrl = article.data.heroImage
     scroll-margin-top: 35px;
   }
 
+  .article-content :global(p) {
+    margin: 18px 0;
+  }
+
   .article-content :global(img) {
     display: block;
     max-width: 100%;
@@ -511,10 +631,19 @@ const imageUrl = article.data.heroImage
     border: 1px solid var(--border);
     border-radius: 10px;
     cursor: zoom-in;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
   .article-content :global(img:hover) {
     border-color: var(--accent);
+    box-shadow: 0 8px 35px rgba(82, 199, 234, 0.15);
+  }
+
+  .article-content :global(img:focus-visible) {
+    outline: 3px solid var(--accent);
+    outline-offset: 4px;
   }
 
   .article-content :global(p > em:only-child) {
@@ -559,43 +688,62 @@ const imageUrl = article.data.heroImage
     color: var(--muted);
   }
 
-  .references,
-  .supporting-material {
+  /* FINDINGS */
+
+  .research-findings {
+    margin: 55px 0;
+  }
+
+  .research-findings > h2 {
+    margin-bottom: 30px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* REFERENCES */
+
+  .references {
     margin-top: 55px;
     padding-top: 20px;
     border-top: 1px solid var(--border);
   }
 
-  .article-footer {
-    margin-top: 70px;
-    padding-top: 25px;
-    border-top: 1px solid var(--border);
+  .references li {
+    margin-bottom: 10px;
+  }
+
+  /* SUPPORTING REPOSITORY */
+
+  .supporting-repository {
+    margin: 45px 0;
+    padding: 25px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .supporting-repository h2 {
+    margin: 10px 0;
+    font-size: 1.3rem;
+  }
+
+  .supporting-repository p {
     color: var(--muted);
-    font-size: 0.9rem;
+    line-height: 1.7;
   }
 
-  .article-footer a {
+  .supporting-repository a {
     display: inline-block;
-    margin-top: 15px;
+    margin-top: 12px;
+    color: var(--accent);
+    font-weight: 600;
   }
 
-  @media (max-width: 600px) {
-    .investigation-summary {
-      padding: 20px;
-    }
-
-    .article-header {
-      padding: 25px 0;
-    }
-  }
-
-
-  /* RESEARCH METHODOLOGY */
+  /* METHODOLOGY */
 
   .methodology-reference {
     margin-top: 60px;
     padding: 28px;
-
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
@@ -618,22 +766,41 @@ const imageUrl = article.data.heroImage
     font-weight: 600;
   }
 
-  .methodology-reference a:hover {
-    text-decoration: underline;
+  /* FOOTER */
+
+  .article-footer {
+    margin-top: 70px;
+    padding: 25px 0;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.9rem;
   }
 
-  /* Investigation findings */
-
-  .research-findings {
-    margin: 55px 0;
+  .article-footer a {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--accent);
   }
 
-  .research-findings > h2 {
-    margin-bottom: 30px;
-    padding-bottom: 12px;
+  /* MOBILE */
 
-    color: var(--text);
-    border-bottom: 1px solid var(--border);
-    font-size: 1.5rem;
+  @media (max-width: 600px) {
+    .article-header {
+      padding: 30px 0;
+    }
+
+    .investigation-summary {
+      padding: 20px;
+    }
+
+    .methodology-reference,
+    .supporting-repository {
+      padding: 20px;
+    }
+
+    .article-metadata {
+      gap: 12px;
+      font-size: 0.8rem;
+    }
   }
 </style>
