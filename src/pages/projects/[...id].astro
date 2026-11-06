@@ -7,6 +7,7 @@ import {
 } from "astro:content";
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import DroneFlightMap from "../../components/DroneFlightMap.astro";
 
 // ==========================================
 // GENERATE PROJECT PAGES
@@ -166,6 +167,8 @@ const statusClass = project.data.status
 
       </div>
 
+      
+
       <!-- TECHNOLOGIES -->
 
       {project.data.technologies.length > 0 && (
@@ -185,6 +188,14 @@ const statusClass = project.data.status
       )}
 
     </section>
+
+    <!-- Drone Stuff -->
+
+    {project.data.projectId === "TT-PR-003" && (
+      <DroneFlightMap
+        title="Drone Flight Reconstructions"
+      />
+    )}
 
     <!-- PROJECT OBJECTIVES -->
 
@@ -207,6 +218,8 @@ const statusClass = project.data.status
     <div class="project-content">
       <Content />
     </div>
+
+    
 
     <!-- SUPPORTING GITHUB REPOSITORY -->
 
