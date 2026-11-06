@@ -1,67 +1,169 @@
+
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+
+// GitHub Pages base path
+const base = import.meta.env.BASE_URL;
+
+const projects = await getCollection(
+  "projects",
+  ({ data }) => !data.draft
+);
+
+// Sort alphabetically for now
+const sortedProjects = [...projects].sort(
+  (a, b) => a.data.title.localeCompare(b.data.title)
+);
 ---
 
-<BaseLayout title="Projects | Trace & Triage">
+<BaseLayout
+  title="Projects | Trace & Triage"
+  description="Digital forensic laboratories, technical experiments and ongoing research projects."
+>
 
-<p class="case-id">PROJECTS</p>
+  <section class="projects-header">
+    <p class="case-id">RESEARCH PORTFOLIO</p>
 
-<h1>Projects</h1>
+    <h1>Projects</h1>
 
-<p class="hero-subtitle">
-  Larger technical projects, laboratories and research environments.
-</p>
-
-
-<div class="grid">
-
-  <div class="card">
-
-    <span class="case-id">
-      PROJECT-001
-    </span>
-
-    <h3>Windows Forensics Lab</h3>
-
-    <p class="muted">
-      A controlled Windows environment used to generate,
-      collect and analyse forensic artefacts.
+    <p class="hero-subtitle">
+      Technical laboratories, forensic experiments
+      and ongoing research.
     </p>
+  </section>
 
-  </div>
+  <section class="project-grid">
 
+    {sortedProjects.map((project) => (
 
-  <div class="card">
+      <a
+        class="project-card"
+        href={`${base}projects/${project.id}/`}
+      >
 
-    <span class="case-id">
-      PROJECT-002
-    </span>
+        <div class="project-top">
+          <span class="case-id">
+            {project.data.projectId}
+          </span>
 
-    <h3>Malware Analysis Lab</h3>
+          <span class="project-status">
+            {project.data.status}
+          </span>
+        </div>
 
-    <p class="muted">
-      An isolated environment for static and dynamic
-      malware analysis.
+        <h2>{project.data.title}</h2>
+
+        <p class="project-description">
+          {project.data.description}
+        </p>
+
+        <div class="technologies">
+          {project.data.technologies.map((tech: string) => (
+            <span class="tech-tag">{tech}</span>
+          ))}
+        </div>
+
+        <span class="view-project">
+          View Project →
+        </span>
+
+      </a>
+
+    ))}
+
+  </section>
+
+  {sortedProjects.length === 0 && (
+    <p class="empty-message">
+      Research projects are being prepared.
     </p>
-
-  </div>
-
-
-  <div class="card">
-
-    <span class="case-id">
-      PROJECT-003
-    </span>
-
-    <h3>Detection Lab</h3>
-
-    <p class="muted">
-      Generating attack telemetry and developing
-      defensive detections.
-    </p>
-
-  </div>
-
-</div>
+  )}
 
 </BaseLayout>
+
+<style>
+  .projects-header {
+    margin: 50px 0;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 28px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    color: var(--text);
+    text-decoration: none;
+
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .project-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+  }
+
+  .project-card h2 {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .project-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .project-status {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+  }
+
+  .project-description {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tech-tag {
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .view-project {
+    margin-top: auto;
+    padding-top: 12px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .empty-message {
+    margin: 40px 0;
+    color: var(--muted);
+  }
+</style>

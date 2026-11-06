@@ -1,0 +1,629 @@
+
+---
+import {
+  getCollection,
+  render,
+  type CollectionEntry
+} from "astro:content";
+
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// ==========================================
+// GENERATE PROJECT PAGES
+// ==========================================
+
+export async function getStaticPaths() {
+  const projects = await getCollection(
+    "projects",
+    ({ data }) => !data.draft
+  );
+
+  return projects.map((project) => ({
+    params: {
+      id: project.id
+    },
+    props: {
+      project
+    }
+  }));
+}
+
+// ==========================================
+// PROJECT TYPES
+// ==========================================
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props as Props;
+
+// Render project Markdown
+const { Content } = await render(project);
+
+// GitHub Pages base path
+const base = import.meta.env.BASE_URL;
+
+// ==========================================
+// HERO IMAGE
+// ==========================================
+
+const heroImageUrl = project.data.heroImage
+  ? `${base}${project.data.heroImage.replace(/^\/+/, "")}`
+  : undefined;
+
+// ==========================================
+// RELATED RESEARCH
+// ==========================================
+
+// Load published research articles
+const publishedResearch = await getCollection(
+  "research",
+  ({ data }) => !data.draft
+);
+
+// IDs of research linked to this project
+const relatedResearchIds = new Set(
+  project.data.relatedResearch
+);
+
+// Match published research with project IDs
+const relatedArticles = publishedResearch.filter(
+  (article) => relatedResearchIds.has(article.id)
+);
+
+// ==========================================
+// PROJECT STATUS STYLING
+// ==========================================
+
+const statusClass = project.data.status
+  .toLowerCase()
+  .replace(/\s+/g, "-");
+---
+
+<BaseLayout
+  title={`${project.data.title} | Trace & Triage`}
+  description={project.data.description}
+  image={project.data.heroImage}
+>
+
+  <article class="project-page">
+
+    <!-- PROJECT HEADER -->
+
+    <header class="project-header">
+
+      <div class="project-meta">
+
+        <span class="case-id">
+          {project.data.projectId}
+        </span>
+
+        <span class:list={["project-status", statusClass]}>
+          {project.data.status}
+        </span>
+
+      </div>
+
+      <h1>{project.data.title}</h1>
+
+      <p class="hero-subtitle">
+        {project.data.description}
+      </p>
+
+      <!-- PROJECT HERO IMAGE -->
+
+      {heroImageUrl && (
+        <img
+          class="project-hero"
+          src={heroImageUrl}
+          alt={project.data.heroImageAlt ?? project.data.title}
+          loading="lazy"
+          decoding="async"
+        />
+      )}
+
+    </header>
+
+    <!-- PROJECT SUMMARY -->
+
+    <section class="project-summary">
+
+      <h2>Project Summary</h2>
+
+      <div class="summary-grid">
+
+        <div>
+          <strong>Project ID</strong>
+          <span>{project.data.projectId}</span>
+        </div>
+
+        <div>
+          <strong>Status</strong>
+          <span>{project.data.status}</span>
+        </div>
+
+        <div>
+          <strong>Category</strong>
+          <span>{project.data.category}</span>
+        </div>
+
+        {project.data.startDate && (
+          <div>
+            <strong>Started</strong>
+            <span>
+              {project.data.startDate.toLocaleDateString(
+                "en-GB",
+                {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric"
+                }
+              )}
+            </span>
+          </div>
+        )}
+
+      </div>
+
+      <!-- TECHNOLOGIES -->
+
+      {project.data.technologies.length > 0 && (
+        <div class="technologies">
+
+          <strong>Technologies</strong>
+
+          <div class="technology-tags">
+            {project.data.technologies.map((tech) => (
+              <span class="technology-tag">
+                {tech}
+              </span>
+            ))}
+          </div>
+
+        </div>
+      )}
+
+    </section>
+
+    <!-- PROJECT OBJECTIVES -->
+
+    {project.data.objectives.length > 0 && (
+      <section class="project-objectives">
+
+        <h2>Project Objectives</h2>
+
+        <ul>
+          {project.data.objectives.map((objective) => (
+            <li>{objective}</li>
+          ))}
+        </ul>
+
+      </section>
+    )}
+
+    <!-- PROJECT MARKDOWN CONTENT -->
+
+    <div class="project-content">
+      <Content />
+    </div>
+
+    <!-- SUPPORTING GITHUB REPOSITORY -->
+
+    {project.data.githubUrl && (
+      <section class="project-github">
+
+        <h2>Supporting Repository</h2>
+
+        <p>
+          Additional technical documentation,
+          supporting scripts and research material
+          associated with this project.
+        </p>
+
+        <a
+          href={project.data.githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View Project on GitHub →
+        </a>
+
+      </section>
+    )}
+
+    <!-- RELATED RESEARCH -->
+
+    {relatedArticles.length > 0 && (
+      <section class="related-project-research">
+
+        <div class="related-header">
+          <p class="section-label">
+            CONTINUE INVESTIGATING
+          </p>
+
+          <h2>Related Research</h2>
+
+          <p>
+            Published Trace & Triage investigations
+            associated with this project.
+          </p>
+        </div>
+
+        <div class="related-list">
+
+          {relatedArticles.map((article) => (
+
+            <a
+              class="related-link"
+              href={`${base}research/${article.id}/`}
+            >
+
+              <span class="case-id">
+                {article.data.caseId}
+              </span>
+
+              <h3>{article.data.title}</h3>
+
+              <p>{article.data.description}</p>
+
+              <div class="related-meta">
+
+                <span>{article.data.category}</span>
+
+                <span>
+                  {article.data.date.toLocaleDateString(
+                    "en-GB"
+                  )}
+                </span>
+
+              </div>
+
+            </a>
+
+          ))}
+
+        </div>
+
+      </section>
+    )}
+
+    <!-- PROJECT FOOTER -->
+
+    <footer class="project-footer">
+
+      <p class="case-id">
+        {project.data.projectId}
+      </p>
+
+      <p>
+        Trace & Triage — Digital Forensics,
+        Incident Response & Security Research
+      </p>
+
+      <a href={`${base}projects/`}>
+        ← Back to Projects
+      </a>
+
+    </footer>
+
+  </article>
+
+</BaseLayout>
+
+<style>
+  /* ==========================================
+     PROJECT PAGE
+     ========================================== */
+
+  .project-page {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* HEADER */
+
+  .project-header {
+    padding: 50px 0 40px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .project-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .project-status {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .project-status.active {
+    color: #86c7aa;
+    border-color: #416e5a;
+  }
+
+  .project-status.completed {
+    color: var(--accent);
+  }
+
+  .project-status.on-hold {
+    color: #e5b96c;
+  }
+
+  .project-header h1 {
+    margin: 20px 0;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.15;
+  }
+
+  /* HERO IMAGE */
+
+  .project-hero {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 30px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  /* PROJECT SUMMARY */
+
+  .project-summary {
+    margin: 45px 0;
+    padding: 30px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .project-summary h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: var(--accent);
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(180px, 1fr));
+    gap: 25px;
+  }
+
+  .summary-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .summary-grid strong,
+  .technologies strong {
+    color: var(--muted);
+    font-family: Consolas, monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  /* TECHNOLOGIES */
+
+  .technologies {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .technology-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .technology-tag {
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /* OBJECTIVES */
+
+  .project-objectives {
+    margin: 45px 0;
+  }
+
+  .project-objectives h2 {
+    margin-bottom: 20px;
+  }
+
+  .project-objectives li {
+    margin-bottom: 10px;
+    color: var(--muted);
+  }
+
+  /* MARKDOWN CONTENT */
+
+  .project-content {
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+
+  .project-content :global(h2) {
+    margin-top: 50px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .project-content :global(h3) {
+    margin-top: 30px;
+  }
+
+  .project-content :global(p) {
+    margin: 18px 0;
+  }
+
+  .project-content :global(img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 25px auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .project-content :global(table) {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    margin: 25px 0;
+  }
+
+  .project-content :global(th),
+  .project-content :global(td) {
+    padding: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .project-content :global(pre) {
+    overflow-x: auto;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  /* GITHUB */
+
+  .project-github {
+    margin-top: 55px;
+    padding: 25px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .project-github p {
+    color: var(--muted);
+  }
+
+  .project-github a {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* RELATED RESEARCH */
+
+  .related-project-research {
+    margin-top: 65px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .related-header h2 {
+    margin: 10px 0;
+    font-size: 1.7rem;
+  }
+
+  .related-header p {
+    color: var(--muted);
+  }
+
+  .related-list {
+    display: grid;
+    gap: 15px;
+    margin-top: 25px;
+  }
+
+  .related-link {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 25px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .related-link:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .related-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .related-link h3 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .related-link p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .related-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /* FOOTER */
+
+  .project-footer {
+    margin-top: 65px;
+    padding: 25px 0;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .project-footer a {
+    display: inline-block;
+    margin-top: 15px;
+    color: var(--accent);
+  }
+
+  /* MOBILE */
+
+  @media (max-width: 600px) {
+    .project-header {
+      padding: 30px 0;
+    }
+
+    .project-summary {
+      padding: 20px;
+    }
+
+    .related-link {
+      padding: 18px;
+    }
+  }
+</style>
