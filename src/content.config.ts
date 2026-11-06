@@ -179,7 +179,44 @@ const research = defineCollection({
 
 });
 
+const projects = defineCollection({
+  loader: glob({
+    pattern: "**/*.md",
+    base: "./scr/content/projects",
+  }),
+
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    projectId: z.string(),
+
+    status: z.enum([
+      "Planned",
+      "Active",
+      "Completed",
+      "On Hold",
+    ]).default("Planned"),
+
+    category: z.string(),
+
+    startDate: z.coerce.date().optional(),
+
+    technologies: z.array(z.string()).default([]),
+
+    objectives: z.array(z.string()).default([]),
+
+    relatedResearch: z.array(z.string()).default([]),
+
+    githubUrl: z.string().url().optional(),
+
+    heroImage: z.string().optional(),
+
+    draft: z.boolean().default(false),
+  }),
+});
+
 // Export the collection so Astro can use it.
-export const collections = {
+export const collection = {
   research,
+  projects,
 };

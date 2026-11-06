@@ -1,0 +1,182 @@
+
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const base = import.meta.env.BASE_URL;
+
+const projects = await getCollection(
+  "projects",
+  ({ data }) => !data.draft
+);
+
+const sortedProjects = projects.sort((a, b) => {
+  const order = {
+    Active: 0,
+    Planned: 1,
+    "On Hold": 2,
+    Completed: 3,
+  };
+
+  return order[a.data.status] - order[b.data.status];
+});
+---
+
+<BaseLayout
+  title="Research Projects | Trace & Triage"
+  description="Explore technical laboratories, digital forensic research environments and ongoing Trace & Triage projects."
+>
+
+  <section class="projects-header">
+    <p class="case-id">RESEARCH ENVIRONMENTS</p>
+
+    <h1>Projects</h1>
+
+    <p class="hero-subtitle">
+      Technical laboratories, experiments and longer-term
+      digital forensic research.
+    </p>
+  </section>
+
+  <div class="project-grid">
+
+    {sortedProjects.map((project) => (
+      <a
+        class="project-card"
+        href={`${base}projects/${project.id}/`}
+      >
+        <div class="project-top">
+          <span class="case-id">
+            {project.data.projectId}
+          </span>
+
+          <span
+            class:list={[
+              "project-status",
+              project.data.status.toLowerCase().replace(" ", "-")
+            ]}
+          >
+            {project.data.status}
+          </span>
+        </div>
+
+        <h2>{project.data.title}</h2>
+
+        <p>{project.data.description}</p>
+
+        <div class="project-technologies">
+          {project.data.technologies.slice(0, 4).map((tech) => (
+            <span>{tech}</span>
+          ))}
+        </div>
+
+        <span class="project-link">
+          View Project →
+        </span>
+      </a>
+    ))}
+
+  </div>
+
+  {sortedProjects.length === 0 && (
+    <p class="muted">
+      Research projects are being prepared for publication.
+    </p>
+  )}
+
+</BaseLayout>
+
+<style>
+  .projects-header {
+    margin: 50px 0;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns:
+      repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+  }
+
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    padding: 28px;
+
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    color: var(--text);
+    text-decoration: none;
+
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .project-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+  }
+
+  .project-top {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .project-status {
+    font-family: Consolas, monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .project-status.active {
+    color: #86c7aa;
+  }
+
+  .project-status.completed {
+    color: var(--accent);
+  }
+
+  .project-status.on-hold {
+    color: #e5b96c;
+  }
+
+  .project-card h2 {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+
+  .project-card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .project-technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .project-technologies span {
+    padding: 5px 9px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .project-link {
+    margin-top: auto;
+    padding-top: 12px;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+</style>
