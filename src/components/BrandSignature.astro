@@ -1,0 +1,98 @@
+---
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+---
+
+<div class:list={["tt-brand-signature", { compact }]}>
+  <div class="brand-meta">
+    <span>INDEPENDENT RESEARCH JOURNAL</span>
+    <span>TT / SYSTEM 01</span>
+  </div>
+
+  <div class="brand-wordmark" aria-label="Trace and Triage">
+    <span>TRACE</span>
+    <span class="ampersand">&amp;</span>
+    <span>TRIAGE</span>
+  </div>
+
+  <p class="brand-subtitle">
+    DIGITAL FORENSICS / INCIDENT RESPONSE / SECURITY RESEARCH
+  </p>
+
+  <div class="brand-footer">
+    <span>RESEARCH</span>
+    <span aria-hidden="true">—</span>
+    <span>ANALYSE</span>
+    <span aria-hidden="true">—</span>
+    <span>DOCUMENT</span>
+  </div>
+</div>
+
+<style>
+  .tt-brand-signature {
+    padding: 35px 0;
+    border-top: 1px solid var(--tt-border);
+    border-bottom: 1px solid var(--tt-border);
+  }
+
+  .brand-meta,
+  .brand-footer,
+  .brand-subtitle {
+    font-family: var(--tt-font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .brand-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: var(--tt-muted);
+  }
+
+  .brand-wordmark {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.18em;
+    margin: 28px 0 15px;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(2.7rem, 8vw, 7rem);
+    letter-spacing: -0.055em;
+    line-height: 1;
+  }
+
+  .ampersand {
+    color: var(--tt-blue);
+    font-style: italic;
+  }
+
+  .brand-subtitle {
+    color: var(--tt-muted);
+    line-height: 1.8;
+  }
+
+  .brand-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+    color: var(--tt-purple);
+  }
+
+  .compact .brand-wordmark {
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+  }
+
+  @media (max-width: 600px) {
+    .brand-meta,
+    .brand-footer {
+      font-size: 0.62rem;
+    }
+  }
+</style>

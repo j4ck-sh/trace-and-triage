@@ -1,0 +1,60 @@
+/* ==========================================
+   TRACE & TRIAGE — MOTION SYSTEM
+   ========================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 650ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  [data-reveal="delay-1"] {
+    transition-delay: 100ms;
+  }
+
+  [data-reveal="delay-2"] {
+    transition-delay: 200ms;
+  }
+
+  [data-reveal="delay-3"] {
+    transition-delay: 300ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Visitor-controlled animation pause */
+
+html.tt-motion-paused *,
+html.tt-motion-paused *::before,
+html.tt-motion-paused *::after {
+  animation-play-state: paused !important;
+  transition-duration: 0s !important;
+}
+
+html.tt-motion-paused [data-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html.tt-motion-paused .tt-typing-host {
+  color: inherit !important;
+}
+
+html.tt-motion-paused .tt-typing-overlay {
+  display: none !important;
+}

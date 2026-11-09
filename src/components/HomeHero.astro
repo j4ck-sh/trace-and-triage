@@ -1,0 +1,185 @@
+---
+const base = import.meta.env.BASE_URL;
+import AmbiantBackground from "./AmbiantBackground.astro";
+
+
+
+
+
+
+---
+
+<section class="tt-home-hero" aria-labelledby="tt-home-title">
+  <AmbiantBackground />
+  <div class="hero-content">
+    <p class="tt-label">TT / INDEPENDENT RESEARCH JOURNAL</p>
+
+    <h1 id="tt-home-title">
+      <span data-typewriter>
+        Evidence tells a story.
+      </span>
+    </h1>
+
+    <p class="hero-description">
+      Trace & Triage explores digital forensics,
+      incident response, malware analysis and
+      specialist technologies through documented
+      research and interactive laboratories.
+    </p>
+
+    <div class="hero-actions">
+      <a class="tt-hero-button primary" data-magnetic href={`${base}research/`}>
+        Explore Research <span aria-hidden="true">↗</span>
+      </a>
+
+      <a class="tt-hero-button secondary" data-magnetic href={`${base}projects/`}>
+        View Projects <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-visual" aria-hidden="true">
+    <div class="orbit orbit-one"></div>
+    <div class="orbit orbit-two"></div>
+    <div class="orbit-center"></div>
+    <span class="visual-label">TT / SIGNAL ANALYSIS</span>
+  </div>
+</section>
+
+<style>
+  .tt-home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(250px, 1fr);
+    align-items: center;
+    gap: 45px;
+    min-height: 570px;
+    padding: 70px 0;
+  }
+
+  h1 {
+    margin: 20px 0 25px;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(3.2rem, 7vw, 6.5rem);
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: -0.055em;
+  }
+
+  .hero-description {
+    max-width: 570px;
+    color: var(--tt-muted);
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .tt-hero-button {
+    display: inline-flex;
+    justify-content: space-between;
+    gap: 22px;
+    padding: 13px 18px;
+    border: 1px solid var(--tt-blue);
+    border-radius: 4px;
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 250ms ease, background 250ms ease;
+  }
+
+  .tt-hero-button.primary {
+    background: var(--tt-blue);
+    color: var(--tt-canvas);
+  }
+
+  .tt-hero-button.secondary {
+    background: transparent;
+    color: var(--tt-blue);
+  }
+
+  .tt-hero-button:hover {
+    transform: translateY(-3px);
+  }
+
+  .hero-visual {
+    position: relative;
+    height: 360px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .orbit {
+    position: absolute;
+    width: 75%;
+    height: 42%;
+    border: 1px solid var(--tt-blue);
+    border-radius: 50%;
+    opacity: 0.55;
+  }
+
+  .orbit-one {
+    transform: rotate(-28deg);
+  }
+
+  .orbit-two {
+    transform: rotate(42deg);
+    border-color: var(--tt-purple);
+  }
+
+  .orbit-center {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: var(--tt-blue);
+    box-shadow: 0 0 30px var(--tt-blue);
+  }
+
+  .visual-label {
+    position: absolute;
+    bottom: 15px;
+    right: 10px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 850px) {
+    .tt-home-hero {
+      grid-template-columns: 1fr;
+      padding: 40px 0;
+    }
+
+    .hero-visual {
+      height: 240px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tt-hero-button {
+      transition: none;
+    }
+
+    .tt-hero-button:hover {
+      transform: none;
+    }
+  }
+
+  .tt-home-hero {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .hero-content,
+  .hero-visual {
+    position: relative;
+    z-index: 1;
+  }
+</style>
