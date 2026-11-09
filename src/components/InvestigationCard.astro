@@ -1,0 +1,205 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  caseId: string;
+  category: string;
+  date: Date;
+  href: string;
+  tags?: string[];
+  readingTime?: string;
+  featured?: boolean;
+}
+
+const {
+  title,
+  description,
+  caseId,
+  category,
+  date,
+  href,
+  tags = [],
+  readingTime,
+  featured = false
+} = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={["investigation-card", { featured }]}
+>
+  <div class="card-top">
+    <span class="card-reference">{caseId}</span>
+    <span class="card-category">{category}</span>
+  </div>
+
+  <div class="card-body">
+    {featured && (
+      <p class="featured-label">
+        FEATURED INVESTIGATION
+      </p>
+    )}
+
+    <h3>{title}</h3>
+    <p class="card-description">{description}</p>
+
+    {tags.length > 0 && (
+      <div class="card-tags">
+        {tags.slice(0, 4).map((tag) => (
+          <span>{tag}</span>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <div class="card-footer">
+    <div>
+      <time datetime={date.toISOString()}>
+        {date.toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        })}
+      </time>
+
+      {readingTime && <span>{readingTime}</span>}
+    </div>
+
+    <span class="card-arrow" aria-hidden="true">↗</span>
+  </div>
+</a>
+
+<style>
+  .investigation-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 0;
+    min-height: 285px;
+    padding: 25px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+    color: var(--tt-text);
+    text-decoration: none;
+    transition:
+      border-color 220ms ease,
+      transform 300ms var(--tt-ease);
+  }
+
+  .investigation-card.featured {
+    min-height: 390px;
+    background: linear-gradient(
+      140deg,
+      var(--tt-raised),
+      var(--tt-deep)
+    );
+  }
+
+  @media (hover: hover) {
+    .investigation-card:hover {
+      border-color: var(--tt-blue);
+      transform: translateY(-4px);
+    }
+  }
+
+  .investigation-card:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 4px;
+  }
+
+  .card-top,
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+
+  .card-reference,
+  .card-category,
+  .featured-label,
+  .card-footer {
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .card-reference,
+  .featured-label {
+    color: var(--tt-purple);
+  }
+
+  .card-category {
+    color: var(--tt-muted);
+    text-align: right;
+  }
+
+  .card-body {
+    margin: 30px 0;
+  }
+
+  h3 {
+    margin: 12px 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .card-description {
+    color: var(--tt-muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 20px;
+  }
+
+  .card-tags span {
+    padding: 4px 8px;
+    border: 1px solid var(--tt-border);
+    border-radius: 3px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .card-footer {
+    align-items: center;
+    padding-top: 18px;
+    border-top: 1px solid var(--tt-border);
+    color: var(--tt-muted);
+  }
+
+  .card-footer > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .card-arrow {
+    color: var(--tt-blue);
+    font-size: 1.4rem;
+    transition: transform 250ms ease;
+  }
+
+  .investigation-card:hover .card-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .investigation-card,
+    .card-arrow {
+      transition: none;
+    }
+
+    .investigation-card:hover,
+    .investigation-card:hover .card-arrow {
+      transform: none;
+    }
+  }
+</style>
