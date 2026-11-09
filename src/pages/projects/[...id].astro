@@ -9,27 +9,10 @@ import {
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 import ProjectHero from "../../components/ProjectHero.astro";
-import LaboratoryPanel from "../../components/LaboratoryPanel.astro";
-import DroneFlightMap from "../../components/DroneFlightMap.astro";
-
-import ForensicAnalyticsWorkspace from "../../components/ForensicAnalyticsWorkspace.astro";
-import ForensicTimeline from "../../components/ForensicTimeline.astro";
-
-import InteractiveEventTimeLine from "../../components/InteractiveEventTimeline.astro";
-import { demoEvents } from "../../data/demoEvents";
-
-import EvidenceRelationshipGraph from "../../components/EvidenceRelationshipGraph.astro";
-
-import {
-  demoEvidenceNodes,
-  demoEvidenceLinks
-} from "../../data/demoEvidence";
-
-
-
+import InvestigationWorkspace from "../../components/InvestigationWorkspace.astro";
 
 // ==========================================
-// GENERATE PROJECT PAGES
+// GENERATE PROJECT ROUTES
 // ==========================================
 
 export async function getStaticPaths() {
@@ -64,13 +47,12 @@ const { project } = Astro.props as Props;
 
 const { Content, headings } = await render(project);
 
-// Only show H2 headings in project navigation
 const tocHeadings = headings.filter(
   (heading) => heading.depth === 2
 );
 
 // ==========================================
-// URLS AND PROJECT CONFIGURATION
+// PROJECT CONFIGURATION
 // ==========================================
 
 const base = import.meta.env.BASE_URL;
@@ -78,7 +60,7 @@ const base = import.meta.env.BASE_URL;
 // Confirmed Drone Forensics project ID
 const isDroneProject = project.id === "drone-forensics";
 
-// No assumed technology field
+// Avoid assuming a technology field exists
 const technologies: string[] = [];
 ---
 
@@ -104,7 +86,10 @@ const technologies: string[] = [];
          PROJECT METADATA
          ===================================== -->
 
-    <section class="project-metadata" aria-label="Project information">
+    <section
+      class="project-metadata"
+      aria-label="Project information"
+    >
       <div class="metadata-item">
         <span>PROJECT REFERENCE</span>
         <strong>{project.data.projectId}</strong>
@@ -121,86 +106,16 @@ const technologies: string[] = [];
       </div>
     </section>
 
+    <!-- =====================================
+         STAGE 68.6 — TABBED DRONE LABORATORY
+         ===================================== -->
+
     {isDroneProject && (
       <section
         class="drone-laboratory"
-        aria-labelledby="drone-lab-heading"
+        aria-label="Interactive Drone Forensics Laboratory"
       >
-        <div class="lab-heading">
-          <span class="section-label">
-            TT / INTERACTIVE LABORATORY
-          </span>
-
-          <h2 id="drone-lab-heading">
-            Drone Flight Reconstruction
-          </h2>
-
-          <p>
-            Explore interactive GPS flight reconstruction,
-            geospatial evidence and drone forensic research.
-          </p>
-        </div>
-
-        <div class="lab-grid">
-
-          <!-- INTERACTIVE FLIGHT MAP -->
-
-          <div class="lab-map-panel">
-            <LaboratoryPanel
-              label="01 / FLIGHT MAP"
-              title="Flight Reconstruction"
-              description="Interactive GPS flight path and geographic reconstruction."
-              accent="blue"
-            >
-              <div class="drone-map-container">
-                <DroneFlightMap />
-              </div>
-            </LaboratoryPanel>
-            <ForensicAnalyticsWorkspace />
-            <InteractiveEventTimeLine events={demoEvents} title="Flight Event Timeline" />
-            <!-- STAGE 68.5 — EVIDENCE RELATIONSHIPS -->
-            <EvidenceRelationshipGraph
-              nodes={demoEvidenceNodes}
-              links={demoEvidenceLinks}
-              title="Drone Evidence Relationships"
-            />
-          </div>
-
-          <!-- INVESTIGATION CONTEXT -->
-
-          <div class="lab-context-panel">
-            <LaboratoryPanel
-              label="02 / INVESTIGATION"
-              title="Research Context"
-              description="Digital evidence and flight reconstruction methodology."
-              accent="purple"
-            >
-              <div class="research-context">
-                <p>
-                  This laboratory explores how drone flight
-                  records and geospatial information can
-                  support forensic investigations.
-                </p>
-
-                <h3>Investigation Focus</h3>
-
-                <ul>
-                  <li>GPS flight-path reconstruction</li>
-                  <li>Geospatial evidence interpretation</li>
-                  <li>Flight activity documentation</li>
-                  <li>Forensic research methodology</li>
-                </ul>
-
-                <p class="context-note">
-                  Additional telemetry and flight-log
-                  analysis features are planned for
-                  future development.
-                </p>
-              </div>
-            </LaboratoryPanel>
-          </div>
-
-        </div>
+        <InvestigationWorkspace />
       </section>
     )}
 
@@ -239,6 +154,7 @@ const technologies: string[] = [];
          ===================================== -->
 
     <section
+      id="tt-project-documentation"
       class="project-documentation"
       aria-label="Project documentation"
     >
@@ -255,21 +171,16 @@ const technologies: string[] = [];
       </div>
     </section>
 
-
-
-    <!-- =====================================
-         DRONE FORENSICS LABORATORY
-         ===================================== -->
-
-    
-
     <!-- =====================================
          PROJECT FOOTER
          ===================================== -->
 
     <footer class="project-footer">
       <div>
-        <span class="footer-label">END OF PROJECT FILE</span>
+        <span class="footer-label">
+          END OF PROJECT FILE
+        </span>
+
         <strong>{project.data.projectId}</strong>
       </div>
 
@@ -283,7 +194,7 @@ const technologies: string[] = [];
 
 <style>
   /* ==========================================
-     TRACE & TRIAGE — STAGE 67
+     TRACE & TRIAGE — STAGE 68.6
      INDIVIDUAL PROJECT DESIGN
      ========================================== */
 
@@ -303,7 +214,7 @@ const technologies: string[] = [];
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 15px;
-    margin: 35px 0 55px;
+    margin: 35px 0 45px;
   }
 
   .metadata-item {
@@ -331,11 +242,20 @@ const technologies: string[] = [];
   }
 
   /* ==========================================
+     DRONE LABORATORY
+     ========================================== */
+
+  .drone-laboratory {
+    min-width: 0;
+    margin: 45px 0 70px;
+  }
+
+  /* ==========================================
      PROJECT TABLE OF CONTENTS
      ========================================== */
 
   .project-contents {
-    margin: 45px 0 65px;
+    margin: 55px 0 65px;
     padding: 25px;
     background: var(--tt-deep);
     border: 1px solid var(--tt-border);
@@ -405,6 +325,7 @@ const technologies: string[] = [];
   .project-documentation {
     margin: 65px 0;
     min-width: 0;
+    scroll-margin-top: 100px;
   }
 
   .documentation-header {
@@ -554,111 +475,6 @@ const technologies: string[] = [];
   }
 
   /* ==========================================
-     DRONE LABORATORY
-     ========================================== */
-
-  .drone-laboratory {
-    margin: 85px 0;
-    padding-top: 25px;
-    border-top: 1px solid var(--tt-border);
-  }
-
-  .lab-heading {
-    margin-bottom: 35px;
-  }
-
-  .section-label {
-    color: var(--tt-purple);
-    font-family: var(--tt-font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-  }
-
-  .lab-heading h2 {
-    margin: 15px 0;
-    color: var(--tt-heading);
-    font-family: var(--tt-font-editorial);
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 400;
-    line-height: 1.15;
-  }
-
-  .lab-heading p {
-    max-width: 750px;
-    color: var(--tt-muted);
-    line-height: 1.8;
-  }
-
-  /* LABORATORY GRID */
-
-  .lab-grid {
-    display: grid;
-    grid-template-columns:
-      minmax(0, 2fr)
-      minmax(260px, 1fr);
-    gap: 18px;
-    align-items: start;
-  }
-
-  .lab-map-panel,
-  .lab-context-panel {
-    min-width: 0;
-  }
-
-  /* DRONE MAP */
-
-  .drone-map-container {
-    position: relative;
-    width: 100%;
-    min-width: 0;
-    min-height: 420px;
-    overflow: hidden;
-    background: var(--tt-deep);
-    border: 1px solid var(--tt-border);
-    border-radius: var(--tt-radius-md);
-  }
-
-  .drone-map-container :global(.leaflet-container) {
-    width: 100%;
-    min-height: 420px;
-    z-index: 0;
-  }
-
-  /* RESEARCH CONTEXT */
-
-  .research-context {
-    color: var(--tt-text);
-    line-height: 1.8;
-  }
-
-  .research-context p {
-    color: var(--tt-muted);
-  }
-
-  .research-context h3 {
-    margin: 25px 0 15px;
-    color: var(--tt-heading);
-    font-size: 1.1rem;
-  }
-
-  .research-context ul {
-    padding-left: 22px;
-    margin: 15px 0;
-  }
-
-  .research-context li {
-    margin-bottom: 10px;
-  }
-
-  .context-note {
-    margin-top: 25px;
-    padding: 15px;
-    background: var(--tt-deep);
-    border-left: 2px solid var(--tt-purple);
-    font-size: 0.85rem;
-  }
-
-  /* ==========================================
      PROJECT FOOTER
      ========================================== */
 
@@ -705,10 +521,6 @@ const technologies: string[] = [];
      ========================================== */
 
   @media (max-width: 950px) {
-    .lab-grid {
-      grid-template-columns: 1fr;
-    }
-
     .project-contents ol {
       grid-template-columns: 1fr;
     }
@@ -724,14 +536,8 @@ const technologies: string[] = [];
       padding-top: 25px;
     }
 
-    .project-contents,
-    .investigation-summary {
+    .project-contents {
       padding: 18px;
-    }
-
-    .drone-map-container,
-    .drone-map-container :global(.leaflet-container) {
-      min-height: 350px;
     }
   }
 
