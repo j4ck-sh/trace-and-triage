@@ -12,6 +12,7 @@ import MagneticButtons from "../components/MagneticButtons.astro";
 import CardSpotlight from "../components/CardSpotlight.astro";
 import WorkspaceStatusBar from "../components/WorkspaceStatusBar.astro";
 import MotionControls from "../components/MotionControls.astro";
+import ThemeSwitcher from "../components/ThemeSwitcher.astro";
 
 const base = import.meta.env.BASE_URL;
 
@@ -109,6 +110,7 @@ const featuredProjects = projects.slice(0, 3);
   <CardSpotlight />
   <WorkspaceStatusBar />
   <MotionControls />
+  <ThemeSwitcher />
 </BaseLayout>
 
 <style>

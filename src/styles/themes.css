@@ -1,0 +1,99 @@
+/* TRACE & TRIAGE — THEME SYSTEM */
+
+/* Default: Tokyo Night */
+
+:root,
+:root[data-theme="tokyo-night"] {
+  color-scheme: dark;
+
+  --tt-canvas: #1a1b26;
+  --tt-surface: #24283b;
+  --tt-raised: #292e42;
+  --tt-deep: #16161e;
+
+  --tt-text: #c0caf5;
+  --tt-heading: #e4e9ff;
+  --tt-muted: #a9b4d0;
+
+  --tt-blue: #7aa2f7;
+  --tt-purple: #bb9af7;
+  --tt-green: #9ece6a;
+  --tt-orange: #e0af68;
+  --tt-red: #f7768e;
+
+  --tt-border: #414868;
+}
+
+/* Gruvbox Dark */
+
+:root[data-theme="gruvbox"] {
+  color-scheme: dark;
+
+  --tt-canvas: #282828;
+  --tt-surface: #32302f;
+  --tt-raised: #3c3836;
+  --tt-deep: #1d2021;
+
+  --tt-text: #ebdbb2;
+  --tt-heading: #fbf1c7;
+  --tt-muted: #d5c4a1;
+
+  --tt-blue: #fabd2f;
+  --tt-purple: #d3869b;
+  --tt-green: #b8bb26;
+  --tt-orange: #fe8019;
+  --tt-red: #fb4934;
+
+  --tt-border: #665c54;
+}
+
+/* Nord */
+
+:root[data-theme="nord"] {
+  color-scheme: dark;
+
+  --tt-canvas: #2e3440;
+  --tt-surface: #3b4252;
+  --tt-raised: #434c5e;
+  --tt-deep: #242933;
+
+  --tt-text: #eceff4;
+  --tt-heading: #ffffff;
+  --tt-muted: #d8dee9;
+
+  --tt-blue: #88c0d0;
+  --tt-purple: #b48ead;
+  --tt-green: #a3be8c;
+  --tt-orange: #ebcb8b;
+  --tt-red: #bf616a;
+
+  --tt-border: #4c566a;
+}
+
+/* Semantic aliases used throughout the site */
+
+:root {
+  --tt-signal: var(--tt-blue);
+  --tt-evidence: var(--tt-purple);
+  --tt-success: var(--tt-green);
+  --tt-warning: var(--tt-orange);
+  --tt-danger: var(--tt-red);
+
+  --bg: var(--tt-canvas);
+  --surface: var(--tt-surface);
+  --text: var(--tt-text);
+  --muted: var(--tt-muted);
+  --accent: var(--tt-blue);
+  --border: var(--tt-border);
+}
+
+/* Theme-aware document */
+
+html {
+  background: var(--tt-canvas);
+}
+
+body {
+  background: var(--tt-canvas);
+  color: var(--tt-text);
+}

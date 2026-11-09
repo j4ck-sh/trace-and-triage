@@ -25,12 +25,12 @@
     inset: -40px;
     background-image:
       linear-gradient(
-        rgba(122, 162, 247, 0.07) 1px,
+        color-mix(in srgb, var(--tt-blue) 7%, transparent),
         transparent 1px
       ),
       linear-gradient(
         90deg,
-        rgba(122, 162, 247, 0.07) 1px,
+        color-mix(in srgb, var(--tt-blue) 7%, transparent),
         transparent 1px
       );
     background-size: 42px 42px;
@@ -43,10 +43,10 @@
     inset: 0;
     background: radial-gradient(
       320px circle at
-      var(--pointer-x, 65%)
+      var(--pointer-x, 65%),
       var(--pointer-y, 40%),
-      rgba(187, 154, 247, 0.15),
-      transparent 75%
+      color-mix(in srgb, var(--tt-purple) 15%, transparent),
+      transparent 75%,
     );
   }
 
@@ -109,7 +109,9 @@
     hero.addEventListener("pointermove", (event) => {
       if (
         motionQuery.matches ||
-        event.pointerType !== "mouse"
+        document.documentElement.classList.contains(
+          "tt-motion-paused"
+        ) || event.pointerType !== "mouse"
       ) return;
 
       if (frame) return;

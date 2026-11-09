@@ -37,7 +37,10 @@
   }
 }
 
-/* Visitor-controlled animation pause */
+
+/* ==========================================
+   MOTION PAUSE AND ACCESSIBILITY
+   ========================================== */
 
 html.tt-motion-paused *,
 html.tt-motion-paused *::before,
@@ -57,4 +60,16 @@ html.tt-motion-paused .tt-typing-host {
 
 html.tt-motion-paused .tt-typing-overlay {
   display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }

@@ -1,0 +1,164 @@
+
+<div class="tt-theme-switcher">
+  <label for="tt-theme-select">Appearance</label>
+
+  <select id="tt-theme-select" aria-label="Website colour theme">
+    <option value="tokyo-night">Tokyo Night</option>
+    <option value="gruvbox">Gruvbox</option>
+    <option value="nord">Nord</option>
+  </select>
+</div>
+
+<style>
+  .tt-theme-switcher {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+  }
+
+  label {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  select {
+    min-width: 145px;
+    padding: 9px 12px;
+    background: var(--tt-deep);
+    color: var(--tt-text);
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  select:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 3px;
+  }
+</style>
+
+<script>
+  const themes = ["tokyo-night", "gruvbox", "nord"] as const;
+  type Theme = typeof themes[number];
+
+  function isTheme(value: string | null): value is Theme {
+    return themes.some((theme) => theme === value);
+  }
+
+  function readTheme(): Theme {
+    try {
+      const stored = localStorage.getItem("tt-theme");
+      return isTheme(stored) ? stored : "tokyo-night";
+    } catch {
+      return "tokyo-night";
+    }
+  }
+
+  function applyTheme(theme: Theme) {
+    document.documentElement.dataset.theme = theme;
+
+    document.querySelectorAll<HTMLSelectElement>(
+      "#tt-theme-select"
+    ).forEach((select) => {
+      select.value = theme;
+    });
+  }
+
+  function initialiseThemeSwitcher() {
+    applyTheme(readTheme());
+
+    document.querySelectorAll<HTMLSelectElement>(
+      "#tt-theme-select"
+    ).forEach((select) => {
+      if (select.dataset.ready === "true") return;
+      select.dataset.ready = "true";
+
+      select.addEventListener("change", () => {
+        const next = select.value;
+
+        if (!isTheme(next)) return;
+
+        applyTheme(next);
+
+        try {
+          localStorage.setItem("tt-theme", next);
+        } catch {
+          // Theme still works for the current page.
+        }
+      });
+    });
+  }
+
+  document.addEventListener("keydown", (event) => {
+  if (
+    !event.altKey ||
+    !event.shiftKey ||
+    event.code !== "KeyT" ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.repeat
+  ) {
+    return;
+  }
+
+  const target = event.target;
+
+  if (
+    target instanceof HTMLElement &&
+    target.closest(
+      "input, textarea, select, [contenteditable]"
+    )
+  ) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const availableThemes = [
+    "tokyo-night",
+    "gruvbox",
+    "nord"
+  ] as const;
+
+  const current =
+    document.documentElement.dataset.theme ??
+    "tokyo-night";
+
+  const index = availableThemes.findIndex(
+    (theme) => theme === current
+  );
+
+  const next =
+    availableThemes[(index + 1) % availableThemes.length];
+
+  document.documentElement.dataset.theme = next;
+
+  const selector = document.querySelector<HTMLSelectElement>(
+    "#tt-theme-select"
+  );
+
+  if (selector) {
+    selector.value = next;
+  }
+
+  try {
+    localStorage.setItem("tt-theme", next);
+  } catch {
+    // Continue without storage.
+  }
+});
+
+  initialiseThemeSwitcher();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseThemeSwitcher
+  );
+</script>

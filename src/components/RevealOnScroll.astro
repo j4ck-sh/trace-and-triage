@@ -4,11 +4,18 @@
       "[data-reveal]:not(.is-visible)"
     );
 
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    const paused = document.documentElement.classList.contains(
+      "tt-motion-paused"
+    );
+
     if (
-      !("IntersectionObserver" in window) ||
-      window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches
+      reducedMotion ||
+      paused ||
+      !("IntersectionObserver" in window)
     ) {
       elements.forEach((element) => {
         element.classList.add("is-visible");
@@ -26,14 +33,18 @@
         });
       },
       {
-        threshold: 0.12,
-        rootMargin: "0px 0px -25px 0px"
+        threshold: 0.1,
+        rootMargin: "0px 0px -20px 0px"
       }
     );
 
     elements.forEach((element) => {
       observer.observe(element);
     });
+
+    document.documentElement.classList.add(
+      "tt-motion-ready"
+    );
   }
 
   if (document.readyState === "loading") {
@@ -45,4 +56,9 @@
   } else {
     initialiseReveals();
   }
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseReveals
+  );
 </script>

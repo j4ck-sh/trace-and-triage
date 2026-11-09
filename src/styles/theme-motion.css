@@ -1,0 +1,57 @@
+
+/* ==========================================
+   TRACE & TRIAGE
+   STAGE 63 — THEME TRANSITIONS
+   ========================================== */
+
+/* Smooth theme changes */
+
+html.tt-theme-animate,
+html.tt-theme-animate body,
+html.tt-theme-animate .tt-panel,
+html.tt-theme-animate .workspace-panel,
+html.tt-theme-animate .research-card,
+html.tt-theme-animate .tt-status-bar,
+html.tt-theme-animate .command-panel {
+  transition:
+    background-color 280ms ease,
+    border-color 280ms ease,
+    color 280ms ease;
+}
+
+/* Interactive elements */
+
+html.tt-theme-animate a,
+html.tt-theme-animate button,
+html.tt-theme-animate select {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+}
+
+/* Respect reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  html.tt-theme-animate,
+  html.tt-theme-animate body,
+  html.tt-theme-animate .tt-panel,
+  html.tt-theme-animate .workspace-panel,
+  html.tt-theme-animate .research-card,
+  html.tt-theme-animate .tt-status-bar,
+  html.tt-theme-animate .command-panel,
+  html.tt-theme-animate a,
+  html.tt-theme-animate button,
+  html.tt-theme-animate select {
+    transition: none !important;
+  }
+}
+
+/* Visitor-controlled pause */
+
+html.tt-motion-paused *,
+html.tt-motion-paused *::before,
+html.tt-motion-paused *::after {
+  animation-play-state: paused !important;
+  transition-duration: 0s !important;
+}
