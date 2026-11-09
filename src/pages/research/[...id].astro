@@ -8,7 +8,7 @@ import {
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
-// Components
+// Existing forensic components
 import ImageLightbox from "../../components/ImageLightbox.astro";
 import RelatedResearch from "../../components/RelatedResearch.astro";
 import ForensicTimeline from "../../components/ForensicTimeline.astro";
@@ -17,14 +17,20 @@ import ResearchCallout from "../../components/ResearchCallout.astro";
 import FrameworkMapping from "../../components/FrameworkMapping.astro";
 import ShareArticle from "../../components/ShareArticle.astro";
 
-// Utilities
+// Stage 66 components
+import ArticleHero from "../../components/ArticleHero.astro";
+import ReadingProgress from "../../components/ReadingProgress.astro";
+import ActiveArticleSection from "../../components/ActiveArticleSection.astro";
+import ArticleInteractions from "../../components/ArticleInteractions.astro";
+
+// Reading-time utilities
 import {
   getReadingTime,
   formatReadingTime
 } from "../../utils/readingTime";
 
 // ==========================================
-// GENERATE RESEARCH ARTICLE PAGES
+// GENERATE RESEARCH ARTICLE ROUTES
 // ==========================================
 
 export async function getStaticPaths() {
@@ -44,7 +50,7 @@ export async function getStaticPaths() {
 }
 
 // ==========================================
-// ARTICLE TYPES
+// ARTICLE PROPS
 // ==========================================
 
 interface Props {
@@ -53,12 +59,11 @@ interface Props {
 
 const { article } = Astro.props as Props;
 
-// Render Markdown and extract headings
-const { Content, headings } = await render(article);
+// ==========================================
+// RENDER ARTICLE CONTENT
+// ==========================================
 
-// ==========================================
-// AUTOMATIC TABLE OF CONTENTS
-// ==========================================
+const { Content, headings } = await render(article);
 
 const tocHeadings = headings.filter(
   (heading) =>
@@ -67,7 +72,7 @@ const tocHeadings = headings.filter(
 );
 
 // ==========================================
-// AUTOMATIC READING TIME
+// READING TIME
 // ==========================================
 
 const readingLabel = formatReadingTime(
@@ -80,10 +85,8 @@ const readingLabel = formatReadingTime(
 
 const base = import.meta.env.BASE_URL;
 
-// Full public URL for sharing
 const articleUrl = Astro.url.toString();
 
-// Convert image path for GitHub Pages
 const heroImageUrl = article.data.heroImage
   ? `${base}${article.data.heroImage.replace(/^\/+/, "")}`
   : undefined;
@@ -104,32 +107,30 @@ const statusClass = article.data.status
   type="article"
   publishedDate={article.data.date}
 >
+  <!-- READING PROGRESS -->
+
+  <ReadingProgress />
 
   <article class="research-article">
 
-    <!-- ARTICLE HEADER -->
+    <!-- =====================================
+         ARTICLE HEADER
+         ===================================== -->
 
-    <header class="article-header">
+    <ArticleHero
+      title={article.data.title}
+      description={article.data.description}
+      caseId={article.data.caseId}
+      category={article.data.category}
+      date={article.data.date}
+      readingTime={readingLabel}
+      tags={article.data.tags ?? []}
+    />
 
-      <div class="article-top">
-        <span class="case-id">
-          {article.data.caseId}
-        </span>
+    <!-- HERO IMAGE -->
 
-        <span class="article-category">
-          {article.data.category}
-        </span>
-      </div>
-
-      <h1>{article.data.title}</h1>
-
-      <p class="article-description">
-        {article.data.description}
-      </p>
-
-      <!-- HERO IMAGE -->
-
-      {heroImageUrl && (
+    {heroImageUrl && (
+      <figure class="article-hero-figure">
         <img
           class="hero-image"
           src={heroImageUrl}
@@ -137,54 +138,36 @@ const statusClass = article.data.status
           loading="eager"
           decoding="async"
         />
+      </figure>
+    )}
+
+    <!-- ARTICLE STATUS AND DIFFICULTY -->
+
+    <div class="article-details">
+      <span class:list={["article-status", statusClass]}>
+        {article.data.status}
+      </span>
+
+      {article.data.difficulty && (
+        <span class="article-difficulty">
+          DIFFICULTY / {article.data.difficulty}
+        </span>
       )}
+    </div>
 
-      <!-- ARTICLE METADATA -->
-
-      <div class="article-metadata">
-
-        <span>
-          {article.data.date.toLocaleDateString(
-            "en-GB",
-            {
-              day: "numeric",
-              month: "long",
-              year: "numeric"
-            }
-          )}
-        </span>
-
-        <span class="reading-time">
-          {readingLabel}
-        </span>
-
-        {article.data.difficulty && (
-          <span>{article.data.difficulty}</span>
-        )}
-
-        <span class:list={["article-status", statusClass]}>
-          {article.data.status}
-        </span>
-
-      </div>
-
-      <!-- ARTICLE TAGS -->
-
-      {article.data.tags.length > 0 && (
-        <div class="article-tags">
-          {article.data.tags.map((tag) => (
-            <span class="article-tag">{tag}</span>
-          ))}
-        </div>
-      )}
-
-    </header>
-
-    <!-- INVESTIGATION SUMMARY -->
+    <!-- =====================================
+         INVESTIGATION SUMMARY
+         ===================================== -->
 
     <section class="investigation-summary">
 
-      <h2>Investigation Summary</h2>
+      <div class="section-heading">
+        <span class="section-label">
+          TT / INVESTIGATION METADATA
+        </span>
+
+        <h2>Investigation Summary</h2>
+      </div>
 
       <div class="summary-grid">
 
@@ -200,17 +183,23 @@ const statusClass = article.data.status
 
         <div>
           <strong>Platform</strong>
-          <span>{article.data.platform ?? "Not specified"}</span>
+          <span>
+            {article.data.platform ?? "Not specified"}
+          </span>
         </div>
 
         <div>
           <strong>Environment</strong>
-          <span>{article.data.environment ?? "Not specified"}</span>
+          <span>
+            {article.data.environment ?? "Not specified"}
+          </span>
         </div>
 
         <div>
           <strong>Difficulty</strong>
-          <span>{article.data.difficulty ?? "Not specified"}</span>
+          <span>
+            {article.data.difficulty ?? "Not specified"}
+          </span>
         </div>
 
         <div>
@@ -236,118 +225,175 @@ const statusClass = article.data.status
 
     </section>
 
-    <!-- AUTOMATIC TABLE OF CONTENTS -->
+    <!-- =====================================
+         ARTICLE NAVIGATION AND CONTENT
+         ===================================== -->
 
-    {tocHeadings.length > 0 && (
-      <nav
-        class="table-of-contents"
-        aria-label="Article table of contents"
-        data-pagefind-ignore
+    <div class="tt-article-layout">
+
+      <!-- STICKY TABLE OF CONTENTS -->
+
+      <aside
+        class="tt-article-sidebar"
+        aria-label="Article navigation"
       >
 
-        <div class="toc-header">
-          <span class="toc-label">
-            ARTICLE CONTENTS
-          </span>
+        {tocHeadings.length > 0 && (
+          <nav
+            class="table-of-contents"
+            aria-label="Article table of contents"
+            data-pagefind-ignore
+          >
 
-          <span class="toc-count">
-            {tocHeadings.length} sections
-          </span>
-        </div>
+            <div class="toc-header">
+              <span class="toc-label">
+                ARTICLE CONTENTS
+              </span>
 
-        <ol class="toc-list">
-          {tocHeadings.map((heading, index) => (
-            <li
-              class:list={[
-                "toc-item",
-                {
-                  "toc-subsection": heading.depth === 3
-                }
-              ]}
-            >
-              <a href={`#${heading.slug}`}>
-                <span class="toc-number">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+              <span class="toc-count">
+                {tocHeadings.length} sections
+              </span>
+            </div>
 
-                <span>{heading.text}</span>
-              </a>
-            </li>
-          ))}
-        </ol>
+            <ol class="toc-list">
+              {tocHeadings.map((heading, index) => (
+                <li
+                  class:list={[
+                    "toc-item",
+                    {
+                      "toc-subsection": heading.depth === 3
+                    }
+                  ]}
+                >
+                  <a href={`#${heading.slug}`}>
+                    <span class="toc-number">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
 
-      </nav>
-    )}
+                    <span>{heading.text}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
 
-    <!-- MAIN MARKDOWN ARTICLE -->
+          </nav>
+        )}
 
-    <div class="article-content" data-pagefind-body>
-      <Content />
+      </aside>
+
+      <!-- MAIN MARKDOWN CONTENT -->
+
+      <div
+        class="article-content"
+        data-article-content
+        data-pagefind-body
+      >
+        <Content />
+      </div>
+
     </div>
+
+    <!-- ARTICLE INTERACTION SCRIPTS -->
+
+    <ActiveArticleSection />
 
     <!-- SCREENSHOT LIGHTBOX -->
 
     <ImageLightbox />
 
-    <!-- FORENSIC TIMELINE -->
+    <!-- =====================================
+         FORENSIC TIMELINE
+         ===================================== -->
 
     {article.data.timeline.length > 0 && (
-      <ForensicTimeline
-        events={article.data.timeline}
-      />
+      <section class="forensic-section">
+        <ForensicTimeline
+          events={article.data.timeline}
+        />
+      </section>
     )}
 
-    <!-- INDICATORS OF COMPROMISE -->
+    <!-- =====================================
+         INDICATORS OF COMPROMISE
+         ===================================== -->
 
     {article.data.indicators.length > 0 && (
-      <IOCTable
-        indicators={article.data.indicators}
-      />
+      <section class="forensic-section">
+        <IOCTable
+          indicators={article.data.indicators}
+        />
+      </section>
     )}
 
-    <!-- EVIDENCE AND FINDINGS -->
+    <!-- =====================================
+         INVESTIGATION FINDINGS
+         ===================================== -->
 
     {article.data.callouts.length > 0 && (
       <section class="research-findings">
 
-        <h2>Investigation Findings & Notes</h2>
+        <div class="section-heading">
+          <span class="section-label">
+            TT / EVIDENCE AND FINDINGS
+          </span>
 
-        {article.data.callouts.map((callout) => (
-          <ResearchCallout
-            type={callout.type}
-            title={callout.title}
-            text={callout.text}
-            reference={callout.reference}
-          />
-        ))}
+          <h2>Investigation Findings & Notes</h2>
+        </div>
+
+        <div class="findings-list">
+          {article.data.callouts.map((callout) => (
+            <ResearchCallout
+              type={callout.type}
+              title={callout.title}
+              text={callout.text}
+              reference={callout.reference}
+            />
+          ))}
+        </div>
 
       </section>
     )}
 
-    <!-- MITRE ATT&CK MAPPING -->
+    <!-- =====================================
+         MITRE ATT&CK MAPPING
+         ===================================== -->
 
     {article.data.attackTechniques.length > 0 && (
-      <FrameworkMapping
-        framework="MITRE ATT&CK"
-        techniques={article.data.attackTechniques}
-      />
+      <section class="forensic-section">
+        <FrameworkMapping
+          framework="MITRE ATT&CK"
+          techniques={article.data.attackTechniques}
+        />
+      </section>
     )}
 
-    <!-- SPARTA MAPPING -->
+    <!-- =====================================
+         SPARTA MAPPING
+         ===================================== -->
 
     {article.data.spartaTechniques.length > 0 && (
-      <FrameworkMapping
-        framework="SPARTA"
-        techniques={article.data.spartaTechniques}
-      />
+      <section class="forensic-section">
+        <FrameworkMapping
+          framework="SPARTA"
+          techniques={article.data.spartaTechniques}
+        />
+      </section>
     )}
 
-    <!-- REFERENCES -->
+    <!-- =====================================
+         REFERENCES
+         ===================================== -->
 
     {article.data.references.length > 0 && (
       <section class="references">
 
-        <h2>References</h2>
+        <div class="section-heading">
+          <span class="section-label">
+            TT / SOURCE MATERIAL
+          </span>
+
+          <h2>References</h2>
+        </div>
 
         <ul>
           {article.data.references.map((reference) => (
@@ -358,6 +404,7 @@ const statusClass = article.data.status
                 rel="noopener noreferrer"
               >
                 {reference.title}
+                <span aria-hidden="true"> ↗</span>
               </a>
             </li>
           ))}
@@ -366,18 +413,23 @@ const statusClass = article.data.status
       </section>
     )}
 
-    <!-- SUPPORTING GITHUB REPOSITORY -->
+    <!-- =====================================
+         SUPPORTING GITHUB REPOSITORY
+         ===================================== -->
 
     {article.data.githubUrl && (
       <section class="supporting-repository">
 
-        <p class="case-id">SUPPORTING MATERIAL</p>
+        <p class="section-label">
+          TT / SUPPORTING MATERIAL
+        </p>
 
         <h2>Research Repository</h2>
 
         <p>
-          Explore supporting documentation, research scripts,
-          sanitised evidence and additional technical material
+          Explore supporting documentation,
+          research scripts, sanitised evidence
+          and additional technical material
           associated with this investigation.
         </p>
 
@@ -386,34 +438,48 @@ const statusClass = article.data.status
           target="_blank"
           rel="noopener noreferrer"
         >
-          View Supporting Repository on GitHub ↗
+          View Supporting Repository on GitHub
+          <span aria-hidden="true"> ↗</span>
         </a>
 
       </section>
     )}
 
-    <!-- RESEARCH METHODOLOGY -->
+    <!-- =====================================
+         RESEARCH METHODOLOGY
+         ===================================== -->
 
     <section class="methodology-reference">
 
-      <p class="case-id">RESEARCH STANDARDS</p>
+      <p class="section-label">
+        TT / RESEARCH STANDARDS
+      </p>
 
       <h2>Research Methodology</h2>
 
       <p>
-        This investigation follows the general research
-        and evidence-handling principles documented by
-        Trace & Triage.
+        This investigation follows the general
+        research and evidence-handling principles
+        documented by Trace & Triage.
+      </p>
 
-        Investigation-specific methods and limitations
-        are described within the article.
+      <p>
+        Investigation-specific methods and
+        limitations are described within the article.
       </p>
 
       <a href={`${base}methodology/`}>
-        View Research Methodology →
+        View Research Methodology
+        <span aria-hidden="true"> ↗</span>
       </a>
 
     </section>
+
+    <!-- =====================================
+         ARTICLE INTERACTIONS
+         ===================================== -->
+
+    <ArticleInteractions />
 
     <!-- SHARE ARTICLE -->
 
@@ -422,17 +488,25 @@ const statusClass = article.data.status
       url={articleUrl}
     />
 
-    <!-- RELATED RESEARCH -->
+    <!-- =====================================
+         RELATED RESEARCH
+         ===================================== -->
 
     <RelatedResearch currentArticle={article} />
 
-    <!-- ARTICLE FOOTER -->
+    <!-- =====================================
+         ARTICLE FOOTER
+         ===================================== -->
 
     <footer class="article-footer">
 
-      <p class="case-id">
-        {article.data.caseId}
-      </p>
+      <div class="footer-top">
+        <span class="section-label">
+          {article.data.caseId}
+        </span>
+
+        <span>END OF CASE FILE</span>
+      </div>
 
       <p>
         Trace & Triage — Digital Forensics,
@@ -440,7 +514,7 @@ const statusClass = article.data.status
       </p>
 
       <a href={`${base}research/`}>
-        ← Back to Research
+        ← Back to Research Archive
       </a>
 
     </footer>
@@ -451,176 +525,247 @@ const statusClass = article.data.status
 
 <style>
   /* ==========================================
-     RESEARCH ARTICLE LAYOUT
+     TRACE & TRIAGE — STAGE 66
+     RESEARCH ARTICLE DESIGN
      ========================================== */
 
   .research-article {
-    max-width: 900px;
+    width: min(100% - 40px, 1250px);
     margin: 0 auto;
-  }
-
-  /* ARTICLE HEADER */
-
-  .article-header {
-    padding: 50px 0 40px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .article-top {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-
-  .article-category {
-    color: var(--muted);
-    font-family: Consolas, monospace;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-  }
-
-  .article-header h1 {
-    margin: 20px 0;
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    line-height: 1.15;
-  }
-
-  .article-description {
-    color: var(--muted);
-    font-size: 1.15rem;
-    line-height: 1.7;
+    padding: 35px 0 90px;
   }
 
   /* HERO IMAGE */
 
+  .article-hero-figure {
+    margin: 35px 0;
+  }
+
   .hero-image {
     display: block;
     width: 100%;
+    max-height: 540px;
+    object-fit: cover;
     height: auto;
-    margin: 30px 0;
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
   }
 
-  /* ARTICLE METADATA */
+  /* STATUS AND DIFFICULTY */
 
-  .article-metadata {
+  .article-details {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 18px;
+    gap: 12px;
     margin: 25px 0;
-    color: var(--muted);
-    font-family: Consolas, monospace;
-    font-size: 0.85rem;
   }
 
-  .reading-time {
-    color: var(--accent);
-    font-weight: 600;
+  .article-status,
+  .article-difficulty {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 11px;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
   }
 
   .article-status {
-    padding: 5px 9px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    color: var(--tt-blue);
   }
 
   .article-status.completed {
-    color: #86c7aa;
+    color: var(--tt-green);
   }
 
   .article-status.in-progress {
-    color: #e5b96c;
+    color: var(--tt-orange);
   }
 
-  /* TAGS */
-
-  .article-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 20px;
+  .article-difficulty {
+    color: var(--tt-muted);
   }
 
-  .article-tag {
-    padding: 5px 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--muted);
-    font-size: 0.8rem;
+  /* SECTION HEADINGS */
+
+  .section-heading {
+    margin-bottom: 25px;
   }
 
-  /* INVESTIGATION SUMMARY */
+  .section-label {
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .section-heading h2 {
+    margin: 12px 0 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  /* ==========================================
+     INVESTIGATION SUMMARY
+     ========================================== */
 
   .investigation-summary {
-    margin: 45px 0;
+    margin: 45px 0 60px;
     padding: 30px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-  }
-
-  .investigation-summary h2 {
-    margin: 0 0 25px;
-    color: var(--accent);
-    font-size: 1.25rem;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
   }
 
   .summary-grid {
     display: grid;
     grid-template-columns:
-      repeat(auto-fit, minmax(180px, 1fr));
+      repeat(auto-fit, minmax(170px, 1fr));
     gap: 25px;
   }
 
   .summary-grid > div {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    min-width: 0;
   }
 
   .summary-grid strong,
   .summary-tools strong {
-    color: var(--muted);
-    font-family: Consolas, monospace;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
     font-size: 0.75rem;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
+  }
+
+  .summary-grid span {
+    color: var(--tt-heading);
+    overflow-wrap: anywhere;
   }
 
   .summary-tools {
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--tt-border);
   }
 
   .summary-tools p {
-    color: var(--text);
-    margin-bottom: 0;
+    margin: 10px 0 0;
+    color: var(--tt-text);
+    line-height: 1.7;
   }
 
-  /* MARKDOWN CONTENT */
+  /* ==========================================
+     STICKY ARTICLE LAYOUT
+     ========================================== */
+
+  .tt-article-layout {
+    display: grid;
+    grid-template-columns:
+      minmax(210px, 250px)
+      minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(25px, 4vw, 65px);
+    margin: 55px 0;
+  }
+
+  .tt-article-sidebar {
+    position: sticky;
+    top: 95px;
+    max-height: calc(100vh - 115px);
+    overflow-y: auto;
+    min-width: 0;
+  }
+
+  .table-of-contents {
+    margin: 0;
+    padding: 20px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+  }
+
+  .toc-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--tt-border);
+  }
+
+  .toc-label,
+  .toc-count {
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .toc-list {
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc-item {
+    margin: 5px 0;
+  }
+
+  .toc-item a {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 9px;
+    border-left: 2px solid transparent;
+    border-radius: 3px;
+    color: var(--tt-muted);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    text-decoration: none;
+    transition:
+      color 200ms ease,
+      background-color 200ms ease;
+  }
+
+  .toc-item a:hover {
+    background: var(--tt-raised);
+    color: var(--tt-heading);
+  }
+
+  .toc-number {
+    flex-shrink: 0;
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .toc-subsection {
+    padding-left: 14px;
+  }
+
+  /* ==========================================
+     ARTICLE CONTENT
+     ========================================== */
 
   .article-content {
-    line-height: 1.8;
+    min-width: 0;
+    max-width: 850px;
     overflow-wrap: anywhere;
+    line-height: 1.85;
   }
 
-  .article-content :global(h2) {
-    margin-top: 55px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
-    scroll-margin-top: 35px;
-  }
-
+  .article-content :global(h2),
   .article-content :global(h3) {
-    margin-top: 35px;
-    scroll-margin-top: 35px;
-  }
-
-  .article-content :global(p) {
-    margin: 18px 0;
+    scroll-margin-top: 110px;
   }
 
   .article-content :global(img) {
@@ -628,179 +773,220 @@ const statusClass = article.data.status
     max-width: 100%;
     height: auto;
     margin: 30px auto 12px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
     cursor: zoom-in;
-    transition:
-      border-color 0.2s ease,
-      box-shadow 0.2s ease;
   }
 
   .article-content :global(img:hover) {
-    border-color: var(--accent);
-    box-shadow: 0 8px 35px rgba(82, 199, 234, 0.15);
+    border-color: var(--tt-blue);
   }
 
   .article-content :global(img:focus-visible) {
-    outline: 3px solid var(--accent);
+    outline: 2px solid var(--tt-blue);
     outline-offset: 4px;
   }
 
   .article-content :global(p > em:only-child) {
     display: block;
-    color: var(--muted);
+    margin-bottom: 30px;
+    color: var(--tt-muted);
     font-size: 0.85rem;
     text-align: center;
-    margin-bottom: 35px;
   }
 
-  .article-content :global(table) {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    border-collapse: collapse;
-    margin: 30px 0;
-  }
+  /* ==========================================
+     FORENSIC SECTIONS
+     ========================================== */
 
-  .article-content :global(th),
-  .article-content :global(td) {
-    padding: 12px;
-    border: 1px solid var(--border);
-    text-align: left;
+  .forensic-section {
+    margin: 60px 0;
+    min-width: 0;
   }
-
-  .article-content :global(th) {
-    background: var(--surface);
-  }
-
-  .article-content :global(pre) {
-    padding: 20px;
-    overflow-x: auto;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-  }
-
-  .article-content :global(blockquote) {
-    margin: 25px 0;
-    padding: 15px 20px;
-    border-left: 3px solid var(--accent);
-    background: var(--surface);
-    color: var(--muted);
-  }
-
-  /* FINDINGS */
 
   .research-findings {
-    margin: 55px 0;
+    margin: 65px 0;
   }
 
-  .research-findings > h2 {
-    margin-bottom: 30px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
+  .findings-list {
+    display: grid;
+    gap: 15px;
   }
 
-  /* REFERENCES */
+  /* ==========================================
+     REFERENCES
+     ========================================== */
 
   .references {
-    margin-top: 55px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
+    margin: 65px 0;
+    padding-top: 25px;
+    border-top: 1px solid var(--tt-border);
+  }
+
+  .references ul {
+    padding-left: 22px;
   }
 
   .references li {
-    margin-bottom: 10px;
+    margin: 12px 0;
+    overflow-wrap: anywhere;
   }
 
-  /* SUPPORTING REPOSITORY */
+  .references a {
+    color: var(--tt-blue);
+  }
+
+  /* ==========================================
+     SUPPORTING REPOSITORY
+     ========================================== */
 
   .supporting-repository {
-    margin: 45px 0;
-    padding: 25px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    margin: 50px 0;
+    padding: 30px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-left: 3px solid var(--tt-green);
+    border-radius: var(--tt-radius-md);
   }
 
   .supporting-repository h2 {
-    margin: 10px 0;
-    font-size: 1.3rem;
+    margin: 12px 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: 1.8rem;
+    font-weight: 400;
   }
 
   .supporting-repository p {
-    color: var(--muted);
-    line-height: 1.7;
+    color: var(--tt-muted);
+    line-height: 1.8;
   }
 
   .supporting-repository a {
     display: inline-block;
     margin-top: 12px;
-    color: var(--accent);
-    font-weight: 600;
+    color: var(--tt-blue);
   }
 
-  /* METHODOLOGY */
+  /* ==========================================
+     METHODOLOGY
+     ========================================== */
 
   .methodology-reference {
-    margin-top: 60px;
-    padding: 28px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    margin: 60px 0;
+    padding: 30px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-left: 3px solid var(--tt-purple);
+    border-radius: var(--tt-radius-md);
   }
 
   .methodology-reference h2 {
-    margin: 10px 0 15px;
-    font-size: 1.3rem;
+    margin: 12px 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: 1.8rem;
+    font-weight: 400;
   }
 
   .methodology-reference p {
-    color: var(--muted);
-    font-size: 0.95rem;
+    max-width: 750px;
+    color: var(--tt-muted);
+    line-height: 1.8;
   }
 
   .methodology-reference a {
     display: inline-block;
-    margin-top: 10px;
-    color: var(--accent);
-    font-weight: 600;
+    margin-top: 12px;
+    color: var(--tt-blue);
   }
 
-  /* FOOTER */
+  /* ==========================================
+     ARTICLE FOOTER
+     ========================================== */
 
   .article-footer {
-    margin-top: 70px;
+    margin-top: 75px;
     padding: 25px 0;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
+    border-top: 1px solid var(--tt-border);
+  }
+
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .footer-top > span:last-child {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .article-footer p {
+    color: var(--tt-muted);
     font-size: 0.9rem;
   }
 
   .article-footer a {
     display: inline-block;
     margin-top: 15px;
-    color: var(--accent);
+    color: var(--tt-blue);
   }
 
-  /* MOBILE */
+  /* ==========================================
+     RESPONSIVE DESIGN
+     ========================================== */
 
-  @media (max-width: 600px) {
-    .article-header {
-      padding: 30px 0;
+  @media (max-width: 950px) {
+    .tt-article-layout {
+      grid-template-columns: 1fr;
     }
 
-    .investigation-summary {
+    .tt-article-sidebar {
+      position: static;
+      max-height: none;
+      overflow: visible;
+    }
+  }
+
+  @media (max-width: 650px) {
+    .research-article {
+      width: min(100% - 30px, 1250px);
+      padding-top: 20px;
+    }
+
+    .investigation-summary,
+    .supporting-repository,
+    .methodology-reference {
       padding: 20px;
     }
 
-    .methodology-reference,
-    .supporting-repository {
-      padding: 20px;
+    .tt-article-layout {
+      margin: 35px 0;
     }
 
-    .article-metadata {
-      gap: 12px;
-      font-size: 0.8rem;
+    .table-of-contents {
+      padding: 15px;
+    }
+
+    .summary-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .summary-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toc-item a {
+      transition: none;
     }
   }
 </style>

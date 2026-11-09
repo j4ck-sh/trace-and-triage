@@ -1,0 +1,13 @@
+/* Stage 66: theme-aware editorial research article styling */
+.tt-article-layout .article-content { min-width:0; font-size:1.02rem; line-height:1.9; color:var(--tt-text); }
+.tt-article-layout .article-content h2 { margin:3.5rem 0 1.5rem; padding-bottom:.8rem; border-bottom:1px solid var(--tt-border); font:400 clamp(1.9rem,3vw,2.7rem)/1.2 var(--tt-font-editorial); color:var(--tt-heading); }
+.tt-article-layout .article-content h3 { margin:2.5rem 0 1rem; color:var(--tt-heading); font-size:1.35rem; }
+.tt-article-layout .article-content a { color:var(--tt-blue); text-underline-offset:4px; }
+.tt-article-layout .article-content blockquote { margin:2rem 0; padding:1.5rem; background:var(--tt-surface); border-left:3px solid var(--tt-purple); color:var(--tt-muted); }
+.tt-article-layout .article-content pre { max-width:100%; overflow-x:auto; padding:1.5rem; background:var(--tt-deep); border:1px solid var(--tt-border); border-radius:var(--tt-radius-md); }
+.tt-article-layout .article-content :not(pre)>code { padding:.2rem .4rem; background:var(--tt-raised); color:var(--tt-purple); border-radius:3px; }
+.tt-article-layout .article-content table { display:block; max-width:100%; overflow-x:auto; border-collapse:collapse; }
+.tt-article-layout .article-content th,.tt-article-layout .article-content td { padding:.85rem 1rem; border:1px solid var(--tt-border); text-align:left; }
+.tt-article-layout .article-content th { background:var(--tt-surface); color:var(--tt-heading); }
+.tt-article-layout .article-content img { max-width:100%; height:auto; border:1px solid var(--tt-border); border-radius:var(--tt-radius-md); }
+@media(max-width:650px) { .tt-article-layout .article-content { font-size:1rem; } }

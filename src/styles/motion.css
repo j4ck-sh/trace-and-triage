@@ -73,3 +73,9 @@ html.tt-motion-paused .tt-typing-overlay {
     transition: none !important;
   }
 }
+/* Stage 66 article interactions */
+@media (prefers-reduced-motion: reduce) {
+  .tt-evidence-panel *, .tt-article-actions * { transition: none !important; animation: none !important; }
+}
+html.tt-motion-paused .tt-evidence-panel *,
+html.tt-motion-paused .tt-article-actions * { transition: none !important; animation: none !important; }

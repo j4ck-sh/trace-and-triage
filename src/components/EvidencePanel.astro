@@ -1,0 +1,23 @@
+---
+interface Props { title:string; reference?:string; description?:string; open?:boolean; }
+const { title, reference='EVIDENCE / TECHNICAL NOTE', description, open=false } = Astro.props;
+---
+<details class="tt-evidence-panel" open={open}>
+  <summary><span class="evidence-heading"><span class="evidence-label">{reference}</span><strong>{title}</strong></span><span class="evidence-toggle" aria-hidden="true">+</span></summary>
+  <div class="evidence-content">{description && <p>{description}</p>}<slot /></div>
+</details>
+<style>
+.tt-evidence-panel { margin:25px 0; background:var(--tt-deep); border:1px solid var(--tt-border); border-left:3px solid var(--tt-purple); border-radius:var(--tt-radius-md); overflow:hidden; }
+summary { display:flex; align-items:center; justify-content:space-between; gap:20px; padding:20px; cursor:pointer; list-style:none; }
+summary::-webkit-details-marker { display:none; }
+summary:hover { background:var(--tt-raised); }
+summary:focus-visible { outline:2px solid var(--tt-blue); outline-offset:-3px; }
+.evidence-heading { display:flex; flex-direction:column; gap:8px; }
+.evidence-label { color:var(--tt-purple); font:.7rem var(--tt-font-mono); letter-spacing:.08em; }
+strong { color:var(--tt-heading); }
+.evidence-toggle { color:var(--tt-blue); font-size:1.5rem; transition:transform .2s; }
+details[open] .evidence-toggle { transform:rotate(45deg); }
+.evidence-content { padding:20px; border-top:1px solid var(--tt-border); color:var(--tt-text); line-height:1.8; }
+.evidence-content p { color:var(--tt-muted); }
+@media(prefers-reduced-motion:reduce) { .evidence-toggle { transition:none; } }
+</style>
