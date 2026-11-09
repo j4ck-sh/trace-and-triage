@@ -5,6 +5,11 @@ import ForensicAnalyticsWorkspace from "./ForensicAnalyticsWorkspace.astro";
 import InteractiveEventTimeline from "./InteractiveEventTimeline.astro";
 import EvidenceRelationshipGraph from "./EvidenceRelationshipGraph.astro";
 
+import DatasetStatusBar from "./DatasetStatusBar.astro";
+import DatasetInformation from "./DatasetInformation.astro";
+import { droneDataset } from "../data/droneDataset";
+
+
 import { demoEvents } from "../data/demoEvents";
 import {
   demoEvidenceNodes,
@@ -47,6 +52,8 @@ const workspaceId = "tt-drone-workspace";
       DEMONSTRATION ANALYTICS
     </span>
   </div>
+
+  <DatasetStatusBar dataset={droneDataset} />
 
   <!-- TABS -->
 
@@ -97,6 +104,18 @@ const workspaceId = "tt-drone-workspace";
           Select a tab above to explore each analytical
           tool individually.
         </p>
+      </div>
+
+      <div class="dataset-notice">
+        <strong>Demonstration environment</strong>
+
+          <p>
+    The telemetry, event timeline and evidence
+    relationships use synthetic demonstration data.
+
+    These visualisations are not derived from
+    a verified forensic evidence collection.
+          </p>
       </div>
 
       <div class="overview-details">
@@ -228,6 +247,8 @@ const workspaceId = "tt-drone-workspace";
       </a>
     </div>
   </section>
+  
+  <DatasetInformation dataset={droneDataset} />
 
   <div class="workspace-footer">
     <span>TRACE & TRIAGE / DRONE LAB</span>
@@ -476,6 +497,32 @@ const workspaceId = "tt-drone-workspace";
       transition: none;
     }
   }
+
+  /* STAGE 68.7 — DATASET NOTICE */
+
+.dataset-notice {
+  margin-top: 25px;
+  padding: 18px;
+  background: var(--tt-surface);
+  border: 1px solid var(--tt-orange);
+  border-left: 3px solid var(--tt-orange);
+  border-radius: var(--tt-radius-md);
+}
+
+.dataset-notice strong {
+  color: var(--tt-orange);
+  font-family: var(--tt-font-mono);
+  font-size: 0.8rem;
+}
+
+.dataset-notice p {
+  margin: 10px 0 0;
+  color: var(--tt-muted);
+  line-height: 1.75;
+}
+
+
+
 </style>
 
 <script>
@@ -535,10 +582,18 @@ const workspaceId = "tt-drone-workspace";
         // Leaflet maps require a size refresh after
         // their hidden container becomes visible.
         if (selectedId === "map") {
-          requestAnimationFrame(() => {
-            window.dispatchEvent(new Event("resize"));
-          });
-        }
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new Event("resize"));
+
+      root.dispatchEvent(
+        new CustomEvent("tt:map-visible", {
+          bubbles: true
+        })
+      );
+    });
+  });
+}
       }
 
       tabs.forEach((tab, index) => {
