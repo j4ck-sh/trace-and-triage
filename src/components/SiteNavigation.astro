@@ -1,0 +1,198 @@
+
+---
+import BrandMark from "./BrandMark.astro";
+
+const base = import.meta.env.BASE_URL;
+
+const navigation = [
+  { label: "Home", href: base, path: "" },
+  { label: "Research", href: `${base}research/`, path: "research" },
+  { label: "Projects", href: `${base}projects/`, path: "projects" },
+  { label: "About", href: `${base}about/`, path: "about" }
+];
+
+const relativePath = Astro.url.pathname
+  .replace(base, "")
+  .replace(/^\/+|\/+$/g, "");
+
+const currentSection = relativePath.split("/")[0] ?? "";
+---
+
+<nav class="tt-site-navigation is-sticky" aria-label="Main navigation">
+  <div class="navigation-inner">
+    <BrandMark />
+
+    <div class="navigation-links">
+      {navigation.map((item) => {
+        const active = currentSection === item.path;
+
+        return (
+          <a
+            href={item.href}
+            class:list={["navigation-link", { active }]}
+            aria-current={active ? "page" : undefined}
+          >
+            {item.label}
+          </a>
+        );
+      })}
+    </div>
+
+    <div class="navigation-actions">
+      <button
+        type="button"
+        class="command-trigger"
+        data-command-trigger
+        aria-label="Open command palette"
+      >
+        <span>Search</span>
+        <kbd>Ctrl K</kbd>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .tt-site-navigation {
+    width: 100%;
+    border-bottom: 1px solid var(--tt-border);
+    background: var(--tt-deep);
+  }
+
+  .navigation-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    width: min(100% - 40px, 1250px);
+    margin: 0 auto;
+    padding: 16px 0;
+  }
+
+  .navigation-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .navigation-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 10px 14px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease,
+      border-color 200ms ease;
+  }
+
+  .navigation-link:hover {
+    background: var(--tt-surface);
+    color: var(--tt-heading);
+  }
+
+  .navigation-link.active {
+    background: var(--tt-raised);
+    border-color: var(--tt-border);
+    color: var(--tt-blue);
+  }
+
+  .navigation-link:focus-visible,
+  .command-trigger:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 3px;
+  }
+
+  .command-trigger {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 40px;
+    padding: 9px 12px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .command-trigger:hover {
+    border-color: var(--tt-blue);
+    color: var(--tt-heading);
+  }
+
+  kbd {
+    padding: 3px 6px;
+    border: 1px solid var(--tt-border);
+    border-radius: 3px;
+    font: inherit;
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 900px) {
+    .navigation-inner {
+      flex-wrap: wrap;
+    }
+
+    .navigation-links {
+      order: 3;
+      width: 100%;
+      overflow-x: auto;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .navigation-inner {
+      width: min(100% - 30px, 1250px);
+    }
+
+    .command-trigger span {
+      display: none;
+    }
+
+    .command-trigger {
+      gap: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .navigation-link {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function initialiseNavigationCommands() {
+    const triggers = document.querySelectorAll<HTMLButtonElement>(
+      "[data-command-trigger]"
+    );
+
+    triggers.forEach((trigger) => {
+      if (trigger.dataset.ready === "true") return;
+
+      trigger.dataset.ready = "true";
+
+      trigger.addEventListener("click", () => {
+        document.dispatchEvent(
+          new CustomEvent("tt:open-command-palette")
+        );
+      });
+    });
+  }
+
+  initialiseNavigationCommands();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseNavigationCommands
+  );
+</script>

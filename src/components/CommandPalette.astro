@@ -3,16 +3,6 @@ const base = import.meta.env.BASE_URL;
 ---
 
 <div class="command-palette-root" data-command-root data-base={base}>
-  <button
-    type="button"
-    class="command-trigger"
-    data-command-open
-    aria-haspopup="dialog"
-    aria-controls="tt-command-dialog"
-  >
-    <span>⌕ Search research & commands</span>
-    <kbd>Ctrl / ⌘ K</kbd>
-  </button>
 
   <dialog id="tt-command-dialog" class="command-dialog" aria-labelledby="tt-command-title">
     <div class="command-shell">
@@ -337,6 +327,13 @@ const base = import.meta.env.BASE_URL;
       input.focus();
       await loadCommands();
       renderResults();
+
+      document.addEventListener(
+        "tt:open-command-palette",
+        () => {
+          openPalette();
+        }
+      );
     }
 
     function closePalette() {
