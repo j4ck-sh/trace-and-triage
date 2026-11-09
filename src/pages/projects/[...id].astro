@@ -18,6 +18,16 @@ import ForensicTimeline from "../../components/ForensicTimeline.astro";
 import InteractiveEventTimeLine from "../../components/InteractiveEventTimeline.astro";
 import { demoEvents } from "../../data/demoEvents";
 
+import EvidenceRelationshipGraph from "../../components/EvidenceRelationshipGraph.astro";
+
+import {
+  demoEvidenceNodes,
+  demoEvidenceLinks
+} from "../../data/demoEvidence";
+
+
+
+
 // ==========================================
 // GENERATE PROJECT PAGES
 // ==========================================
@@ -148,6 +158,12 @@ const technologies: string[] = [];
             </LaboratoryPanel>
             <ForensicAnalyticsWorkspace />
             <InteractiveEventTimeLine events={demoEvents} title="Flight Event Timeline" />
+            <!-- STAGE 68.5 — EVIDENCE RELATIONSHIPS -->
+            <EvidenceRelationshipGraph
+              nodes={demoEvidenceNodes}
+              links={demoEvidenceLinks}
+              title="Drone Evidence Relationships"
+            />
           </div>
 
           <!-- INVESTIGATION CONTEXT -->
