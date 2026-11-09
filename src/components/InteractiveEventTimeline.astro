@@ -1,0 +1,376 @@
+
+
+
+---
+import type { ForensicEvent } from "../data/demoEvents";
+
+interface Props {
+  events: ForensicEvent[];
+  title?: string;
+}
+
+const {
+  events,
+  title = "Forensic Event Timeline"
+} = Astro.props;
+
+const sortedEvents = [...events].sort(
+  (a, b) => a.time - b.time
+);
+---
+
+<section class="tt-viz tt-event-timeline" data-event-timeline>
+  <div class="tt-viz-header">
+    <div>
+      <p class="tt-viz-label">TT / EVENT CHRONOLOGY</p>
+      <h2 class="tt-viz-title">{title}</h2>
+      <p class="tt-viz-description">
+        Select an event to inspect its details.
+      </p>
+    </div>
+  </div>
+
+  <div class="timeline-filters" aria-label="Filter timeline events">
+    <button type="button" data-filter="all" aria-pressed="true">
+      All events
+    </button>
+    <button type="button" data-filter="notable" aria-pressed="false">
+      Notable
+    </button>
+    <button type="button" data-filter="normal" aria-pressed="false">
+      Normal
+    </button>
+  </div>
+
+  <div class="timeline-layout">
+    <ol class="timeline-list">
+      {sortedEvents.map((event, index) => (
+        <li
+          data-event-item
+          data-severity={event.severity}
+        >
+          <button
+            type="button"
+            class="timeline-event"
+            data-event-button
+            data-event-index={index}
+            aria-pressed={index === 0 ? "true" : "false"}
+          >
+            <span class="event-time">
+              {String(Math.floor(event.time / 60)).padStart(2, "0")}:
+              {String(event.time % 60).padStart(2, "0")}
+            </span>
+
+            <span class="event-information">
+              <strong>{event.title}</strong>
+              <small>{event.id} / {event.severity.toUpperCase()}</small>
+            </span>
+          </button>
+        </li>
+      ))}
+    </ol>
+
+    <div class="timeline-detail" aria-live="polite">
+      <span class="detail-label">SELECTED EVENT</span>
+      <h3 data-detail-title>
+        {sortedEvents[0]?.title ?? "No events"}
+      </h3>
+      <p data-detail-description>
+        {sortedEvents[0]?.description ?? "No event data available."}
+      </p>
+      <span data-detail-reference>
+        {sortedEvents[0]?.id ?? ""}
+      </span>
+    </div>
+  </div>
+
+  <script
+    type="application/json"
+    data-event-data
+    set:html={JSON.stringify(sortedEvents).replace(/</g, "\\u003c")}
+  />
+</section>
+
+<style>
+  .timeline-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+  }
+
+  .timeline-filters button {
+    padding: 9px 13px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  .timeline-filters button[aria-pressed="true"] {
+    border-color: var(--tt-blue);
+    color: var(--tt-blue);
+  }
+
+  .timeline-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 0.85fr);
+    gap: 20px;
+  }
+
+  .timeline-list {
+    margin: 0;
+    padding: 0 0 0 15px;
+    border-left: 1px solid var(--tt-border);
+    list-style: none;
+  }
+
+  .timeline-list li {
+    position: relative;
+    margin-bottom: 10px;
+  }
+
+  .timeline-list li::before {
+    content: "";
+    position: absolute;
+    left: -20px;
+    top: 22px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--tt-blue);
+  }
+
+  .timeline-list li[data-severity="notable"]::before {
+    background: var(--tt-orange);
+  }
+
+  .timeline-list li[hidden] {
+    display: none;
+  }
+
+  .timeline-event {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    padding: 15px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: 5px;
+    color: var(--tt-text);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .timeline-event[aria-pressed="true"],
+  .timeline-event:hover {
+    border-color: var(--tt-blue);
+    background: var(--tt-raised);
+  }
+
+  .timeline-event:focus-visible,
+  .timeline-filters button:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 3px;
+  }
+
+  .event-time {
+    flex-shrink: 0;
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+  }
+
+  .event-information {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .event-information small {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .timeline-detail {
+    align-self: start;
+    padding: 25px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: 5px;
+  }
+
+  .detail-label,
+  [data-detail-reference] {
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .timeline-detail h3 {
+    margin: 20px 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: 1.7rem;
+    font-weight: 400;
+  }
+
+  .timeline-detail p {
+    color: var(--tt-muted);
+    line-height: 1.8;
+  }
+
+  @media (max-width: 800px) {
+    .timeline-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function initialiseEventTimelines() {
+    document.querySelectorAll<HTMLElement>(
+      "[data-event-timeline]"
+    ).forEach((root) => {
+      if (root.dataset.ready === "true") return;
+
+      const dataElement = root.querySelector<HTMLScriptElement>(
+        "[data-event-data]"
+      );
+
+      if (!dataElement) return;
+
+      interface EventData {
+        id: string;
+        time: number;
+        title: string;
+        description: string;
+        severity: "normal" | "notable";
+      }
+
+      let events: EventData[] = [];
+
+      try {
+        events = JSON.parse(dataElement.textContent ?? "[]");
+      } catch {
+        return;
+      }
+
+      const items = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-event-item]")
+      );
+
+      const buttons = Array.from(
+        root.querySelectorAll<HTMLButtonElement>(
+          "[data-event-button]"
+        )
+      );
+
+      const detailTitle = root.querySelector<HTMLElement>(
+        "[data-detail-title]"
+      );
+
+      const detailDescription = root.querySelector<HTMLElement>(
+        "[data-detail-description]"
+      );
+
+      const detailReference = root.querySelector<HTMLElement>(
+        "[data-detail-reference]"
+      );
+
+      const filters = Array.from(
+        root.querySelectorAll<HTMLButtonElement>(
+          "[data-filter]"
+        )
+      );
+
+      let selectedIndex = 0;
+
+      function selectEvent(index: number) {
+        const event = events[index];
+
+        if (!event) return;
+
+        selectedIndex = index;
+
+        buttons.forEach((button, buttonIndex) => {
+          button.setAttribute(
+            "aria-pressed",
+            String(buttonIndex === index)
+          );
+        });
+
+        if (detailTitle) {
+          detailTitle.textContent = event.title;
+        }
+
+        if (detailDescription) {
+          detailDescription.textContent = event.description;
+        }
+
+        if (detailReference) {
+          detailReference.textContent = event.id;
+        }
+      }
+
+      function filterEvents(severity: string) {
+        let firstVisible = -1;
+
+        items.forEach((item, index) => {
+          const visible =
+            severity === "all" ||
+            item.dataset.severity === severity;
+
+          item.hidden = !visible;
+
+          if (visible && firstVisible === -1) {
+            firstVisible = index;
+          }
+        });
+
+        filters.forEach((button) => {
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.filter === severity)
+          );
+        });
+
+        if (
+          firstVisible >= 0 &&
+          items[selectedIndex]?.hidden
+        ) {
+          selectEvent(firstVisible);
+        }
+      }
+
+      buttons.forEach((button, index) => {
+        button.addEventListener("click", () => {
+          selectEvent(index);
+        });
+      });
+
+      filters.forEach((button) => {
+        button.addEventListener("click", () => {
+          filterEvents(button.dataset.filter ?? "all");
+        });
+      });
+
+      root.dataset.ready = "true";
+
+      if (events.length > 0) {
+        selectEvent(0);
+      }
+    });
+  }
+
+  initialiseEventTimelines();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseEventTimelines
+  );
+</script>

@@ -15,6 +15,9 @@ import DroneFlightMap from "../../components/DroneFlightMap.astro";
 import ForensicAnalyticsWorkspace from "../../components/ForensicAnalyticsWorkspace.astro";
 import ForensicTimeline from "../../components/ForensicTimeline.astro";
 
+import InteractiveEventTimeLine from "../../components/InteractiveEventTimeline.astro";
+import { demoEvents } from "../../data/demoEvents";
+
 // ==========================================
 // GENERATE PROJECT PAGES
 // ==========================================
@@ -144,6 +147,7 @@ const technologies: string[] = [];
               </div>
             </LaboratoryPanel>
             <ForensicAnalyticsWorkspace />
+            <InteractiveEventTimeLine events={demoEvents} title="Flight Event Timeline" />
           </div>
 
           <!-- INVESTIGATION CONTEXT -->
