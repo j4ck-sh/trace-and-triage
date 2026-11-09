@@ -1,0 +1,89 @@
+---
+import type { DroneDatasetMetadata } from "../data/droneDataset";
+
+interface Props {
+  dataset: DroneDatasetMetadata;
+}
+
+const { dataset } = Astro.props;
+
+const duration = [
+  Math.floor(dataset.durationSeconds / 60),
+  dataset.durationSeconds % 60
+].map((value) => String(value).padStart(2, "0")).join(":");
+---
+
+<div class="dataset-status" aria-label="Current dataset information">
+  <div class="dataset-item">
+    <span>DATASET</span>
+    <strong>{dataset.id}</strong>
+  </div>
+
+  <div class="dataset-item">
+    <span>TYPE</span>
+    <strong>{dataset.kind.toUpperCase()}</strong>
+  </div>
+
+  <div class="dataset-item">
+    <span>SAMPLES</span>
+    <strong>{dataset.sampleCount}</strong>
+  </div>
+
+  <div class="dataset-item">
+    <span>EVENTS</span>
+    <strong>{dataset.eventCount}</strong>
+  </div>
+
+  <div class="dataset-item">
+    <span>DURATION</span>
+    <strong>{duration}</strong>
+  </div>
+</div>
+
+<style>
+  .dataset-status {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1px;
+    margin: 20px 0 25px;
+    overflow: hidden;
+    background: var(--tt-border);
+    border: 1px solid var(--tt-border);
+    border-radius: 5px;
+  }
+
+  .dataset-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 14px;
+    background: var(--tt-surface);
+  }
+
+  .dataset-item span {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+  }
+
+  .dataset-item strong {
+    color: var(--tt-heading);
+    font-family: var(--tt-font-mono);
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 800px) {
+    .dataset-status {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 500px) {
+    .dataset-status {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
