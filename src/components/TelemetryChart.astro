@@ -1,0 +1,308 @@
+
+---
+interface Sample {
+  time: number;
+  altitude: number;
+}
+
+interface Props {
+  samples: Sample[];
+  title?: string;
+  description?: string;
+}
+
+const {
+  samples,
+  title = "Flight Altitude",
+  description = "Altitude over elapsed flight time."
+} = Astro.props;
+
+const validSamples = samples
+  .filter(
+    (sample) =>
+      Number.isFinite(sample.time) &&
+      Number.isFinite(sample.altitude)
+  )
+  .sort((a, b) => a.time - b.time);
+
+const width = 720;
+const height = 260;
+const padding = 35;
+
+const maxTime = Math.max(
+  1,
+  ...validSamples.map((sample) => sample.time)
+);
+
+const minTime = Math.min(
+  0,
+  ...validSamples.map((sample) => sample.time)
+);
+
+const maxAltitude = Math.max(
+  1,
+  ...validSamples.map((sample) => sample.altitude)
+);
+
+const minAltitude = Math.min(
+  0,
+  ...validSamples.map((sample) => sample.altitude)
+);
+
+const x = (time: number) =>
+  padding +
+  ((time - minTime) / Math.max(1, maxTime - minTime)) *
+  (width - padding * 2);
+
+const y = (altitude: number) =>
+  height -
+  padding -
+  ((altitude - minAltitude) /
+    Math.max(1, maxAltitude - minAltitude)) *
+    (height - padding * 2);
+
+const points = validSamples
+  .map((sample) => `${x(sample.time)},${y(sample.altitude)}`)
+  .join(" ");
+
+const maxValue = Math.max(
+  0,
+  ...validSamples.map((sample) => sample.altitude)
+);
+---
+
+<section class="tt-viz" aria-label={title}>
+  <div class="tt-viz-header">
+    <div>
+      <p class="tt-viz-label">TT / TELEMETRY</p>
+      <h2 class="tt-viz-title">{title}</h2>
+      <p class="tt-viz-description">{description}</p>
+    </div>
+  </div>
+
+  {validSamples.length > 0 ? (
+    <>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        class="telemetry-svg"
+        role="img"
+        aria-label={`${title}. Maximum altitude ${maxValue} metres.`}
+      >
+        <title>{title}</title>
+
+        {[0, 1, 2, 3, 4].map((index) => {
+          const lineY =
+            padding + index * (height - padding * 2) / 4;
+
+          return (
+            <line
+              x1={padding}
+              x2={width - padding}
+              y1={lineY}
+              y2={lineY}
+              class="grid-line"
+            />
+          );
+        })}
+
+        <polyline
+          points={points}
+          class="telemetry-line"
+        />
+
+        {validSamples.map((sample, index) => (
+          <circle
+            cx={x(sample.time)}
+            cy={y(sample.altitude)}
+            r="5"
+            class="telemetry-point"
+            tabindex="0"
+            data-telemetry-point
+            data-time={sample.time}
+            data-altitude={sample.altitude}
+            aria-label={`Sample ${index + 1}: ${sample.time} seconds, ${sample.altitude} metres`}
+          />
+        ))}
+      </svg>
+
+      <details class="telemetry-data-table">
+  <summary>View telemetry as a data table</summary>
+
+  <div class="telemetry-table-scroll">
+    <table>
+      <caption>
+        Flight altitude measurements
+      </caption>
+
+      <thead>
+        <tr>
+          <th scope="col">Time (seconds)</th>
+          <th scope="col">Altitude (metres)</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {validSamples.map((sample) => (
+          <tr>
+            <td>{sample.time}</td>
+            <td>{sample.altitude}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</details>
+
+      <p class="telemetry-readout" data-telemetry-readout role="status">
+        Focus or hover over a sample to inspect its values.
+      </p>
+
+      <div class="tt-viz-grid">
+        <div class="tt-viz-metric">
+          <span class="tt-viz-metric-label">MAX ALTITUDE</span>
+          <strong class="tt-viz-metric-value">{maxValue} m</strong>
+        </div>
+
+        <div class="tt-viz-metric">
+          <span class="tt-viz-metric-label">SAMPLES</span>
+          <strong class="tt-viz-metric-value">{validSamples.length}</strong>
+        </div>
+
+        <div class="tt-viz-metric">
+          <span class="tt-viz-metric-label">TIME RANGE</span>
+          <strong class="tt-viz-metric-value">
+            {Math.max(0, maxTime - minTime)} s
+          </strong>
+        </div>
+      </div>
+    </>
+  ) : (
+    <p>No telemetry samples are available.</p>
+  )}
+</section>
+
+<style>
+  .telemetry-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    margin: 20px 0;
+  }
+
+  .grid-line {
+    stroke: var(--tt-border);
+    stroke-width: 1;
+  }
+
+  .telemetry-line {
+    fill: none;
+    stroke: var(--tt-blue);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .telemetry-point {
+    fill: var(--tt-purple);
+    stroke: var(--tt-deep);
+    stroke-width: 2;
+    cursor: pointer;
+  }
+
+  .telemetry-point:hover,
+  .telemetry-point:focus-visible {
+    fill: var(--tt-green);
+    stroke: var(--tt-heading);
+    stroke-width: 3;
+    outline: none;
+  }
+
+  .telemetry-readout {
+    min-height: 1.5em;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+  }
+
+  .telemetry-data-table {
+  margin: 20px 0;
+  border: 1px solid var(--tt-border);
+  border-radius: 5px;
+}
+
+.telemetry-data-table summary {
+  padding: 14px;
+  color: var(--tt-blue);
+  font-family: var(--tt-font-mono);
+  cursor: pointer;
+}
+
+.telemetry-data-table summary:focus-visible {
+  outline: 2px solid var(--tt-blue);
+  outline-offset: 3px;
+}
+
+.telemetry-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 12px;
+}
+
+.telemetry-data-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.telemetry-data-table caption {
+  padding: 10px;
+  color: var(--tt-muted);
+  text-align: left;
+}
+
+.telemetry-data-table th,
+.telemetry-data-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--tt-border);
+  text-align: left;
+}
+
+.telemetry-data-table th {
+  color: var(--tt-heading);
+}
+</style>
+
+<script>
+  function initialiseTelemetry() {
+    document.querySelectorAll<HTMLElement>(
+      ".tt-viz"
+    ).forEach((chart) => {
+      const readout = chart.querySelector<HTMLElement>(
+        "[data-telemetry-readout]"
+      );
+
+      if (!readout || chart.dataset.telemetryReady) return;
+      chart.dataset.telemetryReady = "true";
+
+      chart.querySelectorAll<SVGCircleElement>(
+        "[data-telemetry-point]"
+      ).forEach((point) => {
+        const update = () => {
+          readout.textContent =
+            `Time: ${point.dataset.time} s | ` +
+            `Altitude: ${point.dataset.altitude} m`;
+        };
+
+        point.addEventListener("mouseenter", update);
+        point.addEventListener("focus", update);
+      });
+    });
+  }
+
+  initialiseTelemetry();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseTelemetry
+  );
+</script>

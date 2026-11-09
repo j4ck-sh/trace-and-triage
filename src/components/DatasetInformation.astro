@@ -1,0 +1,128 @@
+
+
+---
+import type { DroneDatasetMetadata } from "../data/droneDataset";
+
+interface Props {
+  dataset: DroneDatasetMetadata;
+}
+
+const { dataset } = Astro.props;
+---
+
+<details class="dataset-information">
+  <summary>
+    <span>DATASET INFORMATION & LIMITATIONS</span>
+    <span aria-hidden="true">+</span>
+  </summary>
+
+  <div class="dataset-information-body">
+    <h3>{dataset.name}</h3>
+
+    <p>{dataset.description}</p>
+
+    <dl>
+      <div>
+        <dt>Dataset reference</dt>
+        <dd>{dataset.id}</dd>
+      </div>
+
+      <div>
+        <dt>Source</dt>
+        <dd>{dataset.source}</dd>
+      </div>
+
+      <div>
+        <dt>Classification</dt>
+        <dd>{dataset.kind.toUpperCase()}</dd>
+      </div>
+    </dl>
+
+    <h4>Limitations</h4>
+
+    <ul>
+      {dataset.limitations.map((limitation) => (
+        <li>{limitation}</li>
+      ))}
+    </ul>
+  </div>
+</details>
+
+<style>
+  .dataset-information {
+    margin: 20px 0;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 5px;
+  }
+
+  summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 16px 18px;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  summary:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 3px;
+  }
+
+  .dataset-information-body {
+    padding: 20px;
+    border-top: 1px solid var(--tt-border);
+  }
+
+  h3 {
+    margin: 0 0 12px;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: 1.6rem;
+    font-weight: 400;
+  }
+
+  h4 {
+    margin-top: 25px;
+    color: var(--tt-heading);
+  }
+
+  p,
+  li,
+  dd {
+    color: var(--tt-muted);
+    line-height: 1.75;
+  }
+
+  dl {
+    display: grid;
+    gap: 12px;
+    margin: 25px 0;
+  }
+
+  dl > div {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--tt-border);
+  }
+
+  dt {
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  dd {
+    margin: 6px 0 0;
+  }
+
+  ul {
+    padding-left: 22px;
+  }
+
+  li {
+    margin: 8px 0;
+  }
+</style>

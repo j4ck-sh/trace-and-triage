@@ -1,0 +1,65 @@
+/* ==========================================
+   TRACE & TRIAGE — STAGE 69
+   NAVIGATION FOUNDATION
+   ========================================== */
+
+:root {
+  --tt-header-height: 76px;
+}
+
+/* Shared navigation refinements */
+
+.tt-site-navigation {
+  position: relative;
+  z-index: 100;
+}
+
+/* Sticky behaviour is enabled once the
+   navigation replaces the existing header. */
+
+.tt-site-navigation.is-sticky {
+  position: sticky;
+  top: 0;
+  background: var(--tt-deep);
+  border-bottom: 1px solid var(--tt-border);
+}
+
+/* Navigation links */
+
+.tt-site-navigation a {
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+/* Keyboard accessibility */
+
+.tt-site-navigation :is(a, button):focus-visible {
+  outline: 2px solid var(--tt-blue);
+  outline-offset: 3px;
+}
+
+/* Avoid horizontal page overflow */
+
+.tt-site-navigation,
+.tt-site-navigation * {
+  box-sizing: border-box;
+}
+
+/* Respect motion preferences */
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-site-navigation *,
+  .tt-site-navigation *::before,
+  .tt-site-navigation *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Mobile refinements */
+
+@media (max-width: 600px) {
+  :root {
+    --tt-header-height: 68px;
+  }
+}

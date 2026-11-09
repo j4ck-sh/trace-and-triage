@@ -1,0 +1,118 @@
+---
+interface Props {
+  title: string;
+  label?: string;
+  description?: string;
+  open?: boolean;
+}
+
+const {
+  title,
+  label = "TT / EVIDENCE VISUALISATION",
+  description,
+  open = false
+} = Astro.props;
+---
+
+<details class="research-viz-panel" open={open}>
+  <summary>
+    <span class="panel-heading">
+      <span class="panel-label">{label}</span>
+      <strong>{title}</strong>
+      {description && <span class="panel-description">{description}</span>}
+    </span>
+
+    <span class="panel-toggle" aria-hidden="true">+</span>
+  </summary>
+
+  <div class="panel-content">
+    <slot />
+  </div>
+</details>
+
+<style>
+  .research-viz-panel {
+    margin: 20px 0;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md, 6px);
+    overflow: hidden;
+  }
+
+  .research-viz-panel[open] {
+    border-color: var(--tt-blue);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary:hover {
+    background: var(--tt-raised);
+  }
+
+  summary:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: -3px;
+  }
+
+  .panel-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .panel-label {
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono, monospace);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .panel-heading strong {
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial, Georgia, serif);
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 400;
+  }
+
+  .panel-description {
+    color: var(--tt-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .panel-toggle {
+    flex-shrink: 0;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono, monospace);
+    font-size: 1.5rem;
+    transition: transform 200ms ease;
+  }
+
+  details[open] .panel-toggle {
+    transform: rotate(45deg);
+  }
+
+  .panel-content {
+    min-width: 0;
+    padding: 20px;
+    border-top: 1px solid var(--tt-border);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel-toggle {
+      transition: none;
+    }
+  }
+</style>

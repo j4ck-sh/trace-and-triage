@@ -1,0 +1,130 @@
+<script>
+  function initTypewriters() {
+    const headings = document.querySelectorAll<HTMLElement>(
+      "[data-typewriter]:not([data-typing-ready])"
+    );
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
+
+    headings.forEach((heading) => {
+      heading.dataset.typingReady = "true";
+
+      const original = heading.textContent?.trim() ?? "";
+
+      if (!original) return;
+
+      // Keep the full heading in the DOM.
+      // A visual overlay creates the typing effect.
+      const overlay = document.createElement("span");
+      overlay.className = "tt-typing-overlay";
+      overlay.setAttribute("aria-hidden", "true");
+
+      heading.classList.add("tt-typing-host");
+      heading.appendChild(overlay);
+
+      if (reducedMotion.matches) return;
+
+      const animate = () => {
+        if (heading.dataset.typed) return;
+        heading.dataset.typed = "true";
+
+        heading.classList.add("tt-typing-active");
+
+        let position = 0;
+        const characters = Array.from(original);
+
+        function typeNext() {
+          if (!heading.isConnected) return;
+
+          if (reducedMotion.matches || document.documentElement.classList.contains("tt-motion-paused")) {
+            heading.classList.remove("tt-typing-active");
+            return;
+          }
+
+          position = Math.min(
+            position + 1,
+            characters.length
+          );
+
+          overlay.textContent =
+            characters.slice(0, position).join("");
+
+          if (position < characters.length) {
+            window.setTimeout(typeNext, 38);
+          } else {
+            window.setTimeout(() => {
+              heading.classList.remove("tt-typing-active");
+            }, 400);
+          }
+        }
+
+        typeNext();
+      };
+
+      if (!("IntersectionObserver" in window)) {
+        animate();
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting) {
+            animate();
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.25 }
+      );
+
+      observer.observe(heading);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initTypewriters,
+      { once: true }
+    );
+  } else {
+    initTypewriters();
+  }
+</script>
+
+<style is:global>
+  .tt-typing-host {
+    position: relative;
+  }
+
+  .tt-typing-overlay {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tt-typing-host.tt-typing-active {
+      color: transparent !important;
+    }
+
+    .tt-typing-active .tt-typing-overlay {
+      display: block;
+      position: absolute;
+      inset: 0;
+      color: var(--tt-heading);
+      pointer-events: none;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .tt-typing-active .tt-typing-overlay::after {
+      content: "|";
+      color: var(--tt-blue);
+      animation: tt-cursor-blink 0.8s steps(1) infinite;
+    }
+  }
+
+  @keyframes tt-cursor-blink {
+    50% { opacity: 0; }
+  }
+</style>

@@ -1,0 +1,154 @@
+---
+interface Props {
+  size?: number;
+  showText?: boolean;
+  href?: string;
+}
+
+const {
+  size = 38,
+  showText = true,
+  href = import.meta.env.BASE_URL
+} = Astro.props;
+---
+
+<a
+  class="tt-brand"
+  href={href}
+  aria-label="Trace & Triage — Homepage"
+>
+  <span
+    class="tt-brand-symbol"
+    style={`--brand-size: ${size}px`}
+    aria-hidden="true"
+  >
+    <svg
+      viewBox="0 0 48 48"
+      width="100%"
+      height="100%"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <!-- Evidence frame -->
+      <path
+        d="M8 8H19M29 8H40V19M40 29V40H29M19 40H8V29M8 19V8"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="square"
+      />
+
+      <!-- Investigation crosshair -->
+      <circle
+        cx="24"
+        cy="24"
+        r="9"
+        stroke="currentColor"
+        stroke-width="2"
+      />
+
+      <path
+        d="M24 12V19M24 29V36M12 24H19M29 24H36"
+        stroke="currentColor"
+        stroke-width="2"
+      />
+
+      <!-- Evidence point -->
+      <circle
+        cx="24"
+        cy="24"
+        r="2.5"
+        fill="currentColor"
+      />
+    </svg>
+  </span>
+
+  {showText && (
+    <span class="tt-brand-wordmark">
+      <strong>TRACE <span>&</span> TRIAGE</strong>
+      <small>DIGITAL FORENSICS / RESEARCH</small>
+    </span>
+  )}
+</a>
+
+<style>
+  .tt-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    color: var(--tt-heading);
+    text-decoration: none;
+  }
+
+  .tt-brand-symbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: var(--brand-size);
+    height: var(--brand-size);
+    color: var(--tt-blue);
+    transition:
+      transform 250ms ease,
+      color 250ms ease;
+  }
+
+  .tt-brand-wordmark {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .tt-brand-wordmark strong {
+    color: var(--tt-heading);
+    font-family: var(--tt-font-mono, monospace);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .tt-brand-wordmark strong span {
+    color: var(--tt-blue);
+  }
+
+  .tt-brand-wordmark small {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono, monospace);
+    font-size: 0.58rem;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+  }
+
+  .tt-brand:hover .tt-brand-symbol {
+    transform: rotate(12deg);
+    color: var(--tt-purple);
+  }
+
+  .tt-brand:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 5px;
+    border-radius: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tt-brand-symbol {
+      transition: none;
+    }
+
+    .tt-brand:hover .tt-brand-symbol {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .tt-brand-wordmark strong {
+      font-size: 0.8rem;
+    }
+
+    .tt-brand-wordmark small {
+      font-size: 0.48rem;
+    }
+  }
+</style>

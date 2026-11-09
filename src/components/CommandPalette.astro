@@ -1,0 +1,383 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<div class="command-palette-root" data-command-root data-base={base}>
+
+  <dialog id="tt-command-dialog" class="command-dialog" aria-labelledby="tt-command-title">
+    <div class="command-shell">
+      <div class="command-header">
+        <span id="tt-command-title">TT / COMMAND LAUNCHER</span>
+
+        <button type="button" data-command-close aria-label="Close command palette">
+          Esc ×
+        </button>
+      </div>
+
+      <label for="tt-command-search" class="sr-only">
+        Search research, projects and commands
+      </label>
+
+      <input
+        id="tt-command-search"
+        data-command-search
+        type="search"
+        autocomplete="off"
+        placeholder="Search research, projects, commands..."
+        aria-controls="tt-command-results"
+        aria-describedby="tt-command-help"
+      />
+
+      <p id="tt-command-help" class="command-help">
+        ↑ ↓ Navigate · Enter Open · Esc Close
+      </p>
+
+      <div id="tt-command-results" class="command-results" data-command-results role="listbox" aria-label="Search results"></div>
+
+      <p class="command-status" data-command-status role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
+</div>
+
+<style>
+  .command-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 11px 15px;
+    width: min(100%, 370px);
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 6px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .command-trigger:hover {
+    border-color: var(--tt-blue);
+    color: var(--tt-heading);
+  }
+
+  kbd {
+    flex-shrink: 0;
+    padding: 3px 6px;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    font: inherit;
+    font-size: 0.7rem;
+  }
+
+  .command-dialog {
+    position: fixed;
+    width: min(92vw, 650px);
+    max-height: min(75vh, 650px);
+    padding: 0;
+    border: 1px solid var(--tt-border);
+    border-radius: 10px;
+    background: var(--tt-deep);
+    color: var(--tt-text);
+    box-shadow: 0 30px 100px rgba(0,0,0,0.5);
+  }
+
+  .command-dialog::backdrop {
+    background: rgba(5, 7, 14, 0.78);
+    backdrop-filter: blur(6px);
+  }
+
+  .command-shell {
+    padding: 20px;
+  }
+
+  .command-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 18px;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  [data-command-close] {
+    padding: 7px 10px;
+    background: transparent;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-muted);
+    cursor: pointer;
+  }
+
+  [data-command-search] {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 6px;
+    color: var(--tt-heading);
+    font: inherit;
+    font-size: 1rem;
+  }
+
+  .command-help {
+    margin: 12px 0;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .command-results {
+    max-height: 360px;
+    overflow-y: auto;
+    display: grid;
+    gap: 5px;
+  }
+
+  .command-result {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--tt-text);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .command-result[aria-selected="true"],
+  .command-result:hover {
+    background: var(--tt-surface);
+    border-color: var(--tt-blue);
+  }
+
+  .command-result-title {
+    display: block;
+    font-weight: 600;
+  }
+
+  .command-result-meta {
+    display: block;
+    margin-top: 5px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .command-status {
+    color: var(--tt-muted);
+    font-size: 0.8rem;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .command-dialog::backdrop {
+      backdrop-filter: none;
+    }
+  }
+</style>
+
+<script>
+  interface Command {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    reference?: string;
+    url: string;
+  }
+
+  const root = document.querySelector<HTMLElement>("[data-command-root]");
+
+  if (root) {
+    const base = root.dataset.base ?? "/";
+    const dialog = root.querySelector<HTMLDialogElement>("dialog");
+    const input = root.querySelector<HTMLInputElement>("[data-command-search]");
+    const results = root.querySelector<HTMLElement>("[data-command-results]");
+    const status = root.querySelector<HTMLElement>("[data-command-status]");
+    const openButton = root.querySelector<HTMLButtonElement>("[data-command-open]");
+    const closeButton = root.querySelector<HTMLButtonElement>("[data-command-close]");
+
+    let commands: Command[] = [];
+    let filtered: Command[] = [];
+    let activeIndex = 0;
+
+    async function loadCommands() {
+      if (commands.length) return;
+
+      if (status) status.textContent = "Loading commands...";
+
+      try {
+        const response = await fetch(`${base}command-index.json`);
+
+        if (!response.ok) throw new Error("Unable to load command index.");
+
+        commands = await response.json();
+
+        if (status) status.textContent = "";
+      } catch {
+        if (status) {
+          status.textContent = "Commands could not be loaded.";
+        }
+      }
+    }
+
+    function renderResults() {
+      if (!results || !input) return;
+
+      const query = input.value.trim().toLowerCase();
+
+      filtered = commands.filter((command) => {
+        const text = [
+          command.title,
+          command.description,
+          command.category,
+          command.reference ?? ""
+        ].join(" ").toLowerCase();
+
+        return text.includes(query);
+      }).slice(0, 12);
+
+      activeIndex = 0;
+      results.replaceChildren();
+
+      filtered.forEach((command, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "command-result";
+        button.setAttribute("role", "option");
+        button.id = `tt-result-${index}`;
+        button.setAttribute("aria-selected", String(index === activeIndex));
+
+        const title = document.createElement("span");
+        title.className = "command-result-title";
+        title.textContent = command.title;
+
+        const meta = document.createElement("span");
+        meta.className = "command-result-meta";
+        meta.textContent =
+          `${command.category} · ${command.reference ?? command.description}`;
+
+        button.append(title, meta);
+
+        button.addEventListener("click", () => {
+          window.location.assign(command.url);
+        });
+
+        results.appendChild(button);
+      });
+
+      if (status) {
+        status.textContent = filtered.length
+          ? `${filtered.length} results`
+          : "No matching commands.";
+      }
+
+      updateSelection();
+    }
+
+    function updateSelection() {
+      const buttons = results?.querySelectorAll<HTMLElement>(
+        '[role="option"]'
+      );
+
+      buttons?.forEach((button, index) => {
+        button.setAttribute(
+          "aria-selected",
+          String(index === activeIndex)
+        );
+      });
+
+      if (input) {
+        if (filtered.length) {
+          input.setAttribute(
+            "aria-activedescendant",
+            `tt-result-${activeIndex}`
+          );
+        } else {
+          input.removeAttribute("aria-activedescendant");
+        }
+      }
+
+      buttons?.[activeIndex]?.scrollIntoView({
+        block: "nearest"
+      });
+    }
+
+    async function openPalette() {
+      if (!dialog || !input) return;
+
+      if (!dialog.open) dialog.showModal();
+
+      input.focus();
+      await loadCommands();
+      renderResults();
+
+      document.addEventListener(
+        "tt:open-command-palette",
+        () => {
+          openPalette();
+        }
+      );
+    }
+
+    function closePalette() {
+      dialog?.close();
+      openButton?.focus();
+    }
+
+    openButton?.addEventListener("click", openPalette);
+    closeButton?.addEventListener("click", closePalette);
+
+    input?.addEventListener("input", renderResults);
+
+    input?.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, filtered.length - 1);
+        updateSelection();
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        activeIndex = Math.max(activeIndex - 1, 0);
+        updateSelection();
+      }
+
+      if (event.key === "Enter" && filtered[activeIndex]) {
+        event.preventDefault();
+        window.location.assign(filtered[activeIndex].url);
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === "k"
+      ) {
+        event.preventDefault();
+
+        if (dialog?.open) {
+          closePalette();
+        } else {
+          openPalette();
+        }
+      }
+    });
+  }
+</script>

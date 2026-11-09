@@ -1,0 +1,77 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<nav class="tt-status-bar" aria-label="Workspace shortcuts">
+  <div class="status-left">
+    <span class="status-dot" aria-hidden="true"></span>
+    <span>TRACE & TRIAGE</span>
+    <span class="status-divider">/</span>
+    <span>WORKSPACE 01</span>
+  </div>
+
+  <div class="status-right">
+    <span>TOKYO NIGHT</span>
+
+    <a href={`${base}research/`}>
+      RESEARCH
+    </a>
+
+    <a href={`${base}projects/`}>
+      PROJECTS
+    </a>
+  </div>
+</nav>
+
+<style>
+  .tt-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 12px 15px;
+    margin: 10px 0 25px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .status-left,
+  .status-right {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 13px;
+  }
+
+  .status-left {
+    color: var(--tt-heading);
+  }
+
+  .status-right {
+    color: var(--tt-muted);
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--tt-green);
+  }
+
+  .status-divider {
+    color: var(--tt-border);
+  }
+
+  a {
+    color: var(--tt-blue);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>

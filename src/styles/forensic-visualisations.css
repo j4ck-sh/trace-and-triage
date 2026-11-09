@@ -1,0 +1,113 @@
+
+/* TRACE & TRIAGE — FORENSIC VISUALISATIONS */
+
+.tt-viz {
+  --viz-primary: var(--tt-blue);
+  --viz-secondary: var(--tt-purple);
+
+  min-width: 0;
+  padding: 22px;
+  background: var(--tt-surface);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-md, 6px);
+  color: var(--tt-text);
+}
+
+.tt-viz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tt-viz-label {
+  color: var(--tt-blue);
+  font-family: var(--tt-font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+}
+
+.tt-viz-title {
+  margin: 10px 0;
+  color: var(--tt-heading);
+  font-family: var(--tt-font-editorial, Georgia, serif);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 400;
+}
+
+.tt-viz-description {
+  color: var(--tt-muted);
+  line-height: 1.7;
+}
+
+.tt-viz-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.tt-viz-metric {
+  min-width: 0;
+  padding: 18px;
+  background: var(--tt-deep);
+  border: 1px solid var(--tt-border);
+  border-radius: 5px;
+}
+
+.tt-viz-metric-label {
+  display: block;
+  color: var(--tt-muted);
+  font-family: var(--tt-font-mono, monospace);
+  font-size: 0.72rem;
+}
+
+.tt-viz-metric-value {
+  display: block;
+  margin-top: 10px;
+  color: var(--tt-heading);
+  font-family: var(--tt-font-mono, monospace);
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  overflow-wrap: anywhere;
+}
+
+.tt-viz-button {
+  padding: 10px 14px;
+  background: var(--tt-deep);
+  border: 1px solid var(--tt-border);
+  border-radius: 4px;
+  color: var(--tt-text);
+  font-family: var(--tt-font-mono, monospace);
+  cursor: pointer;
+}
+
+.tt-viz-button:hover,
+.tt-viz-button[aria-pressed="true"] {
+  border-color: var(--tt-blue);
+  color: var(--tt-blue);
+}
+
+.tt-viz-button:focus-visible {
+  outline: 2px solid var(--tt-blue);
+  outline-offset: 3px;
+}
+
+@media (max-width: 700px) {
+  .tt-viz-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tt-viz {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-viz *,
+  .tt-viz *::before,
+  .tt-viz *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

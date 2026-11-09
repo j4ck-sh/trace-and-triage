@@ -1,0 +1,112 @@
+---
+import ResearchVisualisationPanel from "./ResearchVisualisationPanel.astro";
+
+import {
+  getResearchVisualisations
+} from "../data/researchVisualisations";
+
+interface Props {
+  articleId: string;
+}
+
+const { articleId } = Astro.props;
+
+const visualisations = getResearchVisualisations(articleId);
+---
+
+{visualisations.length > 0 && (
+  <section
+    class="research-visualisations"
+    aria-labelledby="research-visualisations-heading"
+  >
+    <div class="visualisations-header">
+      <p>TT / INTERACTIVE RESEARCH</p>
+      <h2 id="research-visualisations-heading">
+        Evidence Visualisations
+      </h2>
+      <span>
+        Explore supporting evidence and analytical context.
+      </span>
+    </div>
+
+    <div class="visualisations-list">
+      {visualisations.map((visualisation) => (
+        <ResearchVisualisationPanel
+          title={visualisation.title}
+          label={visualisation.sourceLabel}
+          description={visualisation.description}
+        >
+          <div class="visualisation-content">
+            <p class="visualisation-type">
+              {visualisation.type.toUpperCase()}
+            </p>
+
+            {visualisation.notes.length > 0 && (
+              <ul>
+                {visualisation.notes.map((note) => (
+                  <li>{note}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </ResearchVisualisationPanel>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .research-visualisations {
+    margin: 70px 0;
+    padding-top: 25px;
+    border-top: 1px solid var(--tt-border);
+  }
+
+  .visualisations-header {
+    margin-bottom: 30px;
+  }
+
+  .visualisations-header > p {
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  .visualisations-header h2 {
+    margin: 12px 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+  }
+
+  .visualisations-header > span {
+    color: var(--tt-muted);
+    line-height: 1.7;
+  }
+
+  .visualisations-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .visualisation-content {
+    color: var(--tt-text);
+    line-height: 1.8;
+  }
+
+  .visualisation-type {
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .visualisation-content ul {
+    padding-left: 22px;
+  }
+
+  .visualisation-content li {
+    margin: 10px 0;
+  }
+</style>

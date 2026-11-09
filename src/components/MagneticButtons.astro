@@ -1,0 +1,39 @@
+<script>
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
+
+  document.querySelectorAll<HTMLElement>(
+    "[data-magnetic]"
+  ).forEach((element) => {
+    if (element.dataset.magneticReady) return;
+
+    element.dataset.magneticReady = "true";
+
+
+    element.addEventListener("pointermove", (event) => {
+      if (
+        reducedMotion.matches || document.documentElement.classList.contains("tt-motion-paused") || event.pointerType !== "mouse"
+      ) return;
+
+      const rect = element.getBoundingClientRect();
+
+      const x =
+        (event.clientX - rect.left - rect.width / 2) * 0.08;
+
+      const y =
+        (event.clientY - rect.top - rect.height / 2) * 0.08;
+
+      element.style.transform =
+        `translate(${x}px, ${y}px)`;
+    });
+
+    element.addEventListener("pointerleave", () => {
+      element.style.transform = "";
+    });
+
+    element.addEventListener("blur", () => {
+      element.style.transform = "";
+    });
+  });
+</script>

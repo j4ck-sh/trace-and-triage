@@ -1,0 +1,64 @@
+<script>
+  function initialiseReveals() {
+    const elements = document.querySelectorAll<HTMLElement>(
+      "[data-reveal]:not(.is-visible)"
+    );
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    const paused = document.documentElement.classList.contains(
+      "tt-motion-paused"
+    );
+
+    if (
+      reducedMotion ||
+      paused ||
+      !("IntersectionObserver" in window)
+    ) {
+      elements.forEach((element) => {
+        element.classList.add("is-visible");
+      });
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "0px 0px -20px 0px"
+      }
+    );
+
+    elements.forEach((element) => {
+      observer.observe(element);
+    });
+
+    document.documentElement.classList.add(
+      "tt-motion-ready"
+    );
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialiseReveals,
+      { once: true }
+    );
+  } else {
+    initialiseReveals();
+  }
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseReveals
+  );
+</script>

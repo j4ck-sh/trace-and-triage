@@ -1,0 +1,160 @@
+---
+interface Props {
+  title?: string;
+}
+
+const {
+  title = "Flight Reconstruction Map"
+} = Astro.props;
+---
+
+<section class="drone-map-section">
+  <div class="map-heading">
+    <p class="map-label">FLIGHT TELEMETRY / DEMONSTRATION</p>
+    <h2>{title}</h2>
+    <p>
+      Interactive reconstruction using fictional GPS
+      coordinates. Select a waypoint to inspect its data.
+    </p>
+  </div>
+
+  <div
+    id="drone-flight-map"
+    class="drone-flight-map"
+    role="region"
+    aria-label="Simulated drone flight route"
+  ></div>
+
+  <p class="map-note">
+    Demonstration data only. Not actual forensic evidence.
+  </p>
+</section>
+
+<style>
+  .drone-map-section {
+    margin: 55px 0;
+    padding: 25px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .map-label {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .map-heading h2 {
+    margin: 10px 0;
+  }
+
+  .map-heading p,
+  .map-note {
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .drone-flight-map {
+    height: 420px;
+    width: 100%;
+    margin-top: 25px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    z-index: 0;
+  }
+
+  .map-note {
+    margin: 15px 0 0;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 600px) {
+    .drone-map-section {
+      padding: 15px;
+    }
+
+    .drone-flight-map {
+      height: 320px;
+    }
+  }
+</style>
+
+<script>
+  import L from "leaflet";
+  import "leaflet/dist/leaflet.css";
+
+  const mapElement = document.getElementById("drone-flight-map");
+
+  if (mapElement) {
+    // Fictional telemetry coordinates
+    const flight = [
+      { lat: 0.0000, lng: 0.0000, time: "10:00:00", alt: 0 },
+      { lat: 0.0005, lng: 0.0006, time: "10:00:15", alt: 15 },
+      { lat: 0.0010, lng: 0.0013, time: "10:00:30", alt: 32 },
+      { lat: 0.0015, lng: 0.0020, time: "10:00:45", alt: 48 },
+      { lat: 0.0020, lng: 0.0026, time: "10:01:00", alt: 55 },
+      { lat: 0.0014, lng: 0.0031, time: "10:01:15", alt: 42 },
+      { lat: 0.0007, lng: 0.0035, time: "10:01:30", alt: 20 },
+      { lat: 0.0001, lng: 0.0038, time: "10:01:45", alt: 0 }
+    ];
+
+    const map = L.map(mapElement, {
+      scrollWheelZoom: false
+    });
+
+   
+
+    L.tileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+      }
+    ).addTo(map);
+
+    const coordinates = flight.map(
+      (point): L.LatLngTuple => [point.lat, point.lng]
+    );
+
+    const route = L.polyline(coordinates, {
+      color: "#52c7ea",
+      weight: 4
+    }).addTo(map);
+
+    flight.forEach((point, index) => {
+      const isStart = index === 0;
+      const isEnd = index === flight.length - 1;
+
+      const colour = isStart
+        ? "#86c7aa"
+        : isEnd
+          ? "#e5b96c"
+          : "#52c7ea";
+
+      L.circleMarker([point.lat, point.lng], {
+        radius: isStart || isEnd ? 8 : 5,
+        color: colour,
+        fillColor: colour,
+        fillOpacity: 0.9
+      })
+        .addTo(map)
+        .bindPopup(`
+          <strong>
+            ${isStart ? "Take-off" : isEnd ? "Landing" : `Waypoint ${index}`}
+          </strong>
+          <p>Time: ${point.time} UTC</p>
+          <p>Altitude: ${point.alt} m</p>
+          <p>Latitude: ${point.lat.toFixed(5)}</p>
+          <p>Longitude: ${point.lng.toFixed(5)}</p>
+        `);
+    });
+
+    map.fitBounds(route.getBounds(), {
+      padding: [30, 30]
+    });
+  }
+</script>

@@ -115,11 +115,111 @@ const research = defineCollection({
       })
     ).default([]),
 
+    timeline: z.array(
+      z.object({
+        timestamp: z.string(),
+        title: z.string(),
+        description: z.string().optional(),
+        source: z.string().optional(),
+      })
+    ).default([]),
+
+    indicators: z.array(
+      z.object({
+        type: z.string(),
+        value: z.string(),
+        description: z.string().optional(),
+      })
+    ).default([]),
+
+
+    callouts: z.array(
+      z.object({
+        type: z.enum([
+          "finding",
+          "note",
+          "evidence",
+          "limitation",
+          "conclusion"
+        ]),
+
+        title: z.string(),
+
+        text: z.string(),
+
+        reference: z.string().optional()
+      })
+    ).default([]),
+
+    attackTechniques: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        tactic: z.string().optional(),
+        evidence: z.string(),
+        assessment: z.enum(["Observed", "Inferred", "Background"]),
+        confidence: z.enum(["High", "Medium", "Low"]),
+        reference: z.string().url().optional(),
+      })
+    ).default([]),
+
+    spartaTechniques: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        tactic: z.string().optional(),
+        evidence: z.string(),
+        assessment: z.enum(["Observed", "Inferred", "Background"]),
+        confidence: z.enum(["High", "Medium", "Low"]),
+        reference: z.string().url().optional(),
+      })
+    ).default([]),
+
   }),
 
+});
+
+// Project Section
+
+const projects = defineCollection({
+  loader: glob({
+    pattern: "**/*.md",
+    base: "./src/content/projects",
+  }),
+
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    projectId: z.string(),
+
+    category: z.string(),
+
+    status: z.enum([
+      "Planned",
+      "Active",
+      "Completed",
+      "On Hold"
+    ]).default("Planned"),
+
+    startDate: z.coerce.date().optional(),
+
+    technologies: z.array(z.string()).default([]),
+
+    objectives: z.array(z.string()).default([]),
+
+    relatedResearch: z.array(z.string()).default([]),
+
+    githubUrl: z.string().url().optional(),
+
+    heroImage: z.string().optional(),
+    heroImageAlt: z.string().optional(),
+
+    draft: z.boolean().default(false),
+  }),
 });
 
 // Export the collection so Astro can use it.
 export const collections = {
   research,
+  projects,
 };

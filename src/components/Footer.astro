@@ -1,3 +1,7 @@
+---
+import { social } from "../config/social";
+---
+
 <footer>
   <div class="footer-content">
 
@@ -14,6 +18,37 @@
       represent my employer. All security testing is performed
       in isolated or authorised environments.
     </p>
+    
+    
+  <div class="social-links">
+    <a
+      href={social.github}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Trace and Triage GitHub profile"
+    >
+      GitHub ↗
+    </a>
+
+    <a
+      href={social.linkedin}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="LinkedIn profile"
+    >
+      LinkedIn ↗
+    </a>
+
+    <a
+      href={`${import.meta.env.BASE_URL}rss.xml`}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Subscribe to Trace and Triage RSS feed"
+    >
+    RSS Feed
+    </a>
+  </div>
+
 
   </div>
 </footer>
@@ -41,5 +76,28 @@
   .disclaimer {
     font-size: 0.85rem;
     max-width: 750px;
+  }
+
+  .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 15px;
+  }
+
+  .social-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+  }
+
+  .social-links a:hover {
+    color: var(--accent);
+  }
+
+  .social-links a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 </style>

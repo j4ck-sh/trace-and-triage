@@ -1,0 +1,73 @@
+---
+const base = import.meta.env.BASE_URL;
+
+const workspaces = [
+  { number: "01", label: "Research", href: `${base}research/` },
+  { number: "02", label: "Projects", href: `${base}projects/` },
+  { number: "03", label: "Methodology", href: `${base}methodology/` }
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="workspace-nav" aria-label="Research workspaces">
+  {workspaces.map((workspace) => {
+    const active = currentPath === workspace.href;
+
+    return (
+      <a
+        href={workspace.href}
+        class:list={["workspace-link", { active }]}
+        aria-current={active ? "page" : undefined}
+      >
+        <span class="workspace-number">
+          {workspace.number}
+        </span>
+        <span>{workspace.label}</span>
+      </a>
+    );
+  })}
+</nav>
+
+<style>
+  .workspace-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 25px 0;
+  }
+
+  .workspace-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition:
+      background var(--tt-fast) ease,
+      border-color var(--tt-fast) ease;
+  }
+
+  .workspace-link:hover,
+  .workspace-link.active {
+    background: var(--tt-raised);
+    border-color: var(--tt-blue);
+    color: var(--tt-heading);
+  }
+
+  .workspace-number {
+    color: var(--tt-blue);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .workspace-link {
+      transition: none;
+    }
+  }
+</style>

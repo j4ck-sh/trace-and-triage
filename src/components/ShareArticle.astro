@@ -1,0 +1,144 @@
+
+---
+interface Props {
+  title: string;
+  url: string;
+}
+
+const { title, url } = Astro.props;
+
+const linkedinShareUrl =
+  "https://www.linkedin.com/sharing/share-offsite/?url=" +
+  encodeURIComponent(url);
+---
+
+<section class="share-article">
+  <p class="share-label">SHARE THIS INVESTIGATION</p>
+
+  <div class="share-actions">
+    <a
+      class="share-link linkedin"
+      href={linkedinShareUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Share ${title} on LinkedIn`}
+    >
+      Share on LinkedIn ↗
+    </a>
+
+    <button
+      type="button"
+      class="copy-link"
+      data-url={url}
+    >
+      Copy Article Link
+    </button>
+  </div>
+
+  <p class="copy-status" aria-live="polite"></p>
+</section>
+
+<style>
+  .share-article {
+    margin: 45px 0;
+    padding: 25px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .share-label {
+    color: var(--accent);
+    font-family: Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+  }
+
+  .share-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .share-link,
+  .copy-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 16px;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .linkedin {
+    background: var(--accent);
+    color: #0b0f14;
+    border: 1px solid var(--accent);
+  }
+
+  .copy-link {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .share-link:hover,
+  .copy-link:hover {
+    opacity: 0.85;
+  }
+
+  .share-link:focus-visible,
+  .copy-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .copy-status {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  .copy-status:empty {
+    display: none;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>(
+    ".share-article"
+  ).forEach((section) => {
+    const button = section.querySelector<HTMLButtonElement>(
+      ".copy-link"
+    );
+
+    const status = section.querySelector<HTMLElement>(
+      ".copy-status"
+    );
+
+    button?.addEventListener("click", async () => {
+      const url = button.dataset.url;
+
+      if (!url) return;
+
+      try {
+        await navigator.clipboard.writeText(url);
+
+        if (status) {
+          status.textContent = "Article link copied!";
+        }
+      } catch {
+        if (status) {
+          status.textContent =
+            "Unable to copy automatically. Please copy the address from your browser.";
+        }
+      }
+    });
+  });
+</script>

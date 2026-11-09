@@ -1,0 +1,166 @@
+
+
+---
+const base = import.meta.env.BASE_URL;
+---
+
+<section
+  class="command-panel"
+  data-command-panel
+  data-base={base}
+  aria-label="Website command panel"
+>
+  <div class="command-header">
+    <span>trace@triage:~</span>
+    <span>COMMAND INTERFACE</span>
+  </div>
+
+  <p class="command-help">
+    Type <code>help</code> to see available commands.
+  </p>
+
+  <form data-command-form>
+    <label for="tt-command-input">Website command</label>
+
+    <div class="command-line">
+      <span aria-hidden="true">$</span>
+
+      <input
+        id="tt-command-input"
+        data-command-input
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="help"
+      />
+
+      <button type="submit">Run</button>
+    </div>
+  </form>
+
+  <p data-command-output role="status" aria-live="polite">
+    Ready.
+  </p>
+</section>
+
+<style>
+  .command-panel {
+    padding: 24px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+  }
+
+  .command-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .command-help,
+  [data-command-output] {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.85rem;
+  }
+
+  label {
+    display: block;
+    margin: 20px 0 8px;
+    color: var(--tt-text);
+    font-size: 0.8rem;
+  }
+
+  .command-line {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+  }
+
+  .command-line > span {
+    color: var(--tt-green);
+    font-family: var(--tt-font-mono);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 0;
+    background: transparent;
+    border: 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-mono);
+    font-size: 0.9rem;
+  }
+
+  button {
+    padding: 8px 12px;
+    background: var(--tt-blue);
+    border: 0;
+    border-radius: 4px;
+    color: var(--tt-canvas);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  [data-command-output] {
+    min-height: 1.5em;
+    margin: 18px 0 0;
+    white-space: pre-line;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>(
+    "[data-command-panel]"
+  ).forEach((panel) => {
+    const form = panel.querySelector<HTMLFormElement>(
+      "[data-command-form]"
+    );
+
+    const input = panel.querySelector<HTMLInputElement>(
+      "[data-command-input]"
+    );
+
+    const output = panel.querySelector<HTMLElement>(
+      "[data-command-output]"
+    );
+
+    const base = panel.dataset.base ?? "/";
+
+    const commands: Record<string, string> = {
+      home: base,
+      research: `${base}research/`,
+      projects: `${base}projects/`,
+      methodology: `${base}methodology/`
+    };
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      if (!input || !output) return;
+
+      const command = input.value.trim().toLowerCase();
+
+      if (command === "help") {
+        output.textContent =
+          "Available: help, home, research, projects, methodology, clear";
+      } else if (command === "clear") {
+        output.textContent = "";
+      } else if (Object.hasOwn(commands, command)) {
+        window.location.assign(commands[command]);
+      } else {
+        output.textContent =
+          `Unknown command: ${command}. Type help.`;
+      }
+    });
+  });
+</script>
