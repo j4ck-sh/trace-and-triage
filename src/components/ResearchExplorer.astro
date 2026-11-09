@@ -1,0 +1,404 @@
+
+---
+interface Props {
+  categories: string[];
+}
+
+const { categories } = Astro.props;
+---
+
+<section
+  class="research-explorer"
+  aria-label="Research filters"
+>
+  <div class="explorer-heading">
+    <div>
+      <p class="explorer-label">TT / RESEARCH INDEX</p>
+      <h2>Investigation Explorer</h2>
+    </div>
+
+    <button type="button" data-reset>
+      Reset filters ↺
+    </button>
+  </div>
+
+  <div class="explorer-controls">
+    <div class="field">
+      <label for="tt-research-query">
+        Search investigations
+      </label>
+
+      <input
+        id="tt-research-query"
+        data-query
+        type="search"
+        placeholder="Title, tag, case ID..."
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="field">
+      <label for="tt-research-category">
+        Category
+      </label>
+
+      <select
+        id="tt-research-category"
+        data-category
+      >
+        <option value="">All categories</option>
+
+        {categories.map((category) => (
+          <option value={category}>
+            {category}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="tt-research-sort">
+        Sort by
+      </label>
+
+      <select
+        id="tt-research-sort"
+        data-sort
+      >
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="title">Title A–Z</option>
+      </select>
+    </div>
+  </div>
+
+  <p
+    class="explorer-count"
+    data-count
+    role="status"
+    aria-live="polite"
+  >
+    Filter investigations below.
+  </p>
+</section>
+
+<style>
+  /* ==========================================
+     TRACE & TRIAGE — RESEARCH EXPLORER
+     ========================================== */
+
+  .research-explorer {
+    margin: 35px 0;
+    padding: 25px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+  }
+
+  /* HEADER */
+
+  .explorer-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .explorer-label {
+    margin: 0;
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  .explorer-heading h2 {
+    margin: 8px 0 0;
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 400;
+    color: var(--tt-heading);
+  }
+
+  /* RESET BUTTON */
+
+  [data-reset] {
+    padding: 10px 14px;
+    background: transparent;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease;
+  }
+
+  [data-reset]:hover {
+    background: var(--tt-raised);
+    border-color: var(--tt-blue);
+  }
+
+  /* FILTER CONTROLS */
+
+  .explorer-controls {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 15px;
+  }
+
+  .field {
+    min-width: 0;
+  }
+
+  .field label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .field input,
+  .field select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: 5px;
+    color: var(--tt-text);
+    font-family: var(--tt-font-body);
+    font-size: 0.9rem;
+  }
+
+  .field input::placeholder {
+    color: var(--tt-muted);
+    opacity: 0.8;
+  }
+
+  /* FOCUS STATES */
+
+  .field input:focus-visible,
+  .field select:focus-visible,
+  [data-reset]:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 3px;
+  }
+
+  /* RESULTS COUNTER */
+
+  .explorer-count {
+    margin: 20px 0 0;
+    padding-top: 15px;
+    border-top: 1px solid var(--tt-border);
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+  }
+
+  /* RESPONSIVE */
+
+  @media (max-width: 750px) {
+    .research-explorer {
+      padding: 18px;
+    }
+
+    .explorer-controls {
+      grid-template-columns: 1fr;
+    }
+
+    .explorer-heading {
+      align-items: flex-start;
+    }
+  }
+
+  /* ACCESSIBILITY */
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reset] {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  function initialiseExplorer() {
+    // Find the explorer and investigation grid
+    const explorer = document.querySelector<HTMLElement>(
+      ".research-explorer"
+    );
+
+    const grid = document.querySelector<HTMLElement>(
+      "#tt-investigation-grid"
+    );
+
+    if (!explorer || !grid) return;
+
+    // Prevent duplicate event listeners
+    if (explorer.dataset.ready === "true") return;
+
+    const query = explorer.querySelector<HTMLInputElement>(
+      "[data-query]"
+    );
+
+    const category = explorer.querySelector<HTMLSelectElement>(
+      "[data-category]"
+    );
+
+    const sort = explorer.querySelector<HTMLSelectElement>(
+      "[data-sort]"
+    );
+
+    const reset = explorer.querySelector<HTMLButtonElement>(
+      "[data-reset]"
+    );
+
+    const counter = explorer.querySelector<HTMLElement>(
+      "[data-count]"
+    );
+
+    const empty = document.getElementById(
+      "tt-empty-results"
+    );
+
+    if (
+      !query ||
+      !category ||
+      !sort ||
+      !reset ||
+      !counter
+    ) {
+      return;
+    }
+
+    explorer.dataset.ready = "true";
+
+    // Find all investigation cards
+    const cards = Array.from(
+      grid.querySelectorAll<HTMLElement>(
+        "[data-investigation]"
+      )
+    );
+
+    function update() {
+      const search = query!.value.trim().toLowerCase();
+      const selectedCategory = category!.value;
+      const selectedSort = sort!.value;
+
+      let visible = 0;
+
+      // Filter investigations
+      cards.forEach((card) => {
+        const searchable = card.dataset.search ?? "";
+        const cardCategory = card.dataset.category ?? "";
+
+        const matchesSearch =
+          search === "" ||
+          searchable.includes(search);
+
+        const matchesCategory =
+          selectedCategory === "" ||
+          cardCategory === selectedCategory;
+
+        const matches =
+          matchesSearch && matchesCategory;
+
+        card.hidden = !matches;
+
+        if (matches) {
+          visible++;
+
+          // Keep filtered results visible
+          // when scroll animations are enabled
+          card.classList.add("is-visible");
+        }
+      });
+
+      // Sort investigations
+      const sortedCards = [...cards].sort((a, b) => {
+        if (selectedSort === "title") {
+          return (
+            a.dataset.title ?? ""
+          ).localeCompare(
+            b.dataset.title ?? ""
+          );
+        }
+
+        const dateA =
+          Date.parse(a.dataset.date ?? "") || 0;
+
+        const dateB =
+          Date.parse(b.dataset.date ?? "") || 0;
+
+        if (selectedSort === "oldest") {
+          return dateA - dateB;
+        }
+
+        return dateB - dateA;
+      });
+
+      // Reorder cards in the grid
+      sortedCards.forEach((card) => {
+        if (grid) {
+            grid.appendChild(card);
+        }
+      });
+
+      // Update results counter
+      if (counter) {
+        counter.textContent =
+          `${visible} of ${cards.length} investigations shown`;
+      }
+
+      // Show/hide empty-results message
+      if (empty) {
+        empty.hidden = visible !== 0;
+      }
+    }
+
+    // Live search
+    query.addEventListener("input", update);
+
+    // Category filtering
+    category.addEventListener("change", update);
+
+    // Sorting
+    sort.addEventListener("change", update);
+
+    // Reset all filters
+    reset.addEventListener("click", () => {
+      query.value = "";
+      category.value = "";
+      sort.value = "newest";
+
+      update();
+    });
+
+    // Initialise results
+    update();
+  }
+
+  // Normal page load
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialiseExplorer,
+      { once: true }
+    );
+  } else {
+    initialiseExplorer();
+  }
+
+  // Astro client-side navigation compatibility
+  document.addEventListener(
+    "astro:page-load",
+    initialiseExplorer
+  );
+</script>

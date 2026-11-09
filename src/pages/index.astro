@@ -1,12 +1,18 @@
 ---
 import { getCollection } from "astro:content";
-import BaseLayout from "../layouts/BaseLayout.astro";
 
-// Readingtime function
-  import {
-    getReadingTime,
-    formatReadingTime
-  } from "../utils/readingTime";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HomeHero from "../components/HomeHero.astro";
+import WorkspaceNav from "../components/WorkspaceNav.astro";
+import WorkspacePanel from "../components/WorkspacePanel.astro";
+import CommandPanel from "../components/CommandPanel.astro";
+import RevealOnScroll from "../components/RevealOnScroll.astro";
+import TypewriterHeadings from "../components/TypewriterHeadings.astro";
+import MagneticButtons from "../components/MagneticButtons.astro";
+import CardSpotlight from "../components/CardSpotlight.astro";
+import WorkspaceStatusBar from "../components/WorkspaceStatusBar.astro";
+import MotionControls from "../components/MotionControls.astro";
+import ThemeSwitcher from "../components/ThemeSwitcher.astro";
 
 const base = import.meta.env.BASE_URL;
 
@@ -15,213 +21,183 @@ const articles = await getCollection(
   ({ data }) => !data.draft
 );
 
-const latestArticles = articles
-  .sort(
-    (a, b) =>
-      b.data.date.valueOf() - a.data.date.valueOf()
-
-  )
+const latestResearch = [...articles]
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 3);
 
-  
+const projects = await getCollection(
+  "projects",
+  ({ data }) => !data.draft
+);
 
+const featuredProjects = projects.slice(0, 3);
 ---
 
 <BaseLayout
-  title="Trace & Triage"
-  description="Digital Forensics, Incident Response and Security Research"
+  title="Trace & Triage | Digital Forensics Research"
+  description="Independent digital forensics, malware analysis and cybersecurity research."
 >
+  <div class="tt-home">
 
-<section class="hero">
+    <WorkspaceStatusBar />
 
-  <p class="case-id">
-    DIGITAL FORENSICS • INCIDENT RESPONSE • SECURITY RESEARCH
-  </p>
+    <WorkspaceNav />
 
-  <h1>
-    Trace <span class="accent">&</span> Triage
-  </h1>
+    <HomeHero />
 
-  <p class="hero-subtitle">
-    Practical investigations into digital evidence,
-    malware behaviour, security incidents and
-    non-traditional forensic systems.
-  </p>
+    <section class="tt-section" data-reveal>
+      <div class="section-heading">
+        <p class="tt-label">01 / INVESTIGATION JOURNAL</p>
+        <h2 data-typewriter>Latest Research</h2>
+      </div>
 
-</section>
+      <div class="research-grid">
+        {latestResearch.map((article) => (
+          <a
+            class="research-card"
+            data-reveal
+            data-spotlight
+            href={`${base}research/${article.id}/`}
+          >
+            <span class="tt-label">{article.data.caseId}</span>
 
+            <h3>{article.data.title}</h3>
 
-<section>
+            <p>{article.data.description}</p>
 
-  <h2>Latest Research</h2>
+            <span class="card-link">Read Investigation ↗</span>
+          </a>
+        ))}
+      </div>
+    </section>
 
-  <p class="section-description">
-    My latest digital forensic investigations,
-    malware analysis and security research.
-  </p>
+    <section class="tt-section" data-reveal>
+      <div class="section-heading">
+        <p class="tt-label">02 / TECHNICAL LABORATORIES</p>
+        <h2 data-typewriter>Research Workspaces</h2>
+      </div>
 
-  <div class="grid">
+      <div class="lab-grid">
+        {featuredProjects.map((project, index) => (
+          <WorkspacePanel
+            label={project.data.projectId}
+            title={project.data.title}
+            description={project.data.description}
+            href={`${base}projects/${project.id}/`}
+            accent={
+              index === 0 ? "blue" :
+              index === 1 ? "purple" : "green"
+            }
+          />
+        ))}
+      </div>
+    </section>
 
-    {latestArticles.map((article) => (
+    <section class="tt-section" data-reveal>
+      <div class="section-heading">
+        <p class="tt-label">03 / COMMAND INTERFACE</p>
+        <h2 data-typewriter>Navigate the Archive</h2>
+      </div>
 
-      <a
-        class="card"
-        href={`${base}research/${article.id}`}
-      >
-
-        <span class="case-id">
-          {article.data.caseId}
-        </span>
-
-        <h3>
-          {article.data.title}
-        </h3>
-
-        <p class="muted">
-          {article.data.description}
-        </p>
-
-        <p class="article-meta">
-          <span>{article.data.category}</span>
-
-          <span class="meta-seperator">.</span>
-
-          <span>
-            {article.data.date.toLocaleTimeString("en-GB")}
-          </span>
-
-          <span class="meta-seperator"></span>
-
-          <span class="reading-time">
-            {formatReadingTime(getReadingTime(article))}
-          </span>
-        </p>
-
-        <div class="tags">
-
-          {article.data.tags.map((tag) => (
-
-            <span class="tag">
-              {tag}
-            </span>
-
-          ))}
-
-        </div>
-
-      </a>
-
-    ))}
+      <CommandPanel />
+    </section>
 
   </div>
 
-  <p class="view-all">
-    <a href={`${base}research`}>
-      View all research →
-    </a>
-  </p>
-
-</section>
+  <RevealOnScroll />
+  <TypewriterHeadings />
+  <MagneticButtons />
+  <CardSpotlight />
+  <WorkspaceStatusBar />
+  <MotionControls />
+  <ThemeSwitcher />
+</BaseLayout>
 
 <style>
+  .tt-home {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 25px 90px;
+  }
 
-.article-meta {
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin-top: 15px;
-}
+  .tt-section {
+    margin: 90px 0;
+  }
 
-.tags {
-  margin-top: 15px;
-}
+  .section-heading {
+    padding-top: 20px;
+    margin-bottom: 30px;
+    border-top: 1px solid var(--tt-border);
+  }
 
-.view-all {
-  margin-top: 25px;
-}
+  .section-heading h2 {
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 400;
+    color: var(--tt-heading);
+  }
 
+  .research-grid,
+  .lab-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .research-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-height: 260px;
+    padding: 25px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 6px;
+    color: var(--tt-text);
+    text-decoration: none;
+    transition:
+      transform 250ms ease,
+      border-color 250ms ease;
+  }
+
+  .research-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--tt-blue);
+  }
+
+  .research-card h3 {
+    margin: 0;
+    font-family: var(--tt-font-editorial);
+    font-size: 1.7rem;
+    font-weight: 400;
+  }
+
+  .research-card p {
+    color: var(--tt-muted);
+    line-height: 1.7;
+  }
+
+  .card-link {
+    margin-top: auto;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 850px) {
+    .research-grid,
+    .lab-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .research-card {
+      transition: none;
+    }
+
+    .research-card:hover {
+      transform: none;
+    }
+  }
 </style>
-
-
-<section>
-
-  <h2>Research Areas</h2>
-
-  <div class="grid">
-
-    <div class="card">
-      <span class="case-id">TT-DF</span>
-      <h3>Digital Forensics</h3>
-      <p class="muted">
-        Windows artefacts, timelines, disk analysis
-        and evidence reconstruction.
-      </p>
-    </div>
-
-    <div class="card">
-      <span class="case-id">TT-ML</span>
-      <h3>Malware Analysis</h3>
-      <p class="muted">
-        Static and dynamic analysis of malicious software.
-      </p>
-    </div>
-
-    <div class="card">
-      <span class="case-id">TT-IR</span>
-      <h3>Incident Response</h3>
-      <p class="muted">
-        Investigation and reconstruction of security incidents.
-      </p>
-    </div>
-
-    <div class="card">
-      <span class="case-id">TT-DR</span>
-      <h3>Drone Forensics</h3>
-      <p class="muted">
-        UAV telemetry, GPS and digital evidence.
-      </p>
-    </div>
-
-    <div class="card">
-      <span class="case-id">TT-SP</span>
-      <h3>Space Systems</h3>
-      <p class="muted">
-        Satellite cybersecurity, telemetry and space-system research.
-      </p>
-    </div>
-
-    <div class="card">
-      <span class="case-id">TT-TH</span>
-      <h3>Threat Hunting</h3>
-      <p class="muted">
-        Behaviour-based detection and investigative hunting.
-      </p>
-    </div>
-
-  </div>
-
-</section>
-
-
-<section>
-
-  <h2>About Trace & Triage</h2>
-
-  <p class="section-description">
-    Trace & Triage documents my practical research across
-    digital forensics, incident response, malware analysis
-    and security.
-  </p>
-
-  <p>
-    The focus is not simply on identifying malicious activity,
-    but understanding what evidence remains afterwards and how
-    that evidence can be used to reconstruct what happened.
-  </p>
-
-  <a href="/about">
-    More about the project →
-  </a>
-
-</section>
-
-</BaseLayout>

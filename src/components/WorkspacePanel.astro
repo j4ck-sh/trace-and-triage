@@ -1,0 +1,130 @@
+---
+interface Props {
+  label: string;
+  title: string;
+  description: string;
+  href?: string;
+  accent?: "blue" | "purple" | "green";
+}
+
+const {
+  label,
+  title,
+  description,
+  href,
+  accent = "blue"
+} = Astro.props;
+---
+
+<section class:list={["workspace-panel", accent]}>
+  <div class="panel-top">
+    <span>{label}</span>
+    <span class="panel-dot" aria-hidden="true"></span>
+  </div>
+
+  <h3>{title}</h3>
+  <p>{description}</p>
+
+  <div class="panel-content">
+    <slot />
+  </div>
+
+  {href && (
+    <a class="panel-link" href={href}>
+      Open workspace
+      <span aria-hidden="true">↗</span>
+    </a>
+  )}
+</section>
+
+<style>
+  .workspace-panel {
+    --panel-accent: var(--tt-blue);
+    display: flex;
+    flex-direction: column;
+    min-height: 230px;
+    padding: 24px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+    transition:
+      transform var(--tt-medium) var(--tt-ease),
+      border-color var(--tt-fast) ease;
+  }
+
+  .workspace-panel.purple {
+    --panel-accent: var(--tt-purple);
+  }
+
+  .workspace-panel.green {
+    --panel-accent: var(--tt-green);
+  }
+
+  @media (hover: hover) {
+    .workspace-panel:hover {
+      transform: translateY(-3px);
+      border-color: var(--panel-accent);
+    }
+  }
+
+  .panel-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--panel-accent);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .panel-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--panel-accent);
+  }
+
+  h3 {
+    margin: 25px 0 12px;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 400;
+  }
+
+  p {
+    margin: 0;
+    color: var(--tt-muted);
+    line-height: 1.7;
+  }
+
+  .panel-content {
+    margin: 18px 0;
+  }
+
+  .panel-link {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--tt-border);
+    color: var(--panel-accent);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    text-decoration: none;
+  }
+
+  .panel-link:hover {
+    text-decoration: underline;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .workspace-panel {
+      transition: none;
+    }
+
+    .workspace-panel:hover {
+      transform: none;
+    }
+  }
+</style>

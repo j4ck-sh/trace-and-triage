@@ -1,0 +1,116 @@
+---
+import TelemetryChart from "./TelemetryChart.astro";
+import { demoFlight } from "../data/demoFlight";
+
+interface Props {
+  mode?: "demo";
+}
+
+const { mode = "demo" } = Astro.props;
+---
+
+<section
+  class="analytics-workspace"
+  aria-labelledby="analytics-heading"
+>
+  <div class="workspace-header">
+    <div>
+      <p class="workspace-label">
+        TT / FORENSIC ANALYTICS
+      </p>
+
+      <h2 id="analytics-heading">
+        Flight Data Analysis
+      </h2>
+    </div>
+
+    <span class="workspace-status">
+      {mode === "demo" ? "DEMONSTRATION DATA" : ""}
+    </span>
+  </div>
+
+  <p class="workspace-description">
+    Explore sample altitude measurements using
+    the interactive telemetry visualisation.
+    This dataset is illustrative and is not
+    associated with a real forensic investigation.
+  </p>
+
+  <TelemetryChart
+    samples={demoFlight}
+    title="Flight Altitude Profile"
+    description="Demonstration altitude measurements over elapsed time."
+  />
+
+  <div class="workspace-footer">
+    <span>DATA SOURCE / SYNTHETIC</span>
+    <span>VISUALISATION / SVG</span>
+  </div>
+</section>
+
+<style>
+  .analytics-workspace {
+    min-width: 0;
+    margin: 45px 0;
+    padding: 25px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+  }
+
+  .workspace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .workspace-label {
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  h2 {
+    margin: 12px 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 400;
+  }
+
+  .workspace-status {
+    padding: 7px 10px;
+    border: 1px solid var(--tt-orange);
+    border-radius: 4px;
+    color: var(--tt-orange);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .workspace-description {
+    max-width: 760px;
+    color: var(--tt-muted);
+    line-height: 1.8;
+  }
+
+  .workspace-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 25px;
+    padding-top: 18px;
+    border-top: 1px solid var(--tt-border);
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 650px) {
+    .analytics-workspace {
+      padding: 15px;
+    }
+  }
+</style>

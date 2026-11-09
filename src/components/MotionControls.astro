@@ -1,0 +1,50 @@
+<div class="tt-motion-controls">
+  <button
+    type="button"
+    data-motion-toggle
+    aria-pressed="false"
+  >
+    Pause animations
+  </button>
+</div>
+
+<style>
+  .tt-motion-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin: 15px 0;
+  }
+
+  button {
+    padding: 9px 14px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-text);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+
+  button:hover {
+    border-color: var(--tt-blue);
+  }
+</style>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>(
+    "[data-motion-toggle]"
+  );
+
+  button?.addEventListener("click", () => {
+    const paused = document.documentElement.classList.toggle(
+      "tt-motion-paused"
+    );
+
+    button.setAttribute("aria-pressed", String(paused));
+
+    button.textContent = paused
+      ? "Resume animations"
+      : "Pause animations";
+  });
+</script>

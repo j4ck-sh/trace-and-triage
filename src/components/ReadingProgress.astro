@@ -1,0 +1,30 @@
+<div class="tt-reading-progress" data-reading-progress role="progressbar" aria-label="Article reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="tt-progress-fill"></div></div>
+<style>
+.tt-reading-progress { position:fixed; inset:0 0 auto; height:3px; z-index:9999; pointer-events:none; }
+.tt-progress-fill { height:100%; background:var(--tt-blue); transform:scaleX(0); transform-origin:left; }
+</style>
+<script>
+function initReadingProgress() {
+  const progress = document.querySelector<HTMLElement>('[data-reading-progress]');
+  const article = document.querySelector<HTMLElement>('[data-article-content]');
+  if (!progress || !article || progress.dataset.ready) return;
+  const fill = progress.querySelector<HTMLElement>('.tt-progress-fill');
+  if (!fill) return;
+  progress.dataset.ready = 'true';
+  let frame = 0;
+  const update = () => {
+    const rect = article.getBoundingClientRect();
+    const start = window.scrollY + rect.top;
+    const end = start + article.offsetHeight;
+    const fraction = Math.max(0, Math.min(1, (window.scrollY + window.innerHeight - start) / Math.max(end - start, 1)));
+    fill.style.transform = `scaleX(${fraction})`;
+    progress.setAttribute('aria-valuenow', String(Math.round(fraction * 100)));
+  };
+  const requestUpdate = () => { if (frame) return; frame = requestAnimationFrame(() => { frame = 0; update(); }); };
+  window.addEventListener('scroll', requestUpdate, { passive:true });
+  window.addEventListener('resize', requestUpdate);
+  update();
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initReadingProgress, { once:true }); else initReadingProgress();
+document.addEventListener('astro:page-load', initReadingProgress);
+</script>

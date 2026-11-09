@@ -1,0 +1,208 @@
+
+<section class="project-explorer" aria-label="Project filters">
+  <div class="explorer-header">
+    <div>
+      <p class="explorer-label">TT / PROJECT INDEX</p>
+      <h2>Laboratory Explorer</h2>
+    </div>
+
+    <button type="button" data-project-reset>
+      Reset filters ↺
+    </button>
+  </div>
+
+  <div class="explorer-controls">
+    <div class="field">
+      <label for="tt-project-query">Search projects</label>
+      <input
+        id="tt-project-query"
+        data-project-query
+        type="search"
+        placeholder="Project title, ID, technology..."
+      />
+    </div>
+
+    <div class="field">
+      <label for="tt-project-sort">Sort projects</label>
+      <select id="tt-project-sort" data-project-sort>
+        <option value="title">Title A–Z</option>
+        <option value="title-desc">Title Z–A</option>
+      </select>
+    </div>
+  </div>
+
+  <p data-project-count role="status" aria-live="polite"></p>
+</section>
+
+<style>
+  .project-explorer {
+    padding: 25px;
+    margin: 35px 0;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+  }
+
+  .explorer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .explorer-label {
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  h2 {
+    margin: 8px 0 20px;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: 2rem;
+    font-weight: 400;
+  }
+
+  [data-project-reset] {
+    padding: 10px 14px;
+    background: transparent;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-blue);
+    cursor: pointer;
+  }
+
+  .explorer-controls {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 15px;
+  }
+
+  .field label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-text);
+  }
+
+  [data-project-count] {
+    margin: 18px 0 0;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 650px) {
+    .explorer-controls {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  function initialiseProjectExplorer() {
+    const explorer = document.querySelector<HTMLElement>(
+      ".project-explorer"
+    );
+
+    const grid = document.querySelector<HTMLElement>(
+      "#tt-project-grid"
+    );
+
+    if (!explorer || !grid) return;
+    if (explorer.dataset.ready === "true") return;
+
+    const query = explorer.querySelector<HTMLInputElement>(
+      "[data-project-query]"
+    );
+
+    const sort = explorer.querySelector<HTMLSelectElement>(
+      "[data-project-sort]"
+    );
+
+    const reset = explorer.querySelector<HTMLButtonElement>(
+      "[data-project-reset]"
+    );
+
+    const count = explorer.querySelector<HTMLElement>(
+      "[data-project-count]"
+    );
+
+    if (!query || !sort || !reset || !count) return;
+
+    const projectGrid: HTMLElement = grid;
+    const queryInput: HTMLInputElement = query;
+    const sortSelect: HTMLSelectElement = sort;
+    const counter: HTMLElement = count;
+
+    explorer.dataset.ready = "true";
+
+    const cards = Array.from(
+      projectGrid.querySelectorAll<HTMLElement>(
+        "[data-project]"
+      )
+    );
+
+    function update() {
+      const search = queryInput.value.trim().toLowerCase();
+
+      let visible = 0;
+
+      cards.forEach((card) => {
+        const text = card.dataset.search ?? "";
+        const matches = text.includes(search);
+
+        card.hidden = !matches;
+        if (matches) visible++;
+      });
+
+      const sorted = [...cards].sort((a, b) => {
+        const aTitle = a.dataset.title ?? "";
+        const bTitle = b.dataset.title ?? "";
+
+        return sortSelect.value === "title-desc"
+          ? bTitle.localeCompare(aTitle)
+          : aTitle.localeCompare(bTitle);
+      });
+
+      sorted.forEach((card) => {
+        projectGrid.appendChild(card);
+      });
+
+      counter.textContent =
+        `${visible} of ${cards.length} projects shown`;
+    }
+
+    queryInput.addEventListener("input", update);
+    sortSelect.addEventListener("change", update);
+
+    reset.addEventListener("click", () => {
+      queryInput.value = "";
+      sortSelect.value = "title";
+      update();
+    });
+
+    update();
+  }
+
+  initialiseProjectExplorer();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseProjectExplorer
+  );
+</script>

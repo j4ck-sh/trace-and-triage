@@ -1,0 +1,132 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BrandSignature from "../components/BrandSignature.astro";
+import WorkspacePanel from "../components/WorkspacePanel.astro";
+import WorkspaceNav from "../components/WorkspaceNav.astro";
+import CommandPanel from "../components/CommandPanel.astro";
+import RevealOnScroll from "../components/RevealOnScroll.astro";
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout
+  title="Tokyo Night Brand Preview | Trace & Triage"
+  description="Preview of the new Trace & Triage design system."
+>
+  <main class="brand-preview">
+    <div data-reveal>
+      <p class="tt-label">BRAND SYSTEM / TOKYO NIGHT</p>
+      <BrandSignature />
+    </div>
+
+    <div data-reveal="delay-1">
+      <WorkspaceNav />
+    </div>
+
+    <section class="preview-intro" data-reveal>
+      <p class="tt-label">OUR APPROACH</p>
+
+      <h2 class="tt-editorial">
+        Evidence tells a story.
+        Research makes it understandable.
+      </h2>
+
+      <p>
+        Trace & Triage combines evidence-led digital
+        forensic research with interactive laboratories
+        and technical investigation tools.
+      </p>
+    </section>
+
+    <div class="workspace-grid">
+      <div data-reveal="delay-1">
+        <WorkspacePanel
+          label="01 / RESEARCH"
+          title="Investigation Journal"
+          description="Technical case files and forensic research."
+          href={`${base}research/`}
+        />
+      </div>
+
+      <div data-reveal="delay-2">
+        <WorkspacePanel
+          label="02 / PROJECTS"
+          title="Research Laboratories"
+          description="Technical experiments and research environments."
+          accent="purple"
+          href={`${base}projects/`}
+        />
+      </div>
+
+      <div data-reveal="delay-3">
+        <WorkspacePanel
+          label="03 / DRONE FORENSICS"
+          title="Flight Reconstruction"
+          description="GPS telemetry and flight reconstruction research."
+          accent="green"
+          href={`${base}projects/`}
+        />
+      </div>
+    </div>
+
+    <div class="command-wrapper" data-reveal>
+      <CommandPanel />
+    </div>
+
+    <a class="back-link" href={base}>
+      ← Back to Trace & Triage
+    </a>
+  </main>
+
+  <RevealOnScroll />
+</BaseLayout>
+
+<style>
+  .brand-preview {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 60px 20px;
+  }
+
+  .preview-intro {
+    max-width: 780px;
+    margin: 75px 0 50px;
+  }
+
+  .preview-intro h2 {
+    margin: 15px 0 25px;
+    font-size: clamp(2.2rem, 5vw, 4.5rem);
+  }
+
+  .preview-intro > p:not(.tt-label) {
+    max-width: 650px;
+    color: var(--tt-muted);
+    line-height: 1.8;
+  }
+
+  .workspace-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+  }
+
+  .workspace-grid > div {
+    min-width: 0;
+  }
+
+  .command-wrapper {
+    margin-top: 45px;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 55px;
+    color: var(--tt-blue);
+  }
+
+  @media (max-width: 850px) {
+    .workspace-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

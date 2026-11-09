@@ -1,0 +1,448 @@
+---
+import type {
+  EvidenceNode,
+  EvidenceLink
+} from "../data/demoEvidence";
+
+interface Props {
+  nodes: EvidenceNode[];
+  links: EvidenceLink[];
+  title?: string;
+}
+
+const {
+  nodes,
+  links,
+  title = "Evidence Relationship Analysis"
+} = Astro.props;
+
+const validLinks = links.filter((link) =>
+  nodes.some((node) => node.id === link.from) &&
+  nodes.some((node) => node.id === link.to)
+);
+
+const initialNode = nodes[0];
+
+const initialLinks = initialNode
+  ? validLinks.filter(
+      (link) =>
+        link.from === initialNode.id ||
+        link.to === initialNode.id
+    )
+  : [];
+
+const graphData = JSON.stringify({
+  nodes,
+  links: validLinks
+}).replace(/</g, "\\u003c");
+---
+
+<section
+  class="tt-viz tt-evidence-graph"
+  data-evidence-graph
+  aria-label={title}
+>
+  <div class="tt-viz-header">
+    <div>
+      <p class="tt-viz-label">
+        TT / EVIDENCE RELATIONSHIPS
+      </p>
+
+      <h2 class="tt-viz-title">{title}</h2>
+
+      <p class="tt-viz-description">
+        Select an artefact to inspect its relationships
+        with other evidence and analysis records.
+      </p>
+    </div>
+  </div>
+
+  <div class="graph-workspace">
+    <div class="graph-network">
+      <p class="graph-section-label">ARTEFACT NETWORK</p>
+
+      <div class="graph-nodes">
+        {nodes.map((node, index) => (
+          <button
+            type="button"
+            class="graph-node"
+            data-node-id={node.id}
+            data-node-type={node.type}
+            aria-pressed={index === 0 ? "true" : "false"}
+          >
+            <span class="node-type">
+              {node.type.toUpperCase()}
+            </span>
+
+            <strong>{node.label}</strong>
+
+            <span class="node-reference">{node.id}</span>
+          </button>
+        ))}
+      </div>
+
+      <p class="graph-hint">
+        Select a node to inspect connected artefacts.
+      </p>
+    </div>
+
+    <aside
+      class="graph-inspector"
+      aria-label="Selected evidence details"
+    >
+      <p class="graph-section-label">
+        EVIDENCE INSPECTOR
+      </p>
+
+      <h3 data-inspector-title>
+        {initialNode?.label ?? "No evidence"}
+      </h3>
+
+      <span class="inspector-type" data-inspector-type>
+        {initialNode?.type.toUpperCase() ?? ""}
+      </span>
+
+      <p data-inspector-description>
+        {initialNode?.description ?? "No evidence available."}
+      </p>
+
+      <div class="inspector-relations">
+        <h4>Relationships</h4>
+
+        <ul data-inspector-links>
+          {initialLinks.map((link) => (
+            <li>
+              <strong>
+                {link.from === initialNode?.id
+                  ? nodes.find((node) => node.id === link.to)?.label
+                  : nodes.find((node) => node.id === link.from)?.label}
+              </strong>
+
+              <span>{link.relationship}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <div class="graph-footer">
+    <span>{nodes.length} ARTEFACTS</span>
+    <span>{validLinks.length} RELATIONSHIPS</span>
+    <span>DATA / DEMONSTRATION</span>
+  </div>
+
+  <script
+    type="application/json"
+    data-evidence-data
+    set:html={graphData}
+  />
+</section>
+
+<style>
+  .graph-workspace {
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1.4fr)
+      minmax(260px, 0.9fr);
+    gap: 18px;
+  }
+
+  .graph-network,
+  .graph-inspector {
+    min-width: 0;
+    padding: 20px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: 5px;
+  }
+
+  .graph-section-label {
+    margin: 0 0 20px;
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .graph-nodes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .graph-node {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+    min-height: 120px;
+    padding: 15px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 5px;
+    color: var(--tt-text);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .graph-node:hover,
+  .graph-node[aria-pressed="true"] {
+    border-color: var(--tt-blue);
+    background: var(--tt-raised);
+  }
+
+  .graph-node:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 3px;
+  }
+
+  .node-type,
+  .node-reference {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .node-type {
+    color: var(--tt-purple);
+  }
+
+  .graph-node strong {
+    color: var(--tt-heading);
+    font-size: 0.95rem;
+  }
+
+  .node-reference {
+    overflow-wrap: anywhere;
+  }
+
+  .graph-hint {
+    margin: 20px 0 0;
+    color: var(--tt-muted);
+    font-size: 0.8rem;
+  }
+
+  .graph-inspector h3 {
+    margin: 10px 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: 1.7rem;
+    font-weight: 400;
+  }
+
+  .inspector-type {
+    display: inline-block;
+    padding: 5px 8px;
+    border: 1px solid var(--tt-border);
+    border-radius: 3px;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .graph-inspector > p:not(.graph-section-label) {
+    margin: 20px 0;
+    color: var(--tt-muted);
+    line-height: 1.8;
+  }
+
+  .inspector-relations {
+    padding-top: 20px;
+    border-top: 1px solid var(--tt-border);
+  }
+
+  .inspector-relations h4 {
+    margin: 0 0 15px;
+    color: var(--tt-heading);
+  }
+
+  .inspector-relations ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .inspector-relations li {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--tt-border);
+  }
+
+  .inspector-relations li strong {
+    color: var(--tt-blue);
+    font-size: 0.85rem;
+  }
+
+  .inspector-relations li span {
+    color: var(--tt-muted);
+    font-size: 0.8rem;
+  }
+
+  .graph-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--tt-border);
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  @media (max-width: 850px) {
+    .graph-workspace {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .graph-nodes {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  interface NodeData {
+    id: string;
+    label: string;
+    type: string;
+    description: string;
+  }
+
+  interface LinkData {
+    from: string;
+    to: string;
+    relationship: string;
+  }
+
+  function initialiseEvidenceGraphs() {
+    document.querySelectorAll<HTMLElement>(
+      "[data-evidence-graph]"
+    ).forEach((root) => {
+      if (root.dataset.ready === "true") return;
+
+      const dataElement = root.querySelector<HTMLScriptElement>(
+        "[data-evidence-data]"
+      );
+
+      if (!dataElement) return;
+
+      let nodes: NodeData[] = [];
+      let links: LinkData[] = [];
+
+      try {
+        const data = JSON.parse(
+          dataElement.textContent ?? "{}"
+        );
+
+        nodes = data.nodes ?? [];
+        links = data.links ?? [];
+      } catch {
+        return;
+      }
+
+      const buttons = Array.from(
+        root.querySelectorAll<HTMLButtonElement>(
+          "[data-node-id]"
+        )
+      );
+
+      const title = root.querySelector<HTMLElement>(
+        "[data-inspector-title]"
+      );
+
+      const type = root.querySelector<HTMLElement>(
+        "[data-inspector-type]"
+      );
+
+      const description = root.querySelector<HTMLElement>(
+        "[data-inspector-description]"
+      );
+
+      const relations = root.querySelector<HTMLElement>(
+        "[data-inspector-links]"
+      );
+
+      function selectNode(id: string) {
+        const node = nodes.find((item) => item.id === id);
+
+        if (!node) return;
+
+        buttons.forEach((button) => {
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.nodeId === id)
+          );
+        });
+
+        if (title) title.textContent = node.label;
+        if (type) type.textContent = node.type.toUpperCase();
+
+        if (description) {
+          description.textContent = node.description;
+        }
+
+        if (!relations) return;
+
+        relations.replaceChildren();
+
+        const connected = links.filter(
+          (link) => link.from === id || link.to === id
+        );
+
+        connected.forEach((link) => {
+          const otherId =
+            link.from === id ? link.to : link.from;
+
+          const otherNode = nodes.find(
+            (item) => item.id === otherId
+          );
+
+          if (!otherNode) return;
+
+          const item = document.createElement("li");
+          const heading = document.createElement("strong");
+          const detail = document.createElement("span");
+
+          heading.textContent = otherNode.label;
+          detail.textContent = link.relationship;
+
+          item.append(heading, detail);
+          relations.appendChild(item);
+        });
+
+        if (connected.length === 0) {
+          const item = document.createElement("li");
+          item.textContent = "No linked artefacts.";
+          relations.appendChild(item);
+        }
+      }
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          selectNode(button.dataset.nodeId ?? "");
+        });
+      });
+
+      root.dataset.ready = "true";
+
+      if (nodes[0]) {
+        selectNode(nodes[0].id);
+      }
+    });
+  }
+
+  initialiseEvidenceGraphs();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseEvidenceGraphs
+  );
+</script>

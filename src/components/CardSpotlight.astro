@@ -1,0 +1,67 @@
+<script>
+  const reducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  );
+
+  document.querySelectorAll<HTMLElement>(
+    "[data-spotlight]"
+  ).forEach((card) => {
+    if (card.dataset.spotlightReady) return;
+    card.dataset.spotlightReady = "true";
+
+    card.addEventListener("pointermove", (event) => {
+      if (
+        reducedMotion.matches ||
+        event.pointerType !== "mouse"
+      ) return;
+
+      const rect = card.getBoundingClientRect();
+
+      card.style.setProperty(
+        "--spot-x",
+        `${event.clientX - rect.left}px`
+      );
+
+      card.style.setProperty(
+        "--spot-y",
+        `${event.clientY - rect.top}px`
+      );
+    });
+  });
+</script>
+
+<style is:global>
+  [data-spotlight] {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  [data-spotlight]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(
+      280px circle at
+      var(--spot-x, 50%)
+      var(--spot-y, 50%),
+      rgba(122, 162, 247, 0.13),
+      transparent 75%
+    );
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+
+  [data-spotlight]:hover::before,
+  [data-spotlight]:focus-visible::before {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-spotlight]::before {
+      transition: none;
+    }
+  }
+</style>

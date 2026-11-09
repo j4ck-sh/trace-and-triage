@@ -1,0 +1,169 @@
+
+<div class="tt-article-actions">
+  <button
+    type="button"
+    class="tt-back-top"
+    data-back-top
+    aria-label="Return to top of article"
+  >
+    ↑ Back to top
+  </button>
+
+  <p
+    data-copy-status
+    role="status"
+    aria-live="polite"
+    class="tt-copy-status"
+  ></p>
+</div>
+
+<style>
+  .tt-article-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 40px 0;
+  }
+
+  .tt-back-top {
+    padding: 11px 16px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-sm);
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .tt-back-top:hover {
+    border-color: var(--tt-blue);
+  }
+
+  .tt-copy-status {
+    margin: 0;
+    color: var(--tt-muted);
+    font-size: 0.8rem;
+  }
+</style>
+
+<style is:global>
+  .tt-heading-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.5rem;
+    padding: 0.15rem 0.4rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    vertical-align: middle;
+  }
+
+  .tt-heading-copy:hover,
+  .tt-heading-copy:focus-visible {
+    border-color: var(--tt-border);
+    background: var(--tt-raised);
+  }
+</style>
+
+<script>
+  function initialiseArticleInteractions() {
+    const article = document.querySelector<HTMLElement>(
+      "[data-article-content]"
+    );
+
+    if (!article) return;
+
+    const backButton = document.querySelector<HTMLButtonElement>(
+      "[data-back-top]"
+    );
+
+    const status = document.querySelector<HTMLElement>(
+      "[data-copy-status]"
+    );
+
+    if (backButton && backButton.dataset.ready !== "true") {
+      backButton.dataset.ready = "true";
+
+      backButton.addEventListener("click", () => {
+        const reducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+        const paused = document.documentElement.classList.contains(
+          "tt-motion-paused"
+        );
+
+        window.scrollTo({
+          top: 0,
+          behavior: reducedMotion || paused
+            ? "instant"
+            : "smooth"
+        });
+      });
+    }
+
+    const headings = article.querySelectorAll<HTMLElement>(
+      "h2[id], h3[id]"
+    );
+
+    headings.forEach((heading) => {
+      if (heading.querySelector(".tt-heading-copy")) return;
+
+      const button = document.createElement("button");
+
+      button.type = "button";
+      button.className = "tt-heading-copy";
+      button.textContent = "#";
+
+      const headingText =
+        heading.textContent?.trim() ?? "section";
+
+      button.setAttribute(
+        "aria-label",
+        `Copy link to ${headingText}`
+      );
+
+      button.addEventListener("click", async () => {
+        const url = new URL(window.location.href);
+        url.hash = heading.id;
+
+        try {
+          await navigator.clipboard.writeText(url.href);
+
+          if (status) {
+            status.textContent = "Section link copied.";
+          }
+        } catch {
+          if (status) {
+            status.textContent =
+              "Unable to copy link automatically.";
+          }
+        }
+      });
+
+      heading.appendChild(button);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialiseArticleInteractions,
+      { once: true }
+    );
+  } else {
+    initialiseArticleInteractions();
+  }
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseArticleInteractions
+  );
+</script>

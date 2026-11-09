@@ -1,8 +1,17 @@
-
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import CommandPalette from "../components/CommandPalette.astro";
+
+
+
 import "../styles/global.css";
+import "../styles/brand.css";
+import "../styles/themes.css";
+import "../styles/theme-motion.css";
+import "../styles/motion.css";
+import "../styles/article-design.css";
+import "../styles/forensic-visualisations.css";
 
 interface Props {
   title?: string;
@@ -66,6 +75,17 @@ const socialImageURL = getAbsoluteImageURL(image);
 
 <head>
   <meta charset="UTF-8" />
+
+  <script is:inline>
+    try {
+      const allowed = ["tokyo-night", "gruvbox", "nord"];
+      const saved = localStorage.getItem("tt-theme");
+
+      document.documentElement.dataset.theme = allowed.includes(saved) ? saved : "tokyo-night";
+    } catch {
+      document.documentElement.dataset.theme = "tokyo-night";
+    }
+  </script>
 
   <meta
     name="viewport"
@@ -139,6 +159,7 @@ const socialImageURL = getAbsoluteImageURL(image);
 
 <body>
   <Header />
+  <CommandPalette />
 
   <main>
     <slot />

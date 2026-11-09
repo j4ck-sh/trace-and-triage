@@ -1,0 +1,156 @@
+/* ==========================================
+   TRACE & TRIAGE — TOKYO NIGHT
+   DESIGN SYSTEM V1
+   ========================================== */
+
+:root {
+  /* TOKYO NIGHT COLOURS */
+
+  --tt-canvas: #1a1b26;
+  --tt-surface: #24283b;
+  --tt-raised: #292e42;
+  --tt-deep: #16161e;
+
+  --tt-text: #c0caf5;
+  --tt-heading: #e4e9ff;
+  --tt-muted: #a9b4d0;
+
+  --tt-blue: #7aa2f7;
+  --tt-purple: #bb9af7;
+  --tt-green: #9ece6a;
+  --tt-orange: #e0af68;
+  --tt-red: #f7768e;
+
+  --tt-border: #414868;
+
+  /* SEMANTIC COLOURS */
+
+  --tt-signal: var(--tt-blue);
+  --tt-evidence: var(--tt-purple);
+  --tt-success: var(--tt-green);
+  --tt-warning: var(--tt-orange);
+  --tt-danger: var(--tt-red);
+
+  /* TYPOGRAPHY */
+
+  --tt-font-editorial:
+    Georgia, "Times New Roman", serif;
+
+  --tt-font-body:
+    "Segoe UI", Arial, sans-serif;
+
+  --tt-font-mono:
+    Consolas, "Courier New", monospace;
+
+  /* SPACING */
+
+  --tt-space-1: 0.5rem;
+  --tt-space-2: 0.75rem;
+  --tt-space-3: 1rem;
+  --tt-space-4: 1.5rem;
+  --tt-space-5: 2rem;
+  --tt-space-6: 3rem;
+  --tt-space-7: 5rem;
+
+  /* BORDERS */
+
+  --tt-radius-sm: 4px;
+  --tt-radius-md: 6px;
+  --tt-radius-lg: 10px;
+
+  /* MOTION */
+
+  --tt-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --tt-fast: 160ms;
+  --tt-medium: 280ms;
+  --tt-slow: 550ms;
+}
+
+/* ==========================================
+   COMPATIBILITY WITH EXISTING STYLES
+   ========================================== */
+
+:root {
+  --bg: var(--tt-canvas);
+  --surface: var(--tt-surface);
+  --text: var(--tt-text);
+  --muted: var(--tt-muted);
+  --accent: var(--tt-signal);
+  --border: var(--tt-border);
+}
+
+/* ==========================================
+   BRAND TYPOGRAPHY
+   ========================================== */
+
+.tt-editorial {
+  font-family: var(--tt-font-editorial);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.tt-label {
+  font-family: var(--tt-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--tt-blue);
+}
+
+.tt-metadata {
+  font-family: var(--tt-font-mono);
+  font-size: 0.8rem;
+  color: var(--tt-muted);
+}
+
+/* ==========================================
+   REUSABLE SURFACES
+   ========================================== */
+
+.tt-panel {
+  padding: var(--tt-space-4);
+  background: var(--tt-surface);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-md);
+}
+
+.tt-divider {
+  height: 1px;
+  border: 0;
+  background: var(--tt-border);
+}
+
+/* ==========================================
+   FOCUS AND INTERACTION
+   ========================================== */
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--tt-blue);
+  outline-offset: 3px;
+}
+
+.tt-interactive {
+  transition:
+    transform var(--tt-medium) var(--tt-ease),
+    border-color var(--tt-fast) ease;
+}
+
+@media (hover: hover) {
+  .tt-interactive:hover {
+    transform: translateY(-2px);
+    border-color: var(--tt-blue);
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-interactive {
+    transition: none !important;
+    transform: none !important;
+  }
+}
