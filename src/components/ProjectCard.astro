@@ -1,0 +1,133 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  projectId: string;
+  status?: string;
+  href: string;
+  technologies?: string[];
+}
+
+const {
+  title,
+  description,
+  projectId,
+  status = "Research",
+  href,
+  technologies = []
+} = Astro.props;
+---
+
+<a class="project-card" href={href}>
+  <div class="card-top">
+    <span>{projectId}</span>
+    <span class="card-status">{status}</span>
+  </div>
+
+  <div class="card-body">
+    <h3>{title}</h3>
+    <p>{description}</p>
+
+    {technologies.length > 0 && (
+      <div class="card-technologies">
+        {technologies.slice(0, 5).map((tech) => (
+          <span>{tech}</span>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <div class="card-bottom">
+    <span>OPEN PROJECT</span>
+    <span aria-hidden="true">↗</span>
+  </div>
+</a>
+
+<style>
+  .project-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 300px;
+    padding: 25px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+    color: var(--tt-text);
+    text-decoration: none;
+    transition:
+      transform 280ms ease,
+      border-color 220ms ease;
+  }
+
+  .project-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--tt-blue);
+  }
+
+  .card-top,
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .card-top {
+    color: var(--tt-purple);
+  }
+
+  .card-status {
+    color: var(--tt-green);
+  }
+
+  .card-body {
+    margin: 25px 0;
+  }
+
+  h3 {
+    margin: 0 0 15px;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 400;
+  }
+
+  p {
+    color: var(--tt-muted);
+    line-height: 1.7;
+  }
+
+  .card-technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .card-technologies span {
+    padding: 5px 8px;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.7rem;
+  }
+
+  .card-bottom {
+    padding-top: 18px;
+    border-top: 1px solid var(--tt-border);
+    color: var(--tt-blue);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-card {
+      transition: none;
+    }
+
+    .project-card:hover {
+      transform: none;
+    }
+  }
+</style>

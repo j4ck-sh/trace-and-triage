@@ -1,0 +1,106 @@
+---
+interface Props {
+  label: string;
+  title: string;
+  description?: string;
+  accent?: "blue" | "purple" | "green" | "orange";
+  span?: "normal" | "wide";
+}
+
+const {
+  label,
+  title,
+  description,
+  accent = "blue",
+  span = "normal"
+} = Astro.props;
+---
+
+<section class:list={["laboratory-panel", accent, span]}>
+  <div class="panel-header">
+    <span class="panel-label">{label}</span>
+    <span class="panel-dot" aria-hidden="true"></span>
+  </div>
+
+  <div class="panel-heading">
+    <h2>{title}</h2>
+    {description && <p>{description}</p>}
+  </div>
+
+  <div class="panel-body">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .laboratory-panel {
+    --panel-accent: var(--tt-blue);
+    min-width: 0;
+    padding: 24px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+    transition: border-color 220ms ease;
+  }
+
+  .laboratory-panel.purple {
+    --panel-accent: var(--tt-purple);
+  }
+
+  .laboratory-panel.green {
+    --panel-accent: var(--tt-green);
+  }
+
+  .laboratory-panel.orange {
+    --panel-accent: var(--tt-orange);
+  }
+
+  .laboratory-panel:hover {
+    border-color: var(--panel-accent);
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .panel-label {
+    color: var(--panel-accent);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+
+  .panel-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--panel-accent);
+  }
+
+  .panel-heading h2 {
+    margin: 22px 0 10px;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 400;
+  }
+
+  .panel-heading p {
+    color: var(--tt-muted);
+    line-height: 1.7;
+  }
+
+  .panel-body {
+    min-width: 0;
+    margin-top: 20px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .laboratory-panel {
+      transition: none;
+    }
+  }
+</style>

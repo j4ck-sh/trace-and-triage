@@ -7,6 +7,9 @@ import {
 } from "astro:content";
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
+
+import ProjectHero from "../../components/ProjectHero.astro";
+import LaboratoryPanel from "../../components/LaboratoryPanel.astro";
 import DroneFlightMap from "../../components/DroneFlightMap.astro";
 
 // ==========================================
@@ -30,7 +33,7 @@ export async function getStaticPaths() {
 }
 
 // ==========================================
-// PROJECT TYPES
+// PROJECT PROPS
 // ==========================================
 
 interface Props {
@@ -39,604 +42,678 @@ interface Props {
 
 const { project } = Astro.props as Props;
 
-// Render project Markdown
-const { Content } = await render(project);
+// ==========================================
+// RENDER PROJECT MARKDOWN
+// ==========================================
 
-// GitHub Pages base path
+const { Content, headings } = await render(project);
+
+// Only show H2 headings in project navigation
+const tocHeadings = headings.filter(
+  (heading) => heading.depth === 2
+);
+
+// ==========================================
+// URLS AND PROJECT CONFIGURATION
+// ==========================================
+
 const base = import.meta.env.BASE_URL;
 
-// ==========================================
-// HERO IMAGE
-// ==========================================
+// Confirmed Drone Forensics project ID
+const isDroneProject = project.id === "drone-forensics";
 
-const heroImageUrl = project.data.heroImage
-  ? `${base}${project.data.heroImage.replace(/^\/+/, "")}`
-  : undefined;
-
-// ==========================================
-// RELATED RESEARCH
-// ==========================================
-
-// Load published research articles
-const publishedResearch = await getCollection(
-  "research",
-  ({ data }) => !data.draft
-);
-
-// IDs of research linked to this project
-const relatedResearchIds = new Set(
-  project.data.relatedResearch
-);
-
-// Match published research with project IDs
-const relatedArticles = publishedResearch.filter(
-  (article) => relatedResearchIds.has(article.id)
-);
-
-// ==========================================
-// PROJECT STATUS STYLING
-// ==========================================
-
-const statusClass = project.data.status
-  .toLowerCase()
-  .replace(/\s+/g, "-");
+// No assumed technology field
+const technologies: string[] = [];
 ---
 
 <BaseLayout
   title={`${project.data.title} | Trace & Triage`}
   description={project.data.description}
-  image={project.data.heroImage}
 >
+  <article class="tt-project-page">
 
-  <article class="project-page">
+    <!-- =====================================
+         PROJECT HERO
+         ===================================== -->
 
-    <!-- PROJECT HEADER -->
+    <ProjectHero
+      title={project.data.title}
+      description={project.data.description}
+      projectId={project.data.projectId}
+      status={project.data.status}
+      technologies={technologies}
+    />
 
-    <header class="project-header">
+    <!-- =====================================
+         PROJECT METADATA
+         ===================================== -->
 
-      <div class="project-meta">
-
-        <span class="case-id">
-          {project.data.projectId}
-        </span>
-
-        <span class:list={["project-status", statusClass]}>
-          {project.data.status}
-        </span>
-
+    <section class="project-metadata" aria-label="Project information">
+      <div class="metadata-item">
+        <span>PROJECT REFERENCE</span>
+        <strong>{project.data.projectId}</strong>
       </div>
 
-      <h1>{project.data.title}</h1>
-
-      <p class="hero-subtitle">
-        {project.data.description}
-      </p>
-
-      <!-- PROJECT HERO IMAGE -->
-
-      {heroImageUrl && (
-        <img
-          class="project-hero"
-          src={heroImageUrl}
-          alt={project.data.heroImageAlt ?? project.data.title}
-          loading="lazy"
-          decoding="async"
-        />
-      )}
-
-    </header>
-
-    <!-- PROJECT SUMMARY -->
-
-    <section class="project-summary">
-
-      <h2>Project Summary</h2>
-
-      <div class="summary-grid">
-
-        <div>
-          <strong>Project ID</strong>
-          <span>{project.data.projectId}</span>
-        </div>
-
-        <div>
-          <strong>Status</strong>
-          <span>{project.data.status}</span>
-        </div>
-
-        <div>
-          <strong>Category</strong>
-          <span>{project.data.category}</span>
-        </div>
-
-        {project.data.startDate && (
-          <div>
-            <strong>Started</strong>
-            <span>
-              {project.data.startDate.toLocaleDateString(
-                "en-GB",
-                {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric"
-                }
-              )}
-            </span>
-          </div>
-        )}
-
+      <div class="metadata-item">
+        <span>STATUS</span>
+        <strong>{project.data.status}</strong>
       </div>
 
-      
-
-      <!-- TECHNOLOGIES -->
-
-      {project.data.technologies.length > 0 && (
-        <div class="technologies">
-
-          <strong>Technologies</strong>
-
-          <div class="technology-tags">
-            {project.data.technologies.map((tech) => (
-              <span class="technology-tag">
-                {tech}
-              </span>
-            ))}
-          </div>
-
-        </div>
-      )}
-
+      <div class="metadata-item">
+        <span>RESEARCH TYPE</span>
+        <strong>Technical Laboratory</strong>
+      </div>
     </section>
 
-    <!-- Drone Stuff -->
+    {isDroneProject && (
+      <section
+        class="drone-laboratory"
+        aria-labelledby="drone-lab-heading"
+      >
+        <div class="lab-heading">
+          <span class="section-label">
+            TT / INTERACTIVE LABORATORY
+          </span>
 
-    {project.data.projectId === "TT-PR-003" && (
-      <DroneFlightMap
-        title="Drone Flight Reconstructions"
-      />
-    )}
+          <h2 id="drone-lab-heading">
+            Drone Flight Reconstruction
+          </h2>
 
-    <!-- PROJECT OBJECTIVES -->
+          <p>
+            Explore interactive GPS flight reconstruction,
+            geospatial evidence and drone forensic research.
+          </p>
+        </div>
 
-    {project.data.objectives.length > 0 && (
-      <section class="project-objectives">
+        <div class="lab-grid">
 
-        <h2>Project Objectives</h2>
+          <!-- INTERACTIVE FLIGHT MAP -->
 
-        <ul>
-          {project.data.objectives.map((objective) => (
-            <li>{objective}</li>
-          ))}
-        </ul>
+          <div class="lab-map-panel">
+            <LaboratoryPanel
+              label="01 / FLIGHT MAP"
+              title="Flight Reconstruction"
+              description="Interactive GPS flight path and geographic reconstruction."
+              accent="blue"
+            >
+              <div class="drone-map-container">
+                <DroneFlightMap />
+              </div>
+            </LaboratoryPanel>
+          </div>
 
+          <!-- INVESTIGATION CONTEXT -->
+
+          <div class="lab-context-panel">
+            <LaboratoryPanel
+              label="02 / INVESTIGATION"
+              title="Research Context"
+              description="Digital evidence and flight reconstruction methodology."
+              accent="purple"
+            >
+              <div class="research-context">
+                <p>
+                  This laboratory explores how drone flight
+                  records and geospatial information can
+                  support forensic investigations.
+                </p>
+
+                <h3>Investigation Focus</h3>
+
+                <ul>
+                  <li>GPS flight-path reconstruction</li>
+                  <li>Geospatial evidence interpretation</li>
+                  <li>Flight activity documentation</li>
+                  <li>Forensic research methodology</li>
+                </ul>
+
+                <p class="context-note">
+                  Additional telemetry and flight-log
+                  analysis features are planned for
+                  future development.
+                </p>
+              </div>
+            </LaboratoryPanel>
+          </div>
+
+        </div>
       </section>
     )}
 
-    <!-- PROJECT MARKDOWN CONTENT -->
+    <!-- =====================================
+         PROJECT CONTENTS
+         ===================================== -->
 
-    <div class="project-content">
-      <Content />
-    </div>
+    {tocHeadings.length > 0 && (
+      <nav
+        class="project-contents"
+        aria-label="Project table of contents"
+        data-pagefind-ignore
+      >
+        <div class="contents-header">
+          <span>TT / PROJECT CONTENTS</span>
+          <span>{tocHeadings.length} SECTIONS</span>
+        </div>
+
+        <ol>
+          {tocHeadings.map((heading, index) => (
+            <li>
+              <a href={`#${heading.slug}`}>
+                <span class="contents-number">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span>{heading.text}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
+
+    <!-- =====================================
+         PROJECT DOCUMENTATION
+         ===================================== -->
+
+    <section
+      class="project-documentation"
+      aria-label="Project documentation"
+    >
+      <div class="documentation-header">
+        <span>TT / TECHNICAL DOCUMENTATION</span>
+        <span>PROJECT RESEARCH</span>
+      </div>
+
+      <div
+        class="project-content"
+        data-pagefind-body
+      >
+        <Content />
+      </div>
+    </section>
+
+
+
+    <!-- =====================================
+         DRONE FORENSICS LABORATORY
+         ===================================== -->
 
     
 
-    <!-- SUPPORTING GITHUB REPOSITORY -->
-
-    {project.data.githubUrl && (
-      <section class="project-github">
-
-        <h2>Supporting Repository</h2>
-
-        <p>
-          Additional technical documentation,
-          supporting scripts and research material
-          associated with this project.
-        </p>
-
-        <a
-          href={project.data.githubUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          View Project on GitHub →
-        </a>
-
-      </section>
-    )}
-
-    <!-- RELATED RESEARCH -->
-
-    {relatedArticles.length > 0 && (
-      <section class="related-project-research">
-
-        <div class="related-header">
-          <p class="section-label">
-            CONTINUE INVESTIGATING
-          </p>
-
-          <h2>Related Research</h2>
-
-          <p>
-            Published Trace & Triage investigations
-            associated with this project.
-          </p>
-        </div>
-
-        <div class="related-list">
-
-          {relatedArticles.map((article) => (
-
-            <a
-              class="related-link"
-              href={`${base}research/${article.id}/`}
-            >
-
-              <span class="case-id">
-                {article.data.caseId}
-              </span>
-
-              <h3>{article.data.title}</h3>
-
-              <p>{article.data.description}</p>
-
-              <div class="related-meta">
-
-                <span>{article.data.category}</span>
-
-                <span>
-                  {article.data.date.toLocaleDateString(
-                    "en-GB"
-                  )}
-                </span>
-
-              </div>
-
-            </a>
-
-          ))}
-
-        </div>
-
-      </section>
-    )}
-
-    <!-- PROJECT FOOTER -->
+    <!-- =====================================
+         PROJECT FOOTER
+         ===================================== -->
 
     <footer class="project-footer">
-
-      <p class="case-id">
-        {project.data.projectId}
-      </p>
-
-      <p>
-        Trace & Triage — Digital Forensics,
-        Incident Response & Security Research
-      </p>
+      <div>
+        <span class="footer-label">END OF PROJECT FILE</span>
+        <strong>{project.data.projectId}</strong>
+      </div>
 
       <a href={`${base}projects/`}>
-        ← Back to Projects
+        ← Back to Research Projects
       </a>
-
     </footer>
 
   </article>
-
 </BaseLayout>
 
 <style>
   /* ==========================================
-     PROJECT PAGE
+     TRACE & TRIAGE — STAGE 67
+     INDIVIDUAL PROJECT DESIGN
      ========================================== */
 
-  .project-page {
-    max-width: 900px;
+  /* PAGE LAYOUT */
+
+  .tt-project-page {
+    width: min(100% - 40px, 1200px);
     margin: 0 auto;
+    padding: 40px 0 90px;
   }
 
-  /* HEADER */
+  /* ==========================================
+     PROJECT METADATA
+     ========================================== */
 
-  .project-header {
-    padding: 50px 0 40px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .project-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-  }
-
-  .project-status {
-    padding: 6px 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-family: Consolas, monospace;
-    font-size: 0.8rem;
-    color: var(--muted);
-  }
-
-  .project-status.active {
-    color: #86c7aa;
-    border-color: #416e5a;
-  }
-
-  .project-status.completed {
-    color: var(--accent);
-  }
-
-  .project-status.on-hold {
-    color: #e5b96c;
-  }
-
-  .project-header h1 {
-    margin: 20px 0;
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    line-height: 1.15;
-  }
-
-  /* HERO IMAGE */
-
-  .project-hero {
-    display: block;
-    width: 100%;
-    height: auto;
-    margin-top: 30px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-  }
-
-  /* PROJECT SUMMARY */
-
-  .project-summary {
-    margin: 45px 0;
-    padding: 30px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-  }
-
-  .project-summary h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    color: var(--accent);
-  }
-
-  .summary-grid {
+  .project-metadata {
     display: grid;
-    grid-template-columns:
-      repeat(auto-fit, minmax(180px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin: 35px 0 55px;
   }
 
-  .summary-grid > div {
+  .metadata-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
+    min-width: 0;
+    padding: 22px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
   }
 
-  .summary-grid strong,
-  .technologies strong {
-    color: var(--muted);
-    font-family: Consolas, monospace;
+  .metadata-item > span {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
     font-size: 0.75rem;
-    text-transform: uppercase;
+    letter-spacing: 0.07em;
   }
 
-  /* TECHNOLOGIES */
-
-  .technologies {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
-
-  .technology-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-  }
-
-  .technology-tag {
-    padding: 5px 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--muted);
-    font-size: 0.8rem;
-  }
-
-  /* OBJECTIVES */
-
-  .project-objectives {
-    margin: 45px 0;
-  }
-
-  .project-objectives h2 {
-    margin-bottom: 20px;
-  }
-
-  .project-objectives li {
-    margin-bottom: 10px;
-    color: var(--muted);
-  }
-
-  /* MARKDOWN CONTENT */
-
-  .project-content {
-    line-height: 1.8;
+  .metadata-item > strong {
+    color: var(--tt-heading);
+    font-size: 1rem;
     overflow-wrap: anywhere;
   }
 
+  /* ==========================================
+     PROJECT TABLE OF CONTENTS
+     ========================================== */
+
+  .project-contents {
+    margin: 45px 0 65px;
+    padding: 25px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+  }
+
+  .contents-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--tt-border);
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+  }
+
+  .project-contents ol {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 20px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .project-contents li {
+    min-width: 0;
+  }
+
+  .project-contents a {
+    display: flex;
+    gap: 14px;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--tt-text);
+    text-decoration: none;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease;
+  }
+
+  .project-contents a:hover {
+    background: var(--tt-raised);
+    border-color: var(--tt-border);
+  }
+
+  .project-contents a:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 3px;
+  }
+
+  .contents-number {
+    flex-shrink: 0;
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  /* ==========================================
+     PROJECT DOCUMENTATION
+     ========================================== */
+
+  .project-documentation {
+    margin: 65px 0;
+    min-width: 0;
+  }
+
+  .documentation-header {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 18px 0;
+    border-top: 1px solid var(--tt-border);
+    border-bottom: 1px solid var(--tt-border);
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.07em;
+  }
+
+  .documentation-header span:last-child {
+    color: var(--tt-muted);
+  }
+
+  .project-content {
+    width: 100%;
+    max-width: 950px;
+    margin: 35px auto 0;
+    color: var(--tt-text);
+    font-size: 1.02rem;
+    line-height: 1.85;
+    overflow-wrap: anywhere;
+  }
+
+  /* MARKDOWN HEADINGS */
+
   .project-content :global(h2) {
-    margin-top: 50px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
+    margin: 55px 0 25px;
+    padding: 18px 0;
+    border-top: 1px solid var(--tt-border);
+    border-bottom: 1px solid var(--tt-border);
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    scroll-margin-top: 100px;
   }
 
   .project-content :global(h3) {
-    margin-top: 30px;
+    margin: 35px 0 15px;
+    color: var(--tt-blue);
+    font-size: 1.3rem;
   }
+
+  .project-content :global(h4) {
+    margin: 25px 0 12px;
+    color: var(--tt-heading);
+  }
+
+  /* PARAGRAPHS AND LISTS */
 
   .project-content :global(p) {
     margin: 18px 0;
+    color: var(--tt-text);
+    line-height: 1.85;
   }
+
+  .project-content :global(ul),
+  .project-content :global(ol) {
+    margin: 20px 0;
+    padding-left: 25px;
+  }
+
+  .project-content :global(li) {
+    margin-bottom: 10px;
+  }
+
+  /* LINKS */
+
+  .project-content :global(a) {
+    color: var(--tt-blue);
+    text-underline-offset: 4px;
+  }
+
+  .project-content :global(a:hover) {
+    color: var(--tt-purple);
+  }
+
+  /* CODE BLOCKS */
+
+  .project-content :global(pre) {
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 25px 0;
+    padding: 22px;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+    line-height: 1.65;
+  }
+
+  .project-content :global(:not(pre) > code) {
+    padding: 3px 6px;
+    background: var(--tt-raised);
+    border-radius: 4px;
+    color: var(--tt-purple);
+  }
+
+  /* TABLES */
+
+  .project-content :global(table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 30px 0;
+    border-collapse: collapse;
+  }
+
+  .project-content :global(th),
+  .project-content :global(td) {
+    padding: 12px 15px;
+    border: 1px solid var(--tt-border);
+    text-align: left;
+  }
+
+  .project-content :global(th) {
+    background: var(--tt-surface);
+    color: var(--tt-heading);
+  }
+
+  /* BLOCKQUOTES */
+
+  .project-content :global(blockquote) {
+    margin: 30px 0;
+    padding: 20px 25px;
+    background: var(--tt-surface);
+    border-left: 3px solid var(--tt-purple);
+    color: var(--tt-muted);
+  }
+
+  /* IMAGES */
 
   .project-content :global(img) {
     display: block;
     max-width: 100%;
     height: auto;
-    margin: 25px auto;
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    margin: 30px auto;
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
   }
 
-  .project-content :global(table) {
-    display: block;
-    overflow-x: auto;
-    border-collapse: collapse;
-    margin: 25px 0;
+  /* ==========================================
+     DRONE LABORATORY
+     ========================================== */
+
+  .drone-laboratory {
+    margin: 85px 0;
+    padding-top: 25px;
+    border-top: 1px solid var(--tt-border);
   }
 
-  .project-content :global(th),
-  .project-content :global(td) {
-    padding: 12px;
-    border: 1px solid var(--border);
-  }
-
-  .project-content :global(pre) {
-    overflow-x: auto;
-    padding: 20px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-  }
-
-  /* GITHUB */
-
-  .project-github {
-    margin-top: 55px;
-    padding: 25px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-  }
-
-  .project-github p {
-    color: var(--muted);
-  }
-
-  .project-github a {
-    color: var(--accent);
-    font-weight: 600;
-  }
-
-  /* RELATED RESEARCH */
-
-  .related-project-research {
-    margin-top: 65px;
-    padding-top: 30px;
-    border-top: 1px solid var(--border);
+  .lab-heading {
+    margin-bottom: 35px;
   }
 
   .section-label {
-    color: var(--accent);
-    font-family: Consolas, monospace;
-    font-size: 0.8rem;
-    font-weight: 600;
+    color: var(--tt-purple);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
     letter-spacing: 0.08em;
   }
 
-  .related-header h2 {
-    margin: 10px 0;
-    font-size: 1.7rem;
+  .lab-heading h2 {
+    margin: 15px 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.15;
   }
 
-  .related-header p {
-    color: var(--muted);
+  .lab-heading p {
+    max-width: 750px;
+    color: var(--tt-muted);
+    line-height: 1.8;
   }
 
-  .related-list {
+  /* LABORATORY GRID */
+
+  .lab-grid {
     display: grid;
-    gap: 15px;
+    grid-template-columns:
+      minmax(0, 2fr)
+      minmax(260px, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .lab-map-panel,
+  .lab-context-panel {
+    min-width: 0;
+  }
+
+  /* DRONE MAP */
+
+  .drone-map-container {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    min-height: 420px;
+    overflow: hidden;
+    background: var(--tt-deep);
+    border: 1px solid var(--tt-border);
+    border-radius: var(--tt-radius-md);
+  }
+
+  .drone-map-container :global(.leaflet-container) {
+    width: 100%;
+    min-height: 420px;
+    z-index: 0;
+  }
+
+  /* RESEARCH CONTEXT */
+
+  .research-context {
+    color: var(--tt-text);
+    line-height: 1.8;
+  }
+
+  .research-context p {
+    color: var(--tt-muted);
+  }
+
+  .research-context h3 {
+    margin: 25px 0 15px;
+    color: var(--tt-heading);
+    font-size: 1.1rem;
+  }
+
+  .research-context ul {
+    padding-left: 22px;
+    margin: 15px 0;
+  }
+
+  .research-context li {
+    margin-bottom: 10px;
+  }
+
+  .context-note {
     margin-top: 25px;
+    padding: 15px;
+    background: var(--tt-deep);
+    border-left: 2px solid var(--tt-purple);
+    font-size: 0.85rem;
   }
 
-  .related-link {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 25px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    text-decoration: none;
-    transition:
-      border-color 0.2s ease,
-      transform 0.2s ease;
-  }
-
-  .related-link:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-  }
-
-  .related-link:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 3px;
-  }
-
-  .related-link h3 {
-    margin: 0;
-    font-size: 1.15rem;
-  }
-
-  .related-link p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-
-  .related-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 8px;
-    color: var(--muted);
-    font-size: 0.8rem;
-  }
-
-  /* FOOTER */
+  /* ==========================================
+     PROJECT FOOTER
+     ========================================== */
 
   .project-footer {
-    margin-top: 65px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 85px;
     padding: 25px 0;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.9rem;
+    border-top: 1px solid var(--tt-border);
+  }
+
+  .project-footer > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer-label {
+    color: var(--tt-muted);
+    font-family: var(--tt-font-mono);
+    font-size: 0.75rem;
+  }
+
+  .project-footer strong {
+    color: var(--tt-heading);
   }
 
   .project-footer a {
-    display: inline-block;
-    margin-top: 15px;
-    color: var(--accent);
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    text-decoration: none;
   }
 
-  /* MOBILE */
+  .project-footer a:hover {
+    text-decoration: underline;
+  }
 
-  @media (max-width: 600px) {
-    .project-header {
-      padding: 30px 0;
+  /* ==========================================
+     RESPONSIVE DESIGN
+     ========================================== */
+
+  @media (max-width: 950px) {
+    .lab-grid {
+      grid-template-columns: 1fr;
     }
 
-    .project-summary {
-      padding: 20px;
+    .project-contents ol {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 750px) {
+    .project-metadata {
+      grid-template-columns: 1fr;
     }
 
-    .related-link {
+    .tt-project-page {
+      width: min(100% - 30px, 1200px);
+      padding-top: 25px;
+    }
+
+    .project-contents,
+    .investigation-summary {
       padding: 18px;
+    }
+
+    .drone-map-container,
+    .drone-map-container :global(.leaflet-container) {
+      min-height: 350px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-contents a {
+      transition: none;
     }
   }
 </style>
