@@ -124,6 +124,23 @@ const workspaceId = "tt-drone-workspace";
           </p>
       </div>
 
+      <div class="workspace-data-notice">
+  <strong>Data integrity notice</strong>
+
+  <p>
+    The telemetry, event timeline and evidence
+    relationship visualisations currently use
+    synthetic demonstration data.
+
+    The interactive flight map is a separate
+    component and is not synchronised with
+    these demonstration datasets.
+
+    No forensic conclusions should be drawn
+    from the demonstration visualisations.
+  </p>
+</div>
+
       <div class="overview-details">
         <div>
           <span>FLIGHT MAP</span>
@@ -534,6 +551,27 @@ const workspaceId = "tt-drone-workspace";
   font-family: var(--tt-font-mono);
   font-size: 0.75rem;
   line-height: 1.6;
+}
+
+.workspace-data-notice {
+  margin-top: 25px;
+  padding: 18px;
+  background: var(--tt-surface);
+  border: 1px solid var(--tt-orange);
+  border-left: 3px solid var(--tt-orange);
+  border-radius: var(--tt-radius-md);
+}
+
+.workspace-data-notice strong {
+  color: var(--tt-orange);
+  font-family: var(--tt-font-mono);
+  font-size: 0.8rem;
+}
+
+.workspace-data-notice p {
+  margin: 12px 0 0;
+  color: var(--tt-muted);
+  line-height: 1.75;
 }
 
 
