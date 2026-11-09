@@ -125,6 +125,34 @@ const maxValue = Math.max(
         ))}
       </svg>
 
+      <details class="telemetry-data-table">
+  <summary>View telemetry as a data table</summary>
+
+  <div class="telemetry-table-scroll">
+    <table>
+      <caption>
+        Flight altitude measurements
+      </caption>
+
+      <thead>
+        <tr>
+          <th scope="col">Time (seconds)</th>
+          <th scope="col">Altitude (metres)</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {validSamples.map((sample) => (
+          <tr>
+            <td>{sample.time}</td>
+            <td>{sample.altitude}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</details>
+
       <p class="telemetry-readout" data-telemetry-readout role="status">
         Focus or hover over a sample to inspect its values.
       </p>
@@ -196,6 +224,52 @@ const maxValue = Math.max(
     font-family: var(--tt-font-mono);
     font-size: 0.8rem;
   }
+
+  .telemetry-data-table {
+  margin: 20px 0;
+  border: 1px solid var(--tt-border);
+  border-radius: 5px;
+}
+
+.telemetry-data-table summary {
+  padding: 14px;
+  color: var(--tt-blue);
+  font-family: var(--tt-font-mono);
+  cursor: pointer;
+}
+
+.telemetry-data-table summary:focus-visible {
+  outline: 2px solid var(--tt-blue);
+  outline-offset: 3px;
+}
+
+.telemetry-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 12px;
+}
+
+.telemetry-data-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.telemetry-data-table caption {
+  padding: 10px;
+  color: var(--tt-muted);
+  text-align: left;
+}
+
+.telemetry-data-table th,
+.telemetry-data-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--tt-border);
+  text-align: left;
+}
+
+.telemetry-data-table th {
+  color: var(--tt-heading);
+}
 </style>
 
 <script>

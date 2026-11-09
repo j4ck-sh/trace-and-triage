@@ -57,10 +57,16 @@ const workspaceId = "tt-drone-workspace";
 
   <!-- TABS -->
 
+  <p id="tt-workspace-help" class="workspace-help">
+  Use the arrow keys to switch investigation views.
+  Press Tab to enter the selected panel.
+  </p>
+
   <div
     class="workspace-tabs"
     role="tablist"
     aria-label="Investigation tools"
+    aria-describedby="tt-workspace-help"
   >
     {tabs.map((tab, index) => (
       <button
@@ -522,6 +528,14 @@ const workspaceId = "tt-drone-workspace";
 }
 
 
+.workspace-help {
+  margin: 12px 0;
+  color: var(--tt-muted);
+  font-family: var(--tt-font-mono);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
 
 </style>
 
@@ -602,23 +616,36 @@ const workspaceId = "tt-drone-workspace";
         });
 
         tab.addEventListener("keydown", (event) => {
-          let next = index;
+  let next = index;
 
-          if (event.key === "ArrowRight") {
-            next = (index + 1) % tabs.length;
-          } else if (event.key === "ArrowLeft") {
-            next = (index - 1 + tabs.length) % tabs.length;
-          } else if (event.key === "Home") {
-            next = 0;
-          } else if (event.key === "End") {
-            next = tabs.length - 1;
-          } else {
-            return;
-          }
+  if (
+    event.key === "ArrowRight" ||
+    event.key === "ArrowDown"
+  ) {
+    next = (index + 1) % tabs.length;
+  } else if (
+    event.key === "ArrowLeft" ||
+    event.key === "ArrowUp"
+  ) {
+    next = (index - 1 + tabs.length) % tabs.length;
+  } else if (event.key === "Home") {
+    next = 0;
+  } else if (event.key === "End") {
+    next = tabs.length - 1;
+  } else {
+    return;
+  }
 
-          event.preventDefault();
-          activateTab(next, true);
-        });
+  event.preventDefault();
+
+  activateTab(next, true);
+
+  tabs[next]?.scrollIntoView({
+    behavior: "auto",
+    block: "nearest",
+    inline: "nearest"
+  });
+});
       });
 
       root.dataset.ready = "true";

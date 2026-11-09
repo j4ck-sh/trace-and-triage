@@ -7,6 +7,7 @@ import {
 } from "astro:content";
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ResearchVisualisations from "../../components/ResearchVisualisations.astro";
 
 // Existing forensic components
 import ImageLightbox from "../../components/ImageLightbox.astro";
@@ -292,6 +293,8 @@ const statusClass = article.data.status
       </div>
 
     </div>
+
+    <ResearchVisualisations articleId={article.id} />
 
     <!-- ARTICLE INTERACTION SCRIPTS -->
 
