@@ -1,8 +1,10 @@
+
 <div class="tt-motion-controls">
   <button
     type="button"
     data-motion-toggle
     aria-pressed="false"
+    aria-label="Pause animations"
   >
     Pause animations
   </button>
@@ -11,8 +13,8 @@
 <style>
   .tt-motion-controls {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
-    margin: 15px 0;
   }
 
   button {
@@ -24,27 +26,89 @@
     font-family: var(--tt-font-mono);
     font-size: 0.75rem;
     cursor: pointer;
+    transition: border-color 150ms ease;
   }
 
   button:hover {
     border-color: var(--tt-blue);
   }
+
+  button:focus-visible {
+    outline: 2px solid var(--tt-blue);
+    outline-offset: 3px;
+  }
 </style>
 
 <script>
-  const button = document.querySelector<HTMLButtonElement>(
-    "[data-motion-toggle]"
-  );
+  const STORAGE_KEY = "tt-motion-paused";
 
-  button?.addEventListener("click", () => {
-    const paused = document.documentElement.classList.toggle(
-      "tt-motion-paused"
+  const button =
+    document.querySelector<HTMLButtonElement>(
+      "[data-motion-toggle]"
     );
 
-    button.setAttribute("aria-pressed", String(paused));
+  function updateMotionButton(paused: boolean) {
+    if (!button) return;
+
+    button.setAttribute(
+      "aria-pressed",
+      String(paused)
+    );
+
+    button.setAttribute(
+      "aria-label",
+      paused
+        ? "Resume animations"
+        : "Pause animations"
+    );
 
     button.textContent = paused
       ? "Resume animations"
       : "Pause animations";
+  }
+
+  function applyMotionState(paused: boolean) {
+    document.documentElement.classList.toggle(
+      "tt-motion-paused",
+      paused
+    );
+
+    updateMotionButton(paused);
+  }
+
+  let savedPreference: string | null = null;
+
+  try {
+    savedPreference =
+      localStorage.getItem(STORAGE_KEY);
+  } catch {
+    // Storage may be unavailable.
+  }
+
+  const initiallyPaused =
+    savedPreference === null
+      ? document.documentElement.classList.contains(
+          "tt-motion-paused"
+        )
+      : savedPreference === "true";
+
+  applyMotionState(initiallyPaused);
+
+  button?.addEventListener("click", () => {
+    const paused =
+      !document.documentElement.classList.contains(
+        "tt-motion-paused"
+      );
+
+    applyMotionState(paused);
+
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        String(paused)
+      );
+    } catch {
+      // Keep the toggle functional without storage.
+    }
   });
 </script>

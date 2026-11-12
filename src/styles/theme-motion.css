@@ -1,8 +1,13 @@
 
-/* ==========================================
-   TRACE & TRIAGE
-   STAGE 63 — THEME TRANSITIONS
-   ========================================== */
+/*
+ * ==========================================
+ * TRACE & TRIAGE
+ * THEME TRANSITIONS
+ * ==========================================
+ *
+ * Theme colour transitions only.
+ * Manual motion controls are handled by motion.css.
+ */
 
 /* Smooth theme changes */
 
@@ -30,7 +35,7 @@ html.tt-theme-animate select {
     color 220ms ease;
 }
 
-/* Respect reduced motion */
+/* Respect operating-system reduced-motion preferences */
 
 @media (prefers-reduced-motion: reduce) {
   html.tt-theme-animate,
@@ -45,13 +50,4 @@ html.tt-theme-animate select {
   html.tt-theme-animate select {
     transition: none !important;
   }
-}
-
-/* Visitor-controlled pause */
-
-html.tt-motion-paused *,
-html.tt-motion-paused *::before,
-html.tt-motion-paused *::after {
-  animation-play-state: paused !important;
-  transition-duration: 0s !important;
 }

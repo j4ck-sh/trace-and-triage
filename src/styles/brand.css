@@ -1,7 +1,13 @@
-/* ==========================================
-   TRACE & TRIAGE — TOKYO NIGHT
-   DESIGN SYSTEM V1
-   ========================================== */
+
+/*
+ * ==========================================
+ * TRACE & TRIAGE — DESIGN SYSTEM
+ * ==========================================
+ *
+ * Tokyo Night provides the default palette.
+ * themes.css overrides colour tokens for
+ * Gruvbox and Nord.
+ */
 
 :root {
   /* TOKYO NIGHT COLOURS */
@@ -149,8 +155,19 @@
    ========================================== */
 
 @media (prefers-reduced-motion: reduce) {
-  .tt-interactive {
+  .tt-interactive,
+  .tt-interactive:hover {
     transition: none !important;
     transform: none !important;
   }
+}
+
+/* ==========================================
+   MANUALLY PAUSED MOTION
+   ========================================== */
+
+html.tt-motion-paused .tt-interactive,
+html.tt-motion-paused .tt-interactive:hover {
+  transition: none !important;
+  transform: none !important;
 }

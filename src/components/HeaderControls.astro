@@ -1,0 +1,49 @@
+
+---
+import ThemeSwitcher from "./ThemeSwitcher.astro";
+import MotionToggle from "./MotionControls.astro";
+---
+
+<div
+  class="tt-header-controls"
+  aria-label="Website appearance and motion preferences"
+>
+  <div class="header-theme-control">
+    <ThemeSwitcher />
+  </div>
+
+  <div class="header-motion-control">
+    <MotionToggle />
+  </div>
+</div>
+
+<style>
+  .tt-header-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .header-theme-control,
+  .header-motion-control {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  @media (max-width: 900px) {
+    .tt-header-controls {
+      justify-content: flex-start;
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .tt-header-controls {
+      width: 100%;
+    }
+  }
+</style>
