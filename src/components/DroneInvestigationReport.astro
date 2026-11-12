@@ -1,0 +1,633 @@
+
+---
+import { demoFlight } from "../data/demoFlight";
+import { demoEvents } from "../data/demoEvents";
+import { droneDataset } from "../data/droneDataset";
+
+const sortedFlight = [...demoFlight].sort(
+  (a, b) => a.time - b.time
+);
+
+const sortedEvents = [...demoEvents].sort(
+  (a, b) => a.time - b.time
+);
+
+const highestSample = sortedFlight.reduce<
+  (typeof sortedFlight)[number] | null
+>(
+  (highest, sample) =>
+    !highest || sample.altitude > highest.altitude
+      ? sample
+      : highest,
+  null
+);
+
+const firstSample = sortedFlight[0];
+const lastSample = sortedFlight[sortedFlight.length - 1];
+
+const notableEvents = sortedEvents.filter(
+  (event) => event.severity === "notable"
+);
+
+function formatElapsedTime(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+
+  return `${String(minutes).padStart(2, "0")}:${String(
+    remainingSeconds
+  ).padStart(2, "0")}`;
+}
+
+function formatCoordinate(value: number): string {
+  return value.toFixed(4);
+}
+---
+
+<section
+  class="drone-investigation-report"
+  aria-labelledby="drone-report-title"
+>
+  <header class="report-header">
+    <div>
+      <p class="report-eyebrow">
+        TT / DRONE FORENSICS / INVESTIGATION REPORT
+      </p>
+
+      <h2 id="drone-report-title">
+        Synthetic Flight Investigation Report
+      </h2>
+
+      <p class="report-introduction">
+        Dataset-driven reconstruction and event summary
+        for an interactive digital forensics demonstration.
+      </p>
+    </div>
+
+    <span class="report-status">
+      SYNTHETIC DATA
+    </span>
+  </header>
+
+  <div class="report-warning">
+    <strong>Demonstration report — not forensic evidence</strong>
+
+    <p>
+      This report is generated from fictional flight
+      measurements and predefined event records.
+      It does not document an actual aircraft examination,
+      evidence acquisition, independent verification
+      or forensic investigation.
+    </p>
+  </div>
+
+  <section class="report-section" aria-labelledby="report-overview">
+    <div class="section-heading">
+      <span class="section-number">01</span>
+      <h3 id="report-overview">Dataset Overview</h3>
+    </div>
+
+    <dl class="report-metrics">
+      <div>
+        <dt>Dataset reference</dt>
+        <dd>{droneDataset.id}</dd>
+      </div>
+
+      <div>
+        <dt>Dataset classification</dt>
+        <dd>{droneDataset.kind.toUpperCase()}</dd>
+      </div>
+
+      <div>
+        <dt>Flight samples</dt>
+        <dd>{droneDataset.sampleCount}</dd>
+      </div>
+
+      <div>
+        <dt>Recorded events</dt>
+        <dd>{droneDataset.eventCount}</dd>
+      </div>
+
+      <div>
+        <dt>Dataset duration</dt>
+        <dd>{droneDataset.durationSeconds} seconds</dd>
+      </div>
+
+      <div>
+        <dt>Notable events</dt>
+        <dd>{notableEvents.length}</dd>
+      </div>
+    </dl>
+
+    <p class="report-body">
+      {droneDataset.description}
+    </p>
+  </section>
+
+  <section
+    class="report-section"
+    aria-labelledby="report-methodology"
+  >
+    <div class="section-heading">
+      <span class="section-number">02</span>
+      <h3 id="report-methodology">Scope and Methodology</h3>
+    </div>
+
+    <p class="report-body">
+      The demonstration uses a shared synthetic flight
+      dataset to present waypoint positions, elapsed
+      timestamps and altitude measurements. Events are
+      associated with predefined waypoint identifiers,
+      allowing the timeline and flight map to display
+      corresponding records.
+    </p>
+
+    <p class="report-body">
+      The observations below are descriptive summaries
+      of the supplied demonstration records. They are
+      not independently established forensic findings.
+    </p>
+  </section>
+
+  <section
+    class="report-section"
+    aria-labelledby="report-flight-summary"
+  >
+    <div class="section-heading">
+      <span class="section-number">03</span>
+      <h3 id="report-flight-summary">Flight Reconstruction Summary</h3>
+    </div>
+
+    {firstSample && lastSample ? (
+      <>
+        <dl class="report-metrics">
+          <div>
+            <dt>First waypoint</dt>
+            <dd>{firstSample.id}</dd>
+          </div>
+
+          <div>
+            <dt>Final waypoint</dt>
+            <dd>{lastSample.id}</dd>
+          </div>
+
+          <div>
+            <dt>Maximum recorded altitude</dt>
+            <dd>
+              {highestSample
+                ? `${highestSample.altitude} demo units`
+                : "Unavailable"}
+            </dd>
+          </div>
+
+          <div>
+            <dt>Maximum-altitude waypoint</dt>
+            <dd>{highestSample?.id ?? "Unavailable"}</dd>
+          </div>
+        </dl>
+
+        <p class="report-body">
+          The demonstration sequence begins at
+          {" "}{firstSample.id} and ends at
+          {" "}{lastSample.id}. Its highest recorded
+          altitude is
+          {" "}{highestSample?.altitude ?? 0} demonstration
+          units at
+          {" "}{highestSample?.id ?? "an unspecified waypoint"}.
+          These measurements describe the fictional
+          dataset only.
+        </p>
+
+        <div class="report-table-scroll">
+          <table class="report-table">
+            <caption>
+              Synthetic flight samples in elapsed-time order
+            </caption>
+
+            <thead>
+              <tr>
+                <th scope="col">Waypoint</th>
+                <th scope="col">Elapsed</th>
+                <th scope="col">Altitude</th>
+                <th scope="col">Latitude</th>
+                <th scope="col">Longitude</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {sortedFlight.map((sample) => (
+                <tr>
+                  <th scope="row">{sample.id}</th>
+                  <td>{formatElapsedTime(sample.time)}</td>
+                  <td>{sample.altitude}</td>
+                  <td>{formatCoordinate(sample.latitude)}</td>
+                  <td>{formatCoordinate(sample.longitude)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <p class="report-footnote">
+          Altitudes are expressed in demonstration units.
+          Coordinates are fictional and do not identify
+          an actual flight location.
+        </p>
+      </>
+    ) : (
+      <p class="report-body">
+        No synthetic flight samples are available.
+      </p>
+    )}
+  </section>
+
+  <section
+    class="report-section"
+    aria-labelledby="report-events"
+  >
+    <div class="section-heading">
+      <span class="section-number">04</span>
+      <h3 id="report-events">Event Chronology</h3>
+    </div>
+
+    {sortedEvents.length > 0 ? (
+      <ol class="report-events">
+        {sortedEvents.map((event) => (
+          <li>
+            <div class="event-heading">
+              <span class="event-time">
+                {formatElapsedTime(event.time)}
+              </span>
+
+              <span
+                class:list={[
+                  "event-severity",
+                  event.severity === "notable" &&
+                    "event-severity-notable"
+                ]}
+              >
+                {event.severity.toUpperCase()}
+              </span>
+            </div>
+
+            <h4>{event.title}</h4>
+
+            <p>{event.description}</p>
+
+            <p class="event-reference">
+              {event.id} / {event.waypointId}
+            </p>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <p class="report-body">
+        No synthetic events are available.
+      </p>
+    )}
+  </section>
+
+  <section
+    class="report-section"
+    aria-labelledby="report-evidence"
+  >
+    <div class="section-heading">
+      <span class="section-number">05</span>
+      <h3 id="report-evidence">
+        Evidence Relationship Observations
+      </h3>
+    </div>
+
+    <p class="report-body">
+      The investigation workspace presents an
+      illustrative relationship graph connecting
+      synthetic flight records, GPS records, telemetry,
+      event chronology and summary findings.
+    </p>
+
+    <p class="report-body">
+      These connections describe the demonstration's
+      conceptual data relationships. They do not
+      establish provenance, authenticity, integrity
+      or evidential reliability.
+    </p>
+  </section>
+
+  <section
+    class="report-section"
+    aria-labelledby="report-limitations"
+  >
+    <div class="section-heading">
+      <span class="section-number">06</span>
+      <h3 id="report-limitations">
+        Limitations
+      </h3>
+    </div>
+
+    <ul class="report-limitations">
+      {droneDataset.limitations.map((limitation) => (
+        <li>{limitation}</li>
+      ))}
+    </ul>
+  </section>
+
+  <section
+    class="report-section"
+    aria-labelledby="report-conclusion"
+  >
+    <div class="section-heading">
+      <span class="section-number">07</span>
+      <h3 id="report-conclusion">
+        Demonstration Conclusion
+      </h3>
+    </div>
+
+    <p class="report-body">
+      The shared synthetic dataset supports a
+      consistent presentation of flight samples,
+      event chronology and waypoint-linked navigation
+      across the Drone Forensics investigation workspace.
+    </p>
+
+    <p class="report-body">
+      This report demonstrates how structured flight
+      records can be organised for investigative review.
+      It does not provide findings about a real aircraft,
+      establish the cause of an incident or support
+      evidential conclusions.
+    </p>
+  </section>
+
+  <footer class="report-footer">
+    <span>TRACE & TRIAGE / DRONE FORENSICS</span>
+    <span>{droneDataset.id} / SYNTHETIC DEMONSTRATION</span>
+  </footer>
+</section>
+
+<style>
+  .drone-investigation-report {
+    color: var(--tt-text);
+    font-family: var(--tt-font-mono);
+  }
+
+  .report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .report-eyebrow {
+    margin: 0 0 12px;
+    color: var(--tt-purple);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .report-header h2 {
+    margin: 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 400;
+  }
+
+  .report-introduction {
+    max-width: 650px;
+    margin-top: 12px;
+    color: var(--tt-muted);
+    line-height: 1.7;
+  }
+
+  .report-status {
+    padding: 8px 12px;
+    border: 1px solid var(--tt-orange);
+    border-radius: 4px;
+    color: var(--tt-orange);
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+  }
+
+  .report-warning {
+    padding: 18px 20px;
+    margin-bottom: 30px;
+    border: 1px solid var(--tt-orange);
+    border-left-width: 3px;
+    border-radius: 4px;
+    background: var(--tt-deep);
+  }
+
+  .report-warning strong {
+    color: var(--tt-orange);
+    font-size: 0.85rem;
+  }
+
+  .report-warning p {
+    margin: 10px 0 0;
+    color: var(--tt-muted);
+    line-height: 1.75;
+  }
+
+  .report-section {
+    padding: 26px 0;
+    border-top: 1px solid var(--tt-border);
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .section-number {
+    color: var(--tt-purple);
+    font-size: 0.75rem;
+  }
+
+  .section-heading h3 {
+    margin: 0;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+
+  .report-body {
+    max-width: 800px;
+    color: var(--tt-muted);
+    line-height: 1.85;
+  }
+
+  .report-metrics {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(170px, 1fr)
+    );
+    gap: 12px;
+    margin: 0 0 22px;
+  }
+
+  .report-metrics > div {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    background: var(--tt-deep);
+  }
+
+  .report-metrics dt {
+    margin-bottom: 10px;
+    color: var(--tt-muted);
+    font-size: 0.72rem;
+  }
+
+  .report-metrics dd {
+    margin: 0;
+    color: var(--tt-heading);
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+  }
+
+  .report-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    margin-top: 24px;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+  }
+
+  .report-table {
+    width: 100%;
+    min-width: 560px;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.8rem;
+  }
+
+  .report-table caption {
+    padding: 14px;
+    color: var(--tt-muted);
+    text-align: left;
+    caption-side: top;
+  }
+
+  .report-table th,
+  .report-table td {
+    padding: 12px;
+    border-top: 1px solid var(--tt-border);
+    white-space: nowrap;
+  }
+
+  .report-table thead th {
+    color: var(--tt-purple);
+    font-weight: 500;
+  }
+
+  .report-table tbody th {
+    color: var(--tt-heading);
+    font-weight: 500;
+  }
+
+  .report-footnote {
+    margin-top: 12px;
+    color: var(--tt-muted);
+    font-size: 0.75rem;
+    line-height: 1.7;
+  }
+
+  .report-events {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .report-events li {
+    padding: 18px;
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    background: var(--tt-deep);
+  }
+
+  .event-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .event-time {
+    color: var(--tt-purple);
+    font-size: 0.8rem;
+  }
+
+  .event-severity {
+    color: var(--tt-blue);
+    font-size: 0.7rem;
+  }
+
+  .event-severity-notable {
+    color: var(--tt-orange);
+  }
+
+  .report-events h4 {
+    margin: 14px 0 8px;
+    color: var(--tt-heading);
+    font-family: var(--tt-font-editorial);
+    font-size: 1.2rem;
+    font-weight: 400;
+  }
+
+  .report-events p {
+    margin: 8px 0;
+    color: var(--tt-muted);
+    line-height: 1.7;
+  }
+
+  .report-events .event-reference {
+    color: var(--tt-purple);
+    font-size: 0.75rem;
+  }
+
+  .report-limitations {
+    display: grid;
+    gap: 12px;
+    padding-left: 22px;
+    color: var(--tt-muted);
+    line-height: 1.75;
+  }
+
+  .report-limitations li::marker {
+    color: var(--tt-orange);
+  }
+
+  .report-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 22px;
+    border-top: 1px solid var(--tt-border);
+    color: var(--tt-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 600px) {
+    .report-header {
+      flex-direction: column;
+    }
+
+    .report-section {
+      padding: 22px 0;
+    }
+
+    .section-heading h3 {
+      font-size: 1.3rem;
+    }
+  }
+</style>

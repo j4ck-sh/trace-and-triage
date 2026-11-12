@@ -1,0 +1,161 @@
+
+/*
+ * Trace & Triage
+ * Stage 70.1 — Navigation microinteractions
+ *
+ * Visual enhancements only.
+ * Navigation behaviour remains unchanged.
+ */
+
+/* Navigation links */
+
+.tt-site-navigation .navigation-link {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Hover and active-page indicator */
+
+.tt-site-navigation .navigation-link::after {
+  content: "";
+  position: absolute;
+  right: 14px;
+  bottom: 5px;
+  left: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--tt-blue);
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease;
+}
+
+.tt-site-navigation .navigation-link:hover::after,
+.tt-site-navigation .navigation-link:focus-visible::after {
+  transform: scaleX(1);
+  opacity: 0.65;
+}
+
+.tt-site-navigation .navigation-link.active::after,
+.tt-site-navigation .navigation-link[aria-current="page"]::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* Active-page accent */
+
+.tt-site-navigation .navigation-link.active,
+.tt-site-navigation .navigation-link[aria-current="page"] {
+  color: var(--tt-blue);
+  border-color: var(--tt-border);
+  background: var(--tt-raised);
+}
+
+/* Search button feedback */
+
+.tt-site-navigation .command-trigger {
+  position: relative;
+  transition:
+    border-color 180ms ease,
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
+.tt-site-navigation .command-trigger:hover {
+  background: var(--tt-raised);
+  border-color: var(--tt-blue);
+  color: var(--tt-heading);
+}
+
+.tt-site-navigation .command-trigger:active {
+  background: var(--tt-surface);
+}
+
+/* Keyboard shortcut styling */
+
+.tt-site-navigation .command-trigger kbd {
+  transition:
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.tt-site-navigation .command-trigger:hover kbd {
+  border-color: var(--tt-blue);
+  color: var(--tt-blue);
+}
+
+/* Mobile menu button */
+
+.tt-site-navigation .mobile-menu-toggle {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.tt-site-navigation .mobile-menu-toggle:hover,
+.tt-site-navigation .mobile-menu-toggle[aria-expanded="true"] {
+  border-color: var(--tt-blue);
+  background: var(--tt-raised);
+  color: var(--tt-heading);
+}
+
+/* Mobile navigation */
+
+@media (max-width: 900px) {
+  .tt-site-navigation .navigation-link {
+    min-height: 44px;
+  }
+
+  .tt-site-navigation .navigation-link::after {
+    top: 8px;
+    bottom: 8px;
+    left: 0;
+    right: auto;
+    width: 2px;
+    height: auto;
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+
+  .tt-site-navigation .navigation-link:hover::after,
+  .tt-site-navigation .navigation-link:focus-visible::after,
+  .tt-site-navigation .navigation-link.active::after,
+  .tt-site-navigation
+    .navigation-link[aria-current="page"]::after {
+    transform: scaleY(1);
+  }
+
+  .tt-site-navigation .navigation-link.active,
+  .tt-site-navigation .navigation-link[aria-current="page"] {
+    padding-left: 16px;
+  }
+}
+
+/* Operating-system reduced-motion preference */
+
+@media (prefers-reduced-motion: reduce) {
+  .tt-site-navigation .navigation-link::after,
+  .tt-site-navigation .command-trigger,
+  .tt-site-navigation .command-trigger kbd,
+  .tt-site-navigation .mobile-menu-toggle {
+    transition: none;
+  }
+}
+
+/* User-selected paused motion */
+
+html.tt-motion-paused
+  .tt-site-navigation .navigation-link::after,
+html.tt-motion-paused
+  .tt-site-navigation .command-trigger,
+html.tt-motion-paused
+  .tt-site-navigation .command-trigger kbd,
+html.tt-motion-paused
+  .tt-site-navigation .mobile-menu-toggle {
+  transition: none;
+}

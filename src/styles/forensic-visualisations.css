@@ -1,5 +1,14 @@
 
-/* TRACE & TRIAGE — FORENSIC VISUALISATIONS */
+/*
+ * ==========================================
+ * TRACE & TRIAGE
+ * FORENSIC VISUALISATIONS
+ * Stage 70.1 — Step 22.3
+ * ==========================================
+ *
+ * Shared visual styling for forensic
+ * dashboards, evidence metrics and controls.
+ */
 
 .tt-viz {
   --viz-primary: var(--tt-blue);
@@ -12,6 +21,10 @@
   border-radius: var(--tt-radius-md, 6px);
   color: var(--tt-text);
 }
+
+/* ==========================================
+   HEADERS AND DESCRIPTIONS
+   ========================================== */
 
 .tt-viz-header {
   display: flex;
@@ -41,6 +54,10 @@
   color: var(--tt-muted);
   line-height: 1.7;
 }
+
+/* ==========================================
+   METRIC GRID
+   ========================================== */
 
 .tt-viz-grid {
   display: grid;
@@ -72,6 +89,10 @@
   overflow-wrap: anywhere;
 }
 
+/* ==========================================
+   INTERACTIVE CONTROLS
+   ========================================== */
+
 .tt-viz-button {
   padding: 10px 14px;
   background: var(--tt-deep);
@@ -93,6 +114,20 @@
   outline-offset: 3px;
 }
 
+/* ==========================================
+   RESPONSIVE LAYOUTS
+   ========================================== */
+
+/* Intermediate and tablet layouts */
+
+@media (max-width: 1000px) and (min-width: 701px) {
+  .tt-viz-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile layouts */
+
 @media (max-width: 700px) {
   .tt-viz-grid {
     grid-template-columns: 1fr;
@@ -103,6 +138,10 @@
   }
 }
 
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+
 @media (prefers-reduced-motion: reduce) {
   .tt-viz *,
   .tt-viz *::before,
@@ -110,4 +149,15 @@
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* ==========================================
+   MANUALLY PAUSED MOTION
+   ========================================== */
+
+html.tt-motion-paused .tt-viz *,
+html.tt-motion-paused .tt-viz *::before,
+html.tt-motion-paused .tt-viz *::after {
+  animation: none !important;
+  transition: none !important;
 }
