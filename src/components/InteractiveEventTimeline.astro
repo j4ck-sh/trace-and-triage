@@ -1,6 +1,4 @@
 
-
-
 ---
 import type { ForensicEvent } from "../data/demoEvents";
 
@@ -23,7 +21,9 @@ const sortedEvents = [...events].sort(
   <div class="tt-viz-header">
     <div>
       <p class="tt-viz-label">TT / EVENT CHRONOLOGY</p>
+
       <h2 class="tt-viz-title">{title}</h2>
+
       <p class="tt-viz-description">
         Select an event to inspect its details.
       </p>
@@ -31,13 +31,27 @@ const sortedEvents = [...events].sort(
   </div>
 
   <div class="timeline-filters" aria-label="Filter timeline events">
-    <button type="button" data-filter="all" aria-pressed="true">
+    <button
+      type="button"
+      data-filter="all"
+      aria-pressed="true"
+    >
       All events
     </button>
-    <button type="button" data-filter="notable" aria-pressed="false">
+
+    <button
+      type="button"
+      data-filter="notable"
+      aria-pressed="false"
+    >
       Notable
     </button>
-    <button type="button" data-filter="normal" aria-pressed="false">
+
+    <button
+      type="button"
+      data-filter="normal"
+      aria-pressed="false"
+    >
       Normal
     </button>
   </div>
@@ -63,7 +77,10 @@ const sortedEvents = [...events].sort(
 
             <span class="event-information">
               <strong>{event.title}</strong>
-              <small>{event.id} / {event.severity.toUpperCase()}</small>
+
+              <small>
+                {event.id} / {event.severity.toUpperCase()}
+              </small>
             </span>
           </button>
         </li>
@@ -71,16 +88,36 @@ const sortedEvents = [...events].sort(
     </ol>
 
     <div class="timeline-detail" aria-live="polite">
-      <span class="detail-label">SELECTED EVENT</span>
+      <span class="detail-label">
+        SELECTED EVENT
+      </span>
+
       <h3 data-detail-title>
         {sortedEvents[0]?.title ?? "No events"}
       </h3>
+
       <p data-detail-description>
-        {sortedEvents[0]?.description ?? "No event data available."}
+        {sortedEvents[0]?.description ??
+          "No event data available."}
       </p>
+
       <span data-detail-reference>
-        {sortedEvents[0]?.id ?? ""}
+        {sortedEvents[0]
+          ? sortedEvents[0].waypointId
+            ? `${sortedEvents[0].id} / ${sortedEvents[0].waypointId}`
+            : sortedEvents[0].id
+          : ""}
       </span>
+
+      <button
+        type="button"
+        class="timeline-map-action"
+        data-view-on-map
+        hidden={!sortedEvents[0]?.waypointId}
+      >
+        View on Flight Map
+        <span aria-hidden="true">↗</span>
+      </button>
     </div>
   </div>
 
@@ -117,7 +154,9 @@ const sortedEvents = [...events].sort(
 
   .timeline-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(230px, 0.85fr);
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(230px, 0.85fr);
     gap: 20px;
   }
 
@@ -172,7 +211,8 @@ const sortedEvents = [...events].sort(
   }
 
   .timeline-event:focus-visible,
-  .timeline-filters button:focus-visible {
+  .timeline-filters button:focus-visible,
+  .timeline-map-action:focus-visible {
     outline: 2px solid var(--tt-blue);
     outline-offset: 3px;
   }
@@ -224,6 +264,32 @@ const sortedEvents = [...events].sort(
     line-height: 1.8;
   }
 
+  .timeline-map-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    margin-top: 22px;
+    padding: 12px 14px;
+    background: var(--tt-raised);
+    border: 1px solid var(--tt-blue);
+    border-radius: 4px;
+    color: var(--tt-blue);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .timeline-map-action:hover {
+    background: var(--tt-surface);
+  }
+
+  .timeline-map-action[hidden] {
+    display: none;
+  }
+
   @media (max-width: 800px) {
     .timeline-layout {
       grid-template-columns: 1fr;
@@ -232,36 +298,42 @@ const sortedEvents = [...events].sort(
 </style>
 
 <script>
+  interface EventData {
+    id: string;
+    time: number;
+    waypointId?: string;
+    title: string;
+    description: string;
+    severity: "normal" | "notable";
+  }
+
   function initialiseEventTimelines() {
     document.querySelectorAll<HTMLElement>(
       "[data-event-timeline]"
     ).forEach((root) => {
       if (root.dataset.ready === "true") return;
 
-      const dataElement = root.querySelector<HTMLScriptElement>(
-        "[data-event-data]"
-      );
+      const dataElement =
+        root.querySelector<HTMLScriptElement>(
+          "[data-event-data]"
+        );
 
       if (!dataElement) return;
-
-      interface EventData {
-        id: string;
-        time: number;
-        title: string;
-        description: string;
-        severity: "normal" | "notable";
-      }
 
       let events: EventData[] = [];
 
       try {
-        events = JSON.parse(dataElement.textContent ?? "[]");
+        events = JSON.parse(
+          dataElement.textContent ?? "[]"
+        ) as EventData[];
       } catch {
         return;
       }
 
       const items = Array.from(
-        root.querySelectorAll<HTMLElement>("[data-event-item]")
+        root.querySelectorAll<HTMLElement>(
+          "[data-event-item]"
+        )
       );
 
       const buttons = Array.from(
@@ -270,17 +342,30 @@ const sortedEvents = [...events].sort(
         )
       );
 
-      const detailTitle = root.querySelector<HTMLElement>(
-        "[data-detail-title]"
-      );
+      const detailTitle =
+        root.querySelector<HTMLElement>(
+          "[data-detail-title]"
+        );
 
-      const detailDescription = root.querySelector<HTMLElement>(
-        "[data-detail-description]"
-      );
+      const detailDescription =
+        root.querySelector<HTMLElement>(
+          "[data-detail-description]"
+        );
 
-      const detailReference = root.querySelector<HTMLElement>(
-        "[data-detail-reference]"
-      );
+      const detailReference =
+        root.querySelector<HTMLElement>(
+          "[data-detail-reference]"
+        );
+
+      const viewOnMapButton =
+        root.querySelector<HTMLButtonElement>(
+          "[data-view-on-map]"
+        );
+
+      const workspace =
+        root.closest<HTMLElement>(
+          "[data-investigation-workspace]"
+        );
 
       const filters = Array.from(
         root.querySelectorAll<HTMLButtonElement>(
@@ -289,6 +374,12 @@ const sortedEvents = [...events].sort(
       );
 
       let selectedIndex = 0;
+
+      // Hide map navigation if this timeline is
+      // rendered outside the investigation workspace.
+      if (viewOnMapButton && !workspace) {
+        viewOnMapButton.hidden = true;
+      }
 
       function selectEvent(index: number) {
         const event = events[index];
@@ -309,11 +400,35 @@ const sortedEvents = [...events].sort(
         }
 
         if (detailDescription) {
-          detailDescription.textContent = event.description;
+          detailDescription.textContent =
+            event.description;
         }
 
         if (detailReference) {
-          detailReference.textContent = event.id;
+          detailReference.textContent =
+            event.waypointId
+              ? `${event.id} / ${event.waypointId}`
+              : event.id;
+        }
+
+        if (viewOnMapButton) {
+          viewOnMapButton.hidden =
+            !workspace || !event.waypointId;
+        }
+
+        // Notify other investigation components
+        // about the selected synthetic waypoint.
+        if (event.waypointId) {
+          root.dispatchEvent(
+            new CustomEvent("tt:waypoint-select", {
+              bubbles: true,
+              detail: {
+                eventId: event.id,
+                waypointId: event.waypointId,
+                time: event.time
+              }
+            })
+          );
         }
       }
 
@@ -335,10 +450,14 @@ const sortedEvents = [...events].sort(
         filters.forEach((button) => {
           button.setAttribute(
             "aria-pressed",
-            String(button.dataset.filter === severity)
+            String(
+              button.dataset.filter === severity
+            )
           );
         });
 
+        // If the selected event is hidden by the
+        // filter, select the first visible event.
         if (
           firstVisible >= 0 &&
           items[selectedIndex]?.hidden
@@ -353,9 +472,57 @@ const sortedEvents = [...events].sort(
         });
       });
 
+      // Navigate directly from the selected event
+      // to its corresponding waypoint on the map.
+      viewOnMapButton?.addEventListener(
+        "click",
+        () => {
+          if (!workspace) return;
+
+          const selectedEvent =
+            events[selectedIndex];
+
+          if (!selectedEvent?.waypointId) return;
+
+          // Ensure the map receives the current
+          // waypoint selection before navigation.
+          root.dispatchEvent(
+            new CustomEvent(
+              "tt:waypoint-select",
+              {
+                bubbles: true,
+                detail: {
+                  eventId: selectedEvent.id,
+                  waypointId:
+                    selectedEvent.waypointId,
+                  time: selectedEvent.time
+                }
+              }
+            )
+          );
+
+          // Ask the workspace to activate the
+          // Flight Map tab using its existing
+          // accessible navigation controller.
+          root.dispatchEvent(
+            new CustomEvent(
+              "tt:workspace-navigate",
+              {
+                bubbles: true,
+                detail: {
+                  tab: "map"
+                }
+              }
+            )
+          );
+        }
+      );
+
       filters.forEach((button) => {
         button.addEventListener("click", () => {
-          filterEvents(button.dataset.filter ?? "all");
+          filterEvents(
+            button.dataset.filter ?? "all"
+          );
         });
       });
 

@@ -1,3 +1,4 @@
+
 ---
 interface Props {
   title?: string;
@@ -10,11 +11,16 @@ const {
 
 <section class="drone-map-section">
   <div class="map-heading">
-    <p class="map-label">FLIGHT TELEMETRY / DEMONSTRATION</p>
+    <p class="map-label">
+      FLIGHT TELEMETRY / DEMONSTRATION
+    </p>
+
     <h2>{title}</h2>
+
     <p>
       Interactive reconstruction using fictional GPS
       coordinates. Select a waypoint to inspect its data.
+      Timeline event selections can also focus a waypoint.
     </p>
   </div>
 
@@ -27,6 +33,7 @@ const {
 
   <p class="map-note">
     Demonstration data only. Not actual forensic evidence.
+    Coordinates and flight measurements are synthetic.
   </p>
 </section>
 
@@ -86,26 +93,31 @@ const {
   import L from "leaflet";
   import "leaflet/dist/leaflet.css";
 
-  const mapElement = document.getElementById("drone-flight-map");
+  import { demoFlight } from "../data/demoFlight";
 
-  if (mapElement) {
-    // Fictional telemetry coordinates
-    const flight = [
-      { lat: 0.0000, lng: 0.0000, time: "10:00:00", alt: 0 },
-      { lat: 0.0005, lng: 0.0006, time: "10:00:15", alt: 15 },
-      { lat: 0.0010, lng: 0.0013, time: "10:00:30", alt: 32 },
-      { lat: 0.0015, lng: 0.0020, time: "10:00:45", alt: 48 },
-      { lat: 0.0020, lng: 0.0026, time: "10:01:00", alt: 55 },
-      { lat: 0.0014, lng: 0.0031, time: "10:01:15", alt: 42 },
-      { lat: 0.0007, lng: 0.0035, time: "10:01:30", alt: 20 },
-      { lat: 0.0001, lng: 0.0038, time: "10:01:45", alt: 0 }
-    ];
+  interface WaypointSelection {
+    eventId: string;
+    waypointId: string;
+    time: number;
+  }
+
+  function initialiseDroneFlightMap() {
+    const mapElement = document.getElementById(
+      "drone-flight-map"
+    );
+
+    if (!mapElement) return;
+
+    // Prevent duplicate Leaflet initialisation.
+    if (mapElement.dataset.mapReady === "true") return;
+
+    if (demoFlight.length === 0) return;
 
     const map = L.map(mapElement, {
       scrollWheelZoom: false
     });
 
-   
+    mapElement.dataset.mapReady = "true";
 
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -116,8 +128,12 @@ const {
       }
     ).addTo(map);
 
-    const coordinates = flight.map(
-      (point): L.LatLngTuple => [point.lat, point.lng]
+    // All waypoints use the shared synthetic dataset.
+    const coordinates: L.LatLngTuple[] = demoFlight.map(
+      (point) => [
+        point.latitude,
+        point.longitude
+      ]
     );
 
     const route = L.polyline(coordinates, {
@@ -125,9 +141,16 @@ const {
       weight: 4
     }).addTo(map);
 
-    flight.forEach((point, index) => {
+    // Keep references to markers so timeline events
+    // can focus the corresponding waypoint.
+    const waypointMarkers = new Map<
+      string,
+      L.CircleMarker
+    >();
+
+    demoFlight.forEach((point, index) => {
       const isStart = index === 0;
-      const isEnd = index === flight.length - 1;
+      const isEnd = index === demoFlight.length - 1;
 
       const colour = isStart
         ? "#86c7aa"
@@ -135,26 +158,172 @@ const {
           ? "#e5b96c"
           : "#52c7ea";
 
-      L.circleMarker([point.lat, point.lng], {
-        radius: isStart || isEnd ? 8 : 5,
-        color: colour,
-        fillColor: colour,
-        fillOpacity: 0.9
-      })
+      const waypointLabel = isStart
+        ? "Take-off"
+        : isEnd
+          ? "Landing"
+          : "Waypoint";
+
+      const marker = L.circleMarker(
+        [point.latitude, point.longitude],
+        {
+          radius: isStart || isEnd ? 8 : 5,
+          color: colour,
+          fillColor: colour,
+          fillOpacity: 0.9
+        }
+      )
         .addTo(map)
         .bindPopup(`
-          <strong>
-            ${isStart ? "Take-off" : isEnd ? "Landing" : `Waypoint ${index}`}
-          </strong>
-          <p>Time: ${point.time} UTC</p>
-          <p>Altitude: ${point.alt} m</p>
-          <p>Latitude: ${point.lat.toFixed(5)}</p>
-          <p>Longitude: ${point.lng.toFixed(5)}</p>
+          <strong>${waypointLabel} — ${point.id}</strong>
+          <p>Elapsed time: ${point.time} seconds</p>
+          <p>Altitude: ${point.altitude} (demo units)</p>
+          <p>Latitude: ${point.latitude.toFixed(5)}</p>
+          <p>Longitude: ${point.longitude.toFixed(5)}</p>
+          <p>Synthetic demonstration record</p>
         `);
+
+      waypointMarkers.set(point.id, marker);
     });
 
     map.fitBounds(route.getBounds(), {
       padding: [30, 30]
     });
+
+    const workspace = mapElement.closest(
+      "[data-investigation-workspace]"
+    );
+
+    let selectedWaypointId: string | null = null;
+    let highlightedMarker: L.CircleMarker | null = null;
+
+    // Remember original marker styles so a previous
+    // selection can be restored.
+    
+const originalStyles = new Map<
+  string,
+  L.CircleMarkerOptions
+>();
+
+
+    demoFlight.forEach((point, index) => {
+      const isStart = index === 0;
+      const isEnd = index === demoFlight.length - 1;
+
+      const colour = isStart
+        ? "#86c7aa"
+        : isEnd
+          ? "#e5b96c"
+          : "#52c7ea";
+
+      originalStyles.set(point.id, {
+        radius: isStart || isEnd ? 8 : 5,
+        color: colour,
+        fillColor: colour,
+        fillOpacity: 0.9,
+        weight: 3
+      });
+    });
+
+    function focusWaypoint(waypointId: string) {
+      const marker = waypointMarkers.get(waypointId);
+
+      if (!marker) return;
+
+      if (highlightedMarker) {
+        const previousId = Array.from(
+          waypointMarkers.entries()
+        ).find(
+          ([, candidate]) => candidate === highlightedMarker
+        )?.[0];
+
+        if (previousId) {
+          const originalStyle = originalStyles.get(previousId);
+
+          if (originalStyle) {
+            highlightedMarker.setStyle(originalStyle);
+            highlightedMarker.setRadius(
+              originalStyle.radius ?? 5
+            );
+          }
+        }
+      }
+
+      marker.setStyle({
+        color: "#ffffff",
+        fillColor: "#52c7ea",
+        fillOpacity: 1,
+        weight: 4
+      });
+
+      marker.setRadius(10);
+      marker.bringToFront();
+
+      highlightedMarker = marker;
+
+      map.panTo(marker.getLatLng());
+      marker.openPopup();
+    }
+
+    // A selection may occur while the map is hidden.
+    // Store it until the map panel becomes visible.
+    const handleWaypointSelection = (event: Event) => {
+      const selection = (
+        event as CustomEvent<WaypointSelection>
+      ).detail;
+
+      if (!selection?.waypointId) return;
+
+      if (!waypointMarkers.has(selection.waypointId)) {
+        return;
+      }
+
+      selectedWaypointId = selection.waypointId;
+
+      if (mapElement.getClientRects().length > 0) {
+        requestAnimationFrame(() => {
+          focusWaypoint(selection.waypointId);
+        });
+      }
+    };
+
+    const refreshMap = () => {
+      if (mapElement.getClientRects().length === 0) {
+        return;
+      }
+
+      requestAnimationFrame(() => {
+        map.invalidateSize();
+
+        if (selectedWaypointId) {
+          focusWaypoint(selectedWaypointId);
+        } else {
+          map.fitBounds(route.getBounds(), {
+            padding: [30, 30]
+          });
+        }
+      });
+    };
+
+    // Listen on the document because the timeline and
+    // map are separate components within the workspace.
+    document.addEventListener(
+      "tt:waypoint-select",
+      handleWaypointSelection
+    );
+
+    workspace?.addEventListener(
+      "tt:map-visible",
+      refreshMap
+    );
+
+    window.addEventListener("resize", refreshMap);
   }
+
+  initialiseDroneFlightMap();
+
+  document.addEventListener(
+    "astro:page-load",
+    initialiseDroneFlightMap
+  );
 </script>

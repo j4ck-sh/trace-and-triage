@@ -1,7 +1,13 @@
-/* ==========================================
-   TRACE & TRIAGE — STAGE 69
-   NAVIGATION FOUNDATION
-   ========================================== */
+
+/*
+ * ==========================================
+ * TRACE & TRIAGE
+ * NAVIGATION FOUNDATION
+ * ==========================================
+ *
+ * Header stickiness is managed by Header.astro.
+ * Navigation layout is managed by SiteNavigation.astro.
+ */
 
 :root {
   --tt-header-height: 76px;
@@ -12,16 +18,6 @@
 .tt-site-navigation {
   position: relative;
   z-index: 100;
-}
-
-/* Sticky behaviour is enabled once the
-   navigation replaces the existing header. */
-
-.tt-site-navigation.is-sticky {
-  position: sticky;
-  top: 0;
-  background: var(--tt-deep);
-  border-bottom: 1px solid var(--tt-border);
 }
 
 /* Navigation links */
@@ -38,14 +34,14 @@
   outline-offset: 3px;
 }
 
-/* Avoid horizontal page overflow */
+/* Consistent box sizing */
 
 .tt-site-navigation,
 .tt-site-navigation * {
   box-sizing: border-box;
 }
 
-/* Respect motion preferences */
+/* Respect operating-system reduced-motion preferences */
 
 @media (prefers-reduced-motion: reduce) {
   .tt-site-navigation *,

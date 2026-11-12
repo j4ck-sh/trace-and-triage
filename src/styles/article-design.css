@@ -1,13 +1,242 @@
-/* Stage 66: theme-aware editorial research article styling */
-.tt-article-layout .article-content { min-width:0; font-size:1.02rem; line-height:1.9; color:var(--tt-text); }
-.tt-article-layout .article-content h2 { margin:3.5rem 0 1.5rem; padding-bottom:.8rem; border-bottom:1px solid var(--tt-border); font:400 clamp(1.9rem,3vw,2.7rem)/1.2 var(--tt-font-editorial); color:var(--tt-heading); }
-.tt-article-layout .article-content h3 { margin:2.5rem 0 1rem; color:var(--tt-heading); font-size:1.35rem; }
-.tt-article-layout .article-content a { color:var(--tt-blue); text-underline-offset:4px; }
-.tt-article-layout .article-content blockquote { margin:2rem 0; padding:1.5rem; background:var(--tt-surface); border-left:3px solid var(--tt-purple); color:var(--tt-muted); }
-.tt-article-layout .article-content pre { max-width:100%; overflow-x:auto; padding:1.5rem; background:var(--tt-deep); border:1px solid var(--tt-border); border-radius:var(--tt-radius-md); }
-.tt-article-layout .article-content :not(pre)>code { padding:.2rem .4rem; background:var(--tt-raised); color:var(--tt-purple); border-radius:3px; }
-.tt-article-layout .article-content table { display:block; max-width:100%; overflow-x:auto; border-collapse:collapse; }
-.tt-article-layout .article-content th,.tt-article-layout .article-content td { padding:.85rem 1rem; border:1px solid var(--tt-border); text-align:left; }
-.tt-article-layout .article-content th { background:var(--tt-surface); color:var(--tt-heading); }
-.tt-article-layout .article-content img { max-width:100%; height:auto; border:1px solid var(--tt-border); border-radius:var(--tt-radius-md); }
-@media(max-width:650px) { .tt-article-layout .article-content { font-size:1rem; } }
+
+/*
+ * ==========================================
+ * TRACE & TRIAGE
+ * RESEARCH ARTICLE DESIGN
+ * Stage 70.1 — Step 22.2
+ * ==========================================
+ *
+ * Theme-aware editorial styling for
+ * research articles and project reports.
+ */
+
+.tt-article-layout .article-content {
+  min-width: 0;
+  font-size: 1.02rem;
+  line-height: 1.9;
+  color: var(--tt-text);
+}
+
+/* ==========================================
+   HEADINGS
+   ========================================== */
+
+.tt-article-layout .article-content h2 {
+  margin: 3.5rem 0 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid var(--tt-border);
+
+  font:
+    400 clamp(1.9rem, 3vw, 2.7rem) / 1.2
+    var(--tt-font-editorial);
+
+  color: var(--tt-heading);
+}
+
+.tt-article-layout .article-content h3 {
+  margin: 2.5rem 0 1rem;
+  font-size: 1.35rem;
+  line-height: 1.4;
+  color: var(--tt-heading);
+}
+
+.tt-article-layout .article-content h4 {
+  margin: 2rem 0 0.8rem;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  color: var(--tt-heading);
+}
+
+/* ==========================================
+   PARAGRAPHS AND LISTS
+   ========================================== */
+
+.tt-article-layout .article-content p {
+  margin: 0 0 1.5rem;
+}
+
+.tt-article-layout .article-content ul,
+.tt-article-layout .article-content ol {
+  margin: 1.25rem 0 1.75rem;
+  padding-left: 1.75rem;
+}
+
+.tt-article-layout .article-content li {
+  margin-bottom: 0.65rem;
+}
+
+.tt-article-layout .article-content li > ul,
+.tt-article-layout .article-content li > ol {
+  margin: 0.75rem 0;
+}
+
+/* ==========================================
+   LINKS
+   ========================================== */
+
+.tt-article-layout .article-content a {
+  color: var(--tt-blue);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.tt-article-layout .article-content a:hover {
+  color: var(--tt-heading);
+}
+
+.tt-article-layout .article-content a:focus-visible {
+  outline: 2px solid var(--tt-blue);
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   BLOCKQUOTES
+   ========================================== */
+
+.tt-article-layout .article-content blockquote {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--tt-surface);
+  border-left: 3px solid var(--tt-purple);
+  color: var(--tt-muted);
+}
+
+.tt-article-layout .article-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================================
+   CODE BLOCKS
+   ========================================== */
+
+.tt-article-layout .article-content pre {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 1.5rem;
+
+  background: var(--tt-deep);
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-md);
+
+  font-family: var(--tt-font-mono);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+.tt-article-layout .article-content pre code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+/* Inline code */
+
+.tt-article-layout .article-content :not(pre) > code {
+  padding: 0.2rem 0.4rem;
+  background: var(--tt-raised);
+  color: var(--tt-purple);
+  border-radius: 3px;
+  font-family: var(--tt-font-mono);
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+/* ==========================================
+   TABLES
+   ========================================== */
+
+.tt-article-layout .article-content table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 0.92rem;
+}
+
+.tt-article-layout .article-content th,
+.tt-article-layout .article-content td {
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--tt-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tt-article-layout .article-content th {
+  background: var(--tt-surface);
+  color: var(--tt-heading);
+  font-weight: 600;
+}
+
+/* ==========================================
+   IMAGES AND DIAGRAMS
+   ========================================== */
+
+.tt-article-layout .article-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 2rem auto;
+
+  border: 1px solid var(--tt-border);
+  border-radius: var(--tt-radius-md);
+}
+
+.tt-article-layout .article-content figure {
+  margin: 2.5rem 0;
+}
+
+.tt-article-layout .article-content figure img {
+  margin: 0 auto;
+}
+
+.tt-article-layout .article-content figcaption {
+  margin-top: 0.75rem;
+  font-family: var(--tt-font-mono);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--tt-muted);
+  text-align: center;
+}
+
+/* ==========================================
+   HORIZONTAL RULES
+   ========================================== */
+
+.tt-article-layout .article-content hr {
+  margin: 3rem 0;
+  border: 0;
+  border-top: 1px solid var(--tt-border);
+}
+
+/* ==========================================
+   MOBILE REFINEMENTS
+   ========================================== */
+
+@media (max-width: 650px) {
+  .tt-article-layout .article-content {
+    font-size: 1rem;
+    line-height: 1.8;
+  }
+
+  .tt-article-layout .article-content h2 {
+    margin-top: 2.5rem;
+  }
+
+  .tt-article-layout .article-content pre {
+    padding: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .tt-article-layout .article-content blockquote {
+    padding: 1rem;
+  }
+
+  .tt-article-layout .article-content th,
+  .tt-article-layout .article-content td {
+    padding: 0.7rem 0.85rem;
+  }
+}

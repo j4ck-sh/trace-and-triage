@@ -1,6 +1,7 @@
 
 ---
 import BrandMark from "./BrandMark.astro";
+import HeaderControls from "./HeaderControls.astro";
 
 const base = import.meta.env.BASE_URL;
 
@@ -22,20 +23,43 @@ const currentSection = relativePath.split("/")[0] ?? "";
   <div class="navigation-inner">
     <BrandMark />
 
-    <div class="navigation-links">
-      {navigation.map((item) => {
-        const active = currentSection === item.path;
+    <button
+      type="button"
+      class="mobile-menu-toggle"
+      data-mobile-menu-toggle
+      aria-label="Open navigation menu"
+      aria-controls="tt-navigation-links"
+      aria-expanded="false"
+    >
+      <span class="menu-icon" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+      <span class="menu-label">Menu</span>
+    </button>
 
-        return (
-          <a
-            href={item.href}
-            class:list={["navigation-link", { active }]}
-            aria-current={active ? "page" : undefined}
-          >
-            {item.label}
-          </a>
-        );
-      })}
+    <div
+      id="tt-navigation-links"
+      class="navigation-links"
+      data-navigation-links
+      inert
+    >
+      <div class="navigation-links-inner">
+        {navigation.map((item) => {
+          const active = currentSection === item.path;
+
+          return (
+            <a
+              href={item.href}
+              class:list={["navigation-link", { active }]}
+              aria-current={active ? "page" : undefined}
+            >
+              {item.label}
+            </a>
+          );
+        })}
+      </div>
     </div>
 
     <div class="navigation-actions">
@@ -48,6 +72,8 @@ const currentSection = relativePath.split("/")[0] ?? "";
         <span>Search</span>
         <kbd>Ctrl K</kbd>
       </button>
+
+      <HeaderControls />
     </div>
   </div>
 </nav>
@@ -63,13 +89,14 @@ const currentSection = relativePath.split("/")[0] ?? "";
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 25px;
+    flex-wrap: wrap;
+    gap: 16px 24px;
     width: min(100% - 40px, 1250px);
     margin: 0 auto;
-    padding: 16px 0;
+    padding: 12px 0;
   }
 
-  .navigation-links {
+  .navigation-links-inner {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -104,9 +131,19 @@ const currentSection = relativePath.split("/")[0] ?? "";
   }
 
   .navigation-link:focus-visible,
-  .command-trigger:focus-visible {
+  .command-trigger:focus-visible,
+  .mobile-menu-toggle:focus-visible {
     outline: 2px solid var(--tt-blue);
     outline-offset: 3px;
+  }
+
+  .navigation-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-width: 0;
   }
 
   .command-trigger {
@@ -137,15 +174,97 @@ const currentSection = relativePath.split("/")[0] ?? "";
     font-size: 0.7rem;
   }
 
+  .mobile-menu-toggle {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 9px 12px;
+    background: var(--tt-surface);
+    border: 1px solid var(--tt-border);
+    border-radius: 4px;
+    color: var(--tt-text);
+    font-family: var(--tt-font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+
+  .menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .menu-icon span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: currentColor;
+    transition:
+      transform 200ms ease,
+      opacity 200ms ease;
+  }
+
+  .mobile-menu-toggle[aria-expanded="true"] .menu-icon span:first-child {
+    transform: translateY(6px) rotate(45deg);
+  }
+
+  .mobile-menu-toggle[aria-expanded="true"] .menu-icon span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .mobile-menu-toggle[aria-expanded="true"] .menu-icon span:last-child {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  @media (max-width: 1100px) {
+    .navigation-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
   @media (max-width: 900px) {
-    .navigation-inner {
-      flex-wrap: wrap;
+    .mobile-menu-toggle {
+      display: inline-flex;
+      margin-left: auto;
     }
 
     .navigation-links {
+      display: grid;
+      grid-template-rows: 0fr;
       order: 3;
       width: 100%;
-      overflow-x: auto;
+      overflow: hidden;
+      visibility: hidden;
+      transition:
+        grid-template-rows 250ms ease,
+        visibility 250ms ease;
+    }
+
+    .navigation-links-inner {
+      min-height: 0;
+      overflow: hidden;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 4px;
+    }
+
+    .navigation-links.is-open {
+      grid-template-rows: 1fr;
+      visibility: visible;
+    }
+
+    .navigation-link {
+      width: 100%;
+      border-radius: 3px;
+    }
+
+    .navigation-actions {
+      order: 2;
+      width: 100%;
+      margin-left: 0;
+      justify-content: flex-start;
     }
   }
 
@@ -164,19 +283,98 @@ const currentSection = relativePath.split("/")[0] ?? "";
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .navigation-link {
+    .navigation-link,
+    .navigation-links,
+    .menu-icon span {
       transition: none;
     }
+  }
+
+  :global(html.tt-motion-paused) .navigation-link,
+  :global(html.tt-motion-paused) .navigation-links,
+  :global(html.tt-motion-paused) .menu-icon span {
+    transition: none;
   }
 </style>
 
 <script>
-  function initialiseNavigationCommands() {
-    const triggers = document.querySelectorAll<HTMLButtonElement>(
-      "[data-command-trigger]"
-    );
+  function initialiseSiteNavigation() {
+    const menuButton =
+      document.querySelector<HTMLButtonElement>(
+        "[data-mobile-menu-toggle]"
+      );
 
-    triggers.forEach((trigger) => {
+    const menu =
+      document.querySelector<HTMLElement>(
+        "[data-navigation-links]"
+      );
+
+    if (menuButton && menu && menuButton.dataset.ready !== "true") {
+      menuButton.dataset.ready = "true";
+
+      const desktopQuery = window.matchMedia("(min-width: 901px)");
+
+      function setMenuOpen(open: boolean) {
+        menu!.classList.toggle("is-open", open);
+
+        menuButton!.setAttribute(
+          "aria-expanded",
+          String(open)
+        );
+
+        menuButton!.setAttribute(
+          "aria-label",
+          open ? "Close navigation menu" : "Open navigation menu"
+        );
+
+        menu!.inert = !open && !desktopQuery.matches;
+      }
+
+      setMenuOpen(false);
+
+      menuButton.addEventListener("click", () => {
+        const open =
+          menuButton.getAttribute("aria-expanded") !== "true";
+
+        setMenuOpen(open);
+      });
+
+      menu.querySelectorAll<HTMLAnchorElement>("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          setMenuOpen(false);
+        });
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (
+          event.key === "Escape" &&
+          menu.classList.contains("is-open")
+        ) {
+          setMenuOpen(false);
+          menuButton.focus();
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!(event.target instanceof Node)) return;
+
+        if (
+          menu.classList.contains("is-open") &&
+          !menu.contains(event.target) &&
+          !menuButton.contains(event.target)
+        ) {
+          setMenuOpen(false);
+        }
+      });
+
+      desktopQuery.addEventListener("change", () => {
+        setMenuOpen(false);
+      });
+    }
+
+    document.querySelectorAll<HTMLButtonElement>(
+      "[data-command-trigger]"
+    ).forEach((trigger) => {
       if (trigger.dataset.ready === "true") return;
 
       trigger.dataset.ready = "true";
@@ -189,10 +387,10 @@ const currentSection = relativePath.split("/")[0] ?? "";
     });
   }
 
-  initialiseNavigationCommands();
+  initialiseSiteNavigation();
 
   document.addEventListener(
     "astro:page-load",
-    initialiseNavigationCommands
+    initialiseSiteNavigation
   );
 </script>

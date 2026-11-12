@@ -1,6 +1,11 @@
-/* ==========================================
-   TRACE & TRIAGE — MOTION SYSTEM
-   ========================================== */
+
+/*
+ * ==========================================
+ * TRACE & TRIAGE — MOTION SYSTEM
+ * ==========================================
+ */
+
+/* Scroll reveal animations */
 
 @media (prefers-reduced-motion: no-preference) {
   [data-reveal] {
@@ -29,38 +34,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [data-reveal] {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
-}
-
-
-/* ==========================================
-   MOTION PAUSE AND ACCESSIBILITY
-   ========================================== */
-
-html.tt-motion-paused *,
-html.tt-motion-paused *::before,
-html.tt-motion-paused *::after {
-  animation-play-state: paused !important;
-  transition-duration: 0s !important;
-}
-
-html.tt-motion-paused [data-reveal] {
-  opacity: 1 !important;
-  transform: none !important;
-}
-
-html.tt-motion-paused .tt-typing-host {
-  color: inherit !important;
-}
-
-html.tt-motion-paused .tt-typing-overlay {
-  display: none !important;
-}
+/* Operating-system reduced-motion preference */
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -72,10 +46,48 @@ html.tt-motion-paused .tt-typing-overlay {
     transform: none !important;
     transition: none !important;
   }
+
+  .tt-evidence-panel *,
+  .tt-article-actions * {
+    transition: none !important;
+    animation: none !important;
+  }
 }
-/* Stage 66 article interactions */
-@media (prefers-reduced-motion: reduce) {
-  .tt-evidence-panel *, .tt-article-actions * { transition: none !important; animation: none !important; }
+
+/* Manual motion preference */
+
+html.tt-motion-paused {
+  scroll-behavior: auto !important;
 }
+
+html.tt-motion-paused *,
+html.tt-motion-paused *::before,
+html.tt-motion-paused *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Reveal elements must remain visible */
+
+html.tt-motion-paused [data-reveal] {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Typing effects */
+
+html.tt-motion-paused .tt-typing-host {
+  color: inherit !important;
+}
+
+html.tt-motion-paused .tt-typing-overlay {
+  display: none !important;
+}
+
+/* Article interactions */
+
 html.tt-motion-paused .tt-evidence-panel *,
-html.tt-motion-paused .tt-article-actions * { transition: none !important; animation: none !important; }
+html.tt-motion-paused .tt-article-actions * {
+  transition: none !important;
+  animation: none !important;
+}
